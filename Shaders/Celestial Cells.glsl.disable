@@ -1,0 +1,159 @@
+#version 330 core
+
+/*
+    Celestial Cells
+    Living Voronoi lace with thin-film hues.
+    Acknowledgements: nods to nimitz_Shaders (distance artistry), Ferris_Shaders (chromatic care),
+    and Xor_Shaders (minimalist stochastic play).
+*/
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0;  // Audio texture
+
+out vec4 fragColor;
+
+// ===== TWEAKABLE VARIABLES =====
+#define CELL_SCALE 3.2
+#define CAMERA_DRIFT 0.05
+#define CAMERA_ROT_SPEED1 0.23
+#define CAMERA_ROT_SPEED2 0.11
+#define WARP_STRENGTH 0.08
+#define WARP_SCALE 0.3
+#define WARP_SPEED 0.02
+
+#define ANIM_RADIUS 0.35
+#define ANIM_SPEED 0.6
+#define EDGE_SHARPNESS 6.0
+#define RIPPLE_FREQ 18.0
+#define RIPPLE_SPEED 2.5
+
+#define FILM_HUE_SPEED 0.7
+#define FILM_HUE_OFFSET 0.05
+#define CELL_CORE_SHARP 2.5
+#define RIM_SHARP 5.0
+#define RIM_POW 2.0
+
+#define BASE_BRIGHTNESS 1.15
+#define VIGNETTE_STRENGTH 0.10
+#define GLOW_STRENGTH 20.0
+
+#define AUDIO_CELL_MULT 0.8
+#define AUDIO_HUE_MULT 1.2
+#define AUDIO_RIPPLE_MULT 0.6
+#define AUDIO_SPEED_MULT 0.4
+#define AUDIO_BRIGHTNESS_MULT 0.3
+// ===============================
+
+float sat(float x){ return clamp(x,0.0,1.0); }
+
+vec2 hash22(vec2 p){
+    p = vec2(dot(p,vec2(127.1,311.7)),
+             dot(p,vec2(269.5,183.3)));
+    return fract(sin(p)*43758.5453);
+}
+
+mat2 r2(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
+
+vec3 pal(float t, vec3 a, vec3 b, vec3 c, vec3 d){
+    return a + b*cos(6.2831853*(c*t + d));
+}
+
+void main()
+{
+    vec2 R = iResolution.xy;
+    vec2 uv = (gl_FragCoord.xy - 0.5*R)/R.y;
+
+    // Get audio level from channel 0 - sample bass and treble regions
+    float bass = texture(iChannel0, vec2(0.1, 0.5)).r;
+    float treble = texture(iChannel0, vec2(0.8, 0.5)).r;
+    float audioLevel = (bass + treble) * 0.5; // Combine bass and treble
+    float audioHue = (audioLevel - 0.5) * AUDIO_HUE_MULT;
+    float audioSpeed = audioLevel * AUDIO_SPEED_MULT;
+    float audioBrightness = audioLevel * AUDIO_BRIGHTNESS_MULT;
+    
+    // Subtle camera drift with audio influence
+    float t = iTime;
+    uv *= r2(0.1*sin(t*CAMERA_ROT_SPEED1) + 0.2*cos(t*CAMERA_ROT_SPEED2) + audioLevel*0.1);
+    uv += CAMERA_DRIFT*vec2(sin(0.3*t + audioSpeed), cos(0.21*t + audioSpeed*0.7));
+    
+    // Domain warp using procedural noise with audio reactivity
+    vec2 warpPos = uv*WARP_SCALE + (WARP_SPEED + audioSpeed*0.5)*t;
+    vec2 texN = vec2(sin(warpPos.x*6.28 + warpPos.y*4.13), cos(warpPos.y*5.77 - warpPos.x*3.91)) * 0.5;
+    uv += (WARP_STRENGTH + audioLevel*AUDIO_CELL_MULT*0.1)*texN;
+    
+    // Scale with subtle audio modulation
+    vec2 p = uv*(CELL_SCALE + audioLevel*0.2);
+    
+    // Voronoi with animated feature points
+    vec2 g = floor(p);
+    vec2 f = fract(p);
+    float min1 = 1e9;
+    float min2 = 1e9;
+    vec2 id1 = vec2(0.0);
+    vec2 closest = vec2(0.0);
+    
+    for(int j=-1;j<=1;j++){
+        for(int i=-1;i<=1;i++){
+            vec2 o = vec2(i,j);
+            vec2 rnd = hash22(g + o);
+            float ph = 6.2831853*rnd.x;
+            vec2 a = ANIM_RADIUS*r2(ph)*vec2(cos((ANIM_SPEED + audioSpeed)*t + 5.0*rnd.y), 
+                                             sin((ANIM_SPEED + audioSpeed)*t + 5.0*rnd.y));
+            vec2 pos = o + rnd + a;
+            vec2 d = f - pos;
+            float dist = dot(d,d);
+            
+            // Track F1 and F2
+            float m = (dist < min1) ? 1.0 : 0.0;
+            vec2 newClosest = mix(closest, d, m);
+            float newMin1 = min(dist, min1);
+            float newMin2 = (dist < min1) ? min1 : min(min2, dist);
+            closest = newClosest;
+            min2 = newMin2;
+            min1 = newMin1;
+        }
+    }
+    
+    float F1 = sqrt(min1);
+    float F2 = sqrt(min2);
+    float edge = sat(1.0 - EDGE_SHARPNESS*abs(F2 - F1));
+    
+    // Additional micro ripples across cells with audio reactivity
+    float rip = 0.5 + 0.5*sin((RIPPLE_FREQ + audioLevel*AUDIO_RIPPLE_MULT*5.0)*F1 + 
+                              (RIPPLE_SPEED + audioSpeed)*t + 3.0*dot(closest, vec2(1.7, -2.1)));
+    
+    // Thin-film like chroma based on thickness d = F2 - F1 with audio hue shift
+    float dth = F2 - F1;
+    float hueNoise = sin(uv.x*12.34 + uv.y*8.76 + t*2.1) * 0.5 + 0.5;
+    float hue = fract(2.0*dth + 0.15*sin((FILM_HUE_SPEED + audioSpeed*0.5)*t) +
+                      FILM_HUE_OFFSET*hueNoise + audioHue);
+    
+    vec3 film = pal(hue,
+                    vec3(0.45,0.35,0.40),
+                    vec3(0.55,0.65,0.70),
+                    vec3(0.50,0.65,0.80),
+                    vec3(0.00,0.25,0.55));
+    
+    // Cell shading with audio enhancement
+    float cellCore = sat(1.0 - CELL_CORE_SHARP*F1);
+    float rim = pow(sat(1.0 - RIM_SHARP*F1), RIM_POW);
+    vec3 base = mix(vec3(0.06,0.08,0.12), vec3(0.12,0.10,0.16), 0.5 + 0.5*sin(0.3*t));
+    vec3 col = base;
+    
+    col += film * (0.45 + 0.35*rip) * (1.0 + audioBrightness);
+    col = mix(col, vec3(1.0,0.95,0.85), 0.20*cellCore*(1.0 + audioLevel*0.3));
+    col += vec3(0.8,0.6,1.0)*0.15*rim*(1.0 + audioLevel*0.5);
+    col *= 0.9 + 0.1*edge;
+    
+    // Soft global glow and vignette
+    float r = length(uv);
+    col += vec3(0.10,0.12,0.18)/(1.0 + GLOW_STRENGTH*r*r)*(1.0 + audioBrightness);
+    col *= 1.05 - VIGNETTE_STRENGTH*sat(r);
+    
+    // Safe output with audio brightness boost
+    col = tanh(col*(BASE_BRIGHTNESS + audioBrightness));
+    col = clamp(col, 0.0, 1.0);
+    
+    fragColor = vec4(col,1.0);
+}

@@ -1,0 +1,166 @@
+#version 330 core
+
+// Audio-Reactive Enhanced Fractal - Adapted for OneOffRender
+// Default zoom: 8.0, Speed: 3.0, Audio-reactive colors on channel 0
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0;  // Audio texture
+
+out vec4 fragColor;
+
+#define ZOOM 4.0
+#define SPEED 3.0
+#define AUDIO_INTENSITY 0.2  // Controls overall audio reactiveness (0.0 = none, 1.0 = full)
+
+// Base matrix for rotation - will be modified by audio
+mat2 getRotationMatrix(float audioInfluence) {
+    float baseAngle = 0.8;
+    float audioAngle = baseAngle + audioInfluence * AUDIO_INTENSITY * 0.3;
+    float c = cos(audioAngle);
+    float s = sin(audioAngle);
+    return mat2(c, s, -s, c);
+}
+
+float noise(vec2 p) {
+    return sin(p.x) * sin(p.y);
+}
+
+float fbm4(vec2 p, mat2 rotMatrix) {
+    float f = 0.0;
+    f += 0.5000 * noise(p); 
+    p = rotMatrix * p * 2.02;
+    f += 0.2500 * noise(p); 
+    p = rotMatrix * p * 2.03;
+    f += 0.1250 * noise(p); 
+    p = rotMatrix * p * 2.01;
+    f += 0.0625 * noise(p);
+    return f / 0.9375;
+}
+
+float fbm6(vec2 p, mat2 rotMatrix) {
+    float f = 0.0;
+    f += 0.500000 * (0.5 + 0.5 * noise(p)); 
+    p = rotMatrix * p * 2.02;
+    f += 0.250000 * (0.5 + 0.5 * noise(p)); 
+    p = rotMatrix * p * 2.03;
+    f += 0.125000 * (0.5 + 0.5 * noise(p)); 
+    p = rotMatrix * p * 2.01;
+    f += 0.062500 * (0.5 + 0.5 * noise(p)); 
+    p = rotMatrix * p * 2.04;
+    f += 0.031250 * (0.5 + 0.5 * noise(p)); 
+    p = rotMatrix * p * 2.01;
+    f += 0.015625 * (0.5 + 0.5 * noise(p));
+    return f / 0.96875;
+}
+
+vec2 fbm4_2(vec2 p, mat2 rotMatrix) {
+    return vec2(fbm4(p, rotMatrix), fbm4(p + vec2(7.8), rotMatrix));
+}
+
+vec2 fbm6_2(vec2 p, mat2 rotMatrix) {
+    return vec2(fbm6(p + vec2(16.8), rotMatrix), fbm6(p + vec2(11.5), rotMatrix));
+}
+
+vec3 hslToRgb(float h, float s, float l) {
+    h = fract(h / 360.0);
+    float c = (1.0 - abs(2.0 * l - 1.0)) * s;
+    float x = c * (1.0 - abs(mod(h * 6.0, 2.0) - 1.0));
+    float m = l - c / 2.0;
+    
+    vec3 rgb;
+    if (h < 1.0/6.0) rgb = vec3(c, x, 0.0);
+    else if (h < 2.0/6.0) rgb = vec3(x, c, 0.0);
+    else if (h < 3.0/6.0) rgb = vec3(0.0, c, x);
+    else if (h < 4.0/6.0) rgb = vec3(0.0, x, c);
+    else if (h < 5.0/6.0) rgb = vec3(x, 0.0, c);
+    else rgb = vec3(c, 0.0, x);
+    
+    return rgb + m;
+}
+
+vec3 fractalFunc(vec2 q, float time, float audioLow, float audioMid, float audioHigh) {
+    // Create audio-reactive rotation matrix
+    float audioRotationInfluence = sin(time * 2.0) * audioLow + cos(time * 1.5) * audioMid * 0.5;
+    mat2 rotMatrix = getRotationMatrix(audioRotationInfluence);
+    
+    // Apply zoom and add time-based animation with speed multiplier
+    q *= ZOOM;
+    float len = length(q);
+    q += 0.03 * sin(0.27 * time * SPEED + len * 4.1) * vec2(1.0, 1.1);
+    q.y += 0.03 * sin(0.23 * time * SPEED + len * 4.3);
+    
+    // Add subtle audio-reactive spatial warping
+    float warpAmount = 0.01 * AUDIO_INTENSITY;
+    q += warpAmount * audioHigh * vec2(sin(time + len), cos(time * 0.7 + len));
+    
+    vec2 o = fbm4_2(0.9 * q, rotMatrix);
+    float oLen = length(o);
+    o += 0.04 * sin(0.12 * time * SPEED + oLen) * vec2(1.0, 1.1);
+    o.y += 0.04 * sin(0.14 * time * SPEED + oLen);
+    
+    vec2 n = fbm6_2(3.0 * o, rotMatrix);
+    
+    float f = 0.5 + 0.5 * fbm4(1.8 * q + 6.0 * n, rotMatrix);
+    float finalF = f + (f*f*f*3.5 - f) * f * abs(n.x);
+    
+    // Time-based color cycling with subtle audio frequency separation
+    float colorShift = time * SPEED * 15.0;
+    float bassHue = colorShift + audioLow * 20.0 * AUDIO_INTENSITY;
+    float midHue = colorShift + audioMid * 30.0 * AUDIO_INTENSITY;
+    float trebleHue = colorShift + audioHigh * 25.0 * AUDIO_INTENSITY;
+    
+    // Create colors that respond to different frequency ranges
+    float baseHue = (bassHue + midHue + trebleHue) / 3.0 + finalF * 60.0;
+    float turbulenceHue = baseHue + 180.0 + (n.x * n.y) * 120.0;
+    
+    // Create vibrant base colors
+    vec3 color1 = hslToRgb(bassHue + finalF * 30.0, 0.7, 0.4);
+    vec3 color2 = hslToRgb(midHue + 60.0, 0.9, 0.2);
+    vec3 color3 = hslToRgb(trebleHue + turbulenceHue, 0.7, 0.6);
+    vec3 color4 = hslToRgb(baseHue + 30.0, 0.6, 0.4);
+    vec3 accent = hslToRgb(turbulenceHue + 90.0, 1.0, 0.5);
+    
+    // Enhanced mixing
+    vec3 color = mix(color1, color2, finalF);
+    
+    // Add turbulence colors
+    float turbulence = length(n);
+    color = mix(color, color3, turbulence);
+    
+    // Add pattern details
+    float pattern = 0.2 + 0.5 * o.y * o.y;
+    color = mix(color, color4, pattern);
+    
+    // Add bright accents
+    float edgeDetection = abs(n.x) + abs(n.y);
+    if (edgeDetection > 1.2) {
+        float edgeStrength = min((edgeDetection - 1.2) * 5.0, 1.0);
+        color = mix(color, accent, edgeStrength);
+    }
+    
+    // Base lighting
+    float brightness = max(finalF * 1.5, 0.1);
+    color *= brightness;
+    
+    return clamp(color, 0.0, 1.0);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Normalize coordinates
+    vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
+    
+    // Get audio data from OneOffRender audio texture format (256x1 with bass 0-63, treble 192-255)
+    float audioLow = texture(iChannel0, vec2(0.125, 0.5)).r;    // Bass region
+    float audioMid = texture(iChannel0, vec2(0.5, 0.5)).r;      // Mid region (interpolated)
+    float audioHigh = texture(iChannel0, vec2(0.875, 0.5)).r;   // Treble region
+    
+    // Apply fractal function
+    vec3 color = fractalFunc(uv, iTime, audioLow, audioMid, audioHigh);
+    
+    fragColor = vec4(color, 1.0);
+}
+
+void main() {
+    mainImage(fragColor, gl_FragCoord.xy);
+}

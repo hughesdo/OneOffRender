@@ -1,0 +1,653 @@
+{
+  "Bounce.glsl": {
+    "shadow_colour": [
+      0.0,
+      0.0,
+      0.0,
+      0.6
+    ],
+    "shadow_height": 0.075,
+    "bounces": 3.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "BowTieHorizontal.glsl": {
+    "adjust": 0.5,
+    "reverse": false,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "BowTieVertical.glsl": {
+    "adjust": 0.5,
+    "reverse": false,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "BowTieWithParameter.glsl": {
+    "adjust": 0.5,
+    "reverse": false,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "Burn.glsl": {
+    "color": [
+      0.9,
+      0.4,
+      0.2
+    ],
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "ButterflyWaveScrawler.glsl": {
+    "amplitude": 1.0,
+    "waves": 30.0,
+    "colorSeparation": 0.3,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "CannabisLeaf - Copy.glsl": {
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "CannabisLeaf - correctly flipped.glsl": {
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "CannabisLeaf - works.glsl": {
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "CannabisLeaf.glsl": {
+    "r": 0.5,
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "Circle.glsl": {
+    "center": [
+      0.5,
+      0.5
+    ],
+    "backColor": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "CircleCrop.glsl": {
+    "bgcolor": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "ratio": 1.0,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "Circleopen.glsl": {
+    "smoothness": 0.3,
+    "opening": true,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "Colorphase.glsl": {
+    "fromStep": [
+      0.0,
+      0.2,
+      0.4,
+      0.0
+    ],
+    "toStep": [
+      0.6,
+      0.8,
+      1.0,
+      1.0
+    ],
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "ColourDistance.glsl": {
+    "power": 5.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "Coord-from-in.glsl": {
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "CrazyParametricFun.glsl": {
+    "a": 4.0,
+    "b": 1.0,
+    "amplitude": 120.0,
+    "smoothness": 0.1,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "CrossZoom.glsl": {
+    "strength": 0.4,
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "Crosshatch.glsl": {
+    "center": [
+      0.5,
+      0.5
+    ],
+    "threshold": 3.0,
+    "fadeEdge": 0.1,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Crosswarp.glsl": {
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "Cube.glsl": {
+    "persp": 0.7,
+    "unzoom": 0.3,
+    "reflection": 0.4,
+    "floating": 3.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "Directional-easing.glsl": {
+    "direction": [
+      0.0,
+      1.0
+    ],
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "Directional.glsl": {
+    "direction": [
+      0.0,
+      1.0
+    ],
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "DirectionalScaled.glsl": {
+    "direction": [
+      0.0,
+      1.0
+    ],
+    "scale": 0.7,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "DirectionalWarp.glsl": {
+    "smoothness": 0.1,
+    "direction": [
+      -1.0,
+      1.0
+    ],
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "DirectionalWipe.glsl": {
+    "direction": [
+      1.0,
+      -1.0
+    ],
+    "smoothness": 0.5,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Displacement.glsl": {
+    "strength": 0.5,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "DoomScreenTransition.glsl": {
+    "bars": 30,
+    "amplitude": 2.0,
+    "noise": 0.1,
+    "frequency": 0.5,
+    "dripScale": 0.5,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Doorway.glsl": {
+    "reflection": 0.4,
+    "perspective": 0.4,
+    "depth": 3.0,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "Dreamy.glsl": {
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "EdgeTransition.glsl": {
+    "edge_thickness": 0.001,
+    "edge_brightness": 8.0,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Fade.glsl": {
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "FadeColor.glsl": {
+    "color": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "colorPhase": 0.4,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "FadeGrayscale.glsl": {
+    "intensity": 0.3,
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "FilmBurn.glsl": {
+    "Seed": 2.31,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Flyeye.glsl": {
+    "size": 0.04,
+    "zoom": 50.0,
+    "colorSeparation": 0.3,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "GlitchDisplace.glsl": {
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "GlitchMemories.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "GridFlip.glsl": {
+    "size": [
+      4,
+      4
+    ],
+    "pause": 0.1,
+    "dividerWidth": 0.05,
+    "bgcolor": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "randomness": 0.1,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "Heart.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Hexagonalize.glsl": {
+    "steps": 50,
+    "horizontalHexagons": 20.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "HorizontalClose.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "HorizontalOpen.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Kaleidoscope.glsl": {
+    "speed": 1.0,
+    "angle": 1.0,
+    "power": 1.5,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "LeftRight.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "LinearBlur.glsl": {
+    "intensity": 0.1,
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "Luma.glsl": {
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Luminance_melt.glsl": {
+    "direction": true,
+    "l_threshold": 0.8,
+    "above": false,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Morph.glsl": {
+    "strength": 0.1,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Mosaic.glsl": {
+    "endx": 2,
+    "endy": -1,
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "Mosaic_transition.glsl": {
+    "mosaicNum": 10.0,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Multiply_blend.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Overexposure.glsl": {
+    "strength": 0.6,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "PAZe.glsl": {
+    "smoothness": 0.3,
+    "opening": true,
+    "TURB_AMP": 0.9,
+    "TURB_SPEED": 1.3,
+    "TURB_FREQ": 4.0,
+    "TURB_EXP": 1.9,
+    "peakPoint": 0.1,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Perlin.glsl": {
+    "scale": 4.0,
+    "smoothness": 0.01,
+    "seed": 12.9898,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "Pinwheel.glsl": {
+    "speed": 2.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "Pixelize.glsl": {
+    "squaresMin": [
+      20,
+      20
+    ],
+    "steps": 50,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Polar_function.glsl": {
+    "segments": 5,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "PolkaDotsCurtain.glsl": {
+    "dots": 20.0,
+    "center": [
+      0.0,
+      0.0
+    ],
+    "preference": "Low",
+    "status": "Fully Working"
+  },
+  "PowerKaleido.glsl": {
+    "scale": 2.0,
+    "z": 1.5,
+    "speed": 5.0,
+    "ratio": 1.0,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Radial.glsl": {
+    "smoothness": 1.0,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "RandomNoisex.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Randomsquares.glsl": {
+    "size": [
+      10,
+      10
+    ],
+    "smoothness": 0.5,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Rectangle.glsl": {
+    "bgcolor": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "RectangleCrop.glsl": {
+    "bgcolor": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "Rolls.glsl": {
+    "type": 0,
+    "RotDown": false,
+    "ratio": 1.0,
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "RotateScaleVanish.glsl": {
+    "FadeInSecond": true,
+    "ReverseEffect": false,
+    "ReverseRotation": false,
+    "ratio": 1.0,
+    "preference": "Highly Desired",
+    "status": "Minor Adjustments"
+  },
+  "RotateTransition.glsl": {
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Rotate_scale_fade.glsl": {
+    "center": [
+      0.5,
+      0.5
+    ],
+    "rotations": 1.0,
+    "scale": 8.0,
+    "backColor": [
+      0.15,
+      0.15,
+      0.15,
+      1.0
+    ],
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Scale-in.glsl": {
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "SimpleZoom.glsl": {
+    "zoom_quickness": 0.8,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "Slides.glsl": {
+    "type": 0,
+    "In": false,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Squareswire.glsl": {
+    "squares": [
+      10,
+      10
+    ],
+    "direction": [
+      1.0,
+      -0.5
+    ],
+    "smoothness": 1.6,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Squeeze.glsl": {
+    "colorSeparation": 0.04,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "StaticFade.glsl": {
+    "n_noise_pixels": 200.0,
+    "static_luminosity": 0.8,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Static_wipe.glsl": {
+    "u_transitionUpToDown": true,
+    "u_max_static_span": 0.5,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "StereoViewer.glsl": {
+    "zoom": 0.88,
+    "corner_radius": 0.22,
+    "ratio": 1.0,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "Swap.glsl": {
+    "reflection": 0.4,
+    "perspective": 0.2,
+    "depth": 3.0,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "Swirl.glsl": {
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "TVStatic.glsl": {
+    "offset": 0.05,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "TangentMotionBlur.glsl": {
+    "ratio": 1.0,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "TopBottom.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "TrippySwirl4.glsl": {
+    "adjust": 0.5,
+    "reverse": false,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "UndulatingBurnOut.glsl": {
+    "smoothness": 0.03,
+    "center": [
+      0.5,
+      0.5
+    ],
+    "color": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "preference": "Mid",
+    "status": "Fully Working"
+  },
+  "VerticalClose.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "VerticalOpen.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "WaterDrop.glsl": {
+    "amplitude": 30.0,
+    "speed": 30.0,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  },
+  "Wind.glsl": {
+    "size": 0.2,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Windowblinds.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "Windowslice.glsl": {
+    "count": 10.0,
+    "smoothness": 0.5,
+    "preference": "Mid",
+    "status": "Minor Adjustments"
+  },
+  "WipeDown.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "WipeLeft.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "WipeRight.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "WipeUp.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "X_axis_translation.glsl": {
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "ZoomInCircles.glsl": {
+    "ratio": 1.0,
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "ZoomLeftWipe.glsl": {
+    "zoom_quickness": 0.8,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "ZoomRigthWipe.glsl": {
+    "zoom_quickness": 0.8,
+    "preference": "Low",
+    "status": "Minor Adjustments"
+  },
+  "dissolve.glsl": {
+    "preference": "Low",
+    "status": "Broken"
+  },
+  "ripple.glsl": {
+    "amplitude": 100.0,
+    "speed": 50.0,
+    "preference": "Highly Desired",
+    "status": "Fully Working"
+  }
+}

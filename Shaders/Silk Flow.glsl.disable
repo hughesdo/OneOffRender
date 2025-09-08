@@ -1,0 +1,279 @@
+#version 330 core
+
+/*
+Silk Flow LIC - Dual Layer Edition
+Influences:
+- Line Integral Convolution aesthetics (classic visualization),
+- Nimitz and BigWings (field design and motion cues),
+- IQ (palette and value noise),
+- mrange (smooth, noise-aware post look).
+Two independent layers: base colorful flow + translucent audio-reactive overlay
+*/
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform vec4 iMouse;
+uniform sampler2D iChannel0;  // Audio texture
+
+out vec4 fragColor;
+
+// ======== AUDIO INTENSITY CONTROLS ========
+const float AUDIO_SENSITIVITY = 3.0;     // Overall audio sensitivity (0.5 = subtle, 3.0 = intense)
+const float AUDIO_BRIGHTNESS = 0.9;      // Brightness of audio layer (0.0 - 1.0)
+const float AUDIO_SPARKLE_THRESHOLD = 0.6; // When sparkles appear (0.0 = always, 1.0 = never)
+const float AUDIO_FLOW_STRENGTH = 1.0;   // How much audio affects the flow pattern (0.0 - 1.0)
+
+mat2 myRot(float a){ 
+    float c = cos(a), s = sin(a); 
+    return mat2(c, -s, s, c); 
+}
+
+float myHash21(vec2 p){ 
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); 
+}
+
+float myValueNoise2D(vec2 p){
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f*f*(3.0-2.0*f);
+    float a = myHash21(i + vec2(0.0, 0.0));
+    float b = myHash21(i + vec2(1.0, 0.0));
+    float c = myHash21(i + vec2(0.0, 1.0));
+    float d = myHash21(i + vec2(1.0, 1.0));
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+// Multi-octave noise for richer texture
+float myFBM(vec2 p, float t) {
+    float val = 0.0;
+    float amp = 0.5;
+    vec2 shift = vec2(100.0);
+    mat2 rot = myRot(0.5);
+    for(int i = 0; i < 3; i++) {
+        val += amp * myValueNoise2D(p + t * 0.1);
+        p = rot * p * 2.0 + shift;
+        amp *= 0.5;
+    }
+    return val;
+}
+
+vec3 myPalette(float t){
+    // Vibrant base palette
+    vec3 a = vec3(0.55, 0.45, 0.58);
+    vec3 b = vec3(0.55, 0.48, 0.42);
+    vec3 c = vec3(1.20, 1.10, 0.95);
+    vec3 d = vec3(0.15, 0.35, 0.65);
+    return clamp(a + b*cos(6.28318*(c*t + d)), 0.0, 1.0);
+}
+
+vec3 myPalette2(float t){
+    // Secondary palette for mixing
+    vec3 a = vec3(0.68, 0.38, 0.45);
+    vec3 b = vec3(0.42, 0.55, 0.48);
+    vec3 c = vec3(0.95, 1.15, 1.25);
+    vec3 d = vec3(0.45, 0.15, 0.25);
+    return clamp(a + b*cos(6.28318*(c*t + d)), 0.0, 1.0);
+}
+
+// Base flow - unaffected by audio
+vec2 myBaseFlow(vec2 p, float t){
+    vec2 q = p;
+    q *= myRot(0.25*sin(0.2*t));
+    
+    float s1 = sin(q.x*2.1 + 0.7*t) + 0.5*sin(q.y*1.3 - 0.4*t);
+    float s2 = cos(q.y*2.3 - 0.5*t) - 0.5*cos(q.x*1.7 + 0.3*t);
+    
+    // Add higher frequency components
+    s1 += 0.3*sin(q.x*4.5 - t*0.8);
+    s2 += 0.3*cos(q.y*3.8 + t*0.6);
+    
+    vec2 v = vec2(s1, s2);
+    
+    float r2 = dot(q, q);
+    vec2 swirl = 0.7*vec2(-q.y, q.x) / (1.0 + 1.5*r2);
+    
+    // Add turbulence
+    vec2 turb = 0.2 * vec2(
+        myValueNoise2D(q*3.0 + t*0.3) - 0.5,
+        myValueNoise2D(q*3.0 + vec2(100.0) + t*0.3) - 0.5
+    );
+    
+    v += swirl + turb;
+    return normalize(v);
+}
+
+// Audio-reactive flow - separate system
+vec2 myAudioFlow(vec2 p, float t, float audioMod){
+    vec2 q = p;
+    
+    // Different rotation pattern influenced by audio
+    q *= myRot(0.4*sin(0.15*t) + 0.3*audioMod);
+    
+    // Different frequency patterns for variety
+    float s1 = sin(q.x*3.2 + 0.5*t) * (1.0 + audioMod);
+    float s2 = cos(q.y*2.8 - 0.6*t) * (1.0 + audioMod);
+    
+    vec2 v = vec2(s1, s2);
+    
+    // Audio-modulated swirl
+    float r2 = dot(q, q);
+    vec2 swirl = (0.5 + 0.5*audioMod)*vec2(-q.y, q.x) / (1.0 + r2);
+    
+    v += swirl;
+    return normalize(v);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = (fragCoord - 0.5*iResolution.xy)/iResolution.y;
+    
+    // Audio sampling - multiple frequency bands
+    float bass = texture(iChannel0, vec2(0.02, 0.25)).x;
+    float subBass = texture(iChannel0, vec2(0.01, 0.25)).x;
+    float midLow = texture(iChannel0, vec2(0.05, 0.25)).x;
+    float mid = texture(iChannel0, vec2(0.1, 0.25)).x;
+    float highMid = texture(iChannel0, vec2(0.2, 0.25)).x;
+    float high = texture(iChannel0, vec2(0.4, 0.25)).x;
+    
+    // Audio modulation values
+    float audioMod = (0.4 * bass + 0.3 * midLow + 0.2 * mid + 0.1 * highMid) * AUDIO_SENSITIVITY * AUDIO_FLOW_STRENGTH;
+    float audioIntensity = (0.5 * bass + 0.3 * mid + 0.2 * high) * AUDIO_SENSITIVITY;
+    
+    // Time continues normally for base layer
+    float time = iTime;
+
+    // Mouse interaction
+    vec2 pan = (iMouse.z > 0.0) ? (iMouse.xy/iResolution.xy - 0.5) * 1.2 : vec2(0.0);
+    vec2 p0 = uv*1.6 + pan;
+    
+    // Add gentle autonomous drift
+    p0 += 0.1 * vec2(sin(time*0.1), cos(time*0.13));
+
+    // ============= BASE LAYER (Colorful, continuous) =============
+    const int STEPS = 24;
+    float h = 0.018;
+    float baseAcc = 0.0;
+    float baseAcc2 = 0.0;
+    float baseWsum = 0.0;
+
+    // LIC for base colorful flow
+    for(int i=0; i<STEPS; i++){
+        float fi = float(i)+1.0;
+        float w = exp(-fi*0.15);
+        
+        // Use base flow (no audio influence)
+        vec2 dir = myBaseFlow(p0, time);
+        vec2 posF = p0 + dir * (fi*h);
+        vec2 posB = p0 - dir * (fi*h);
+        
+        float nF = myFBM(posF*6.0 + time*0.1, time);
+        float nF2 = myValueNoise2D(posF*8.0 - time*0.15);
+        float nB = myFBM(posB*6.0 - time*0.1, time);
+        float nB2 = myValueNoise2D(posB*8.0 + time*0.15);
+        
+        baseAcc += (nF + nB)*w;
+        baseAcc2 += (nF2 + nB2)*w;
+        baseWsum += 2.0*w;
+    }
+
+    float baseIntensity = (baseWsum > 0.0) ? baseAcc/baseWsum : 0.0;
+    float baseIntensity2 = (baseWsum > 0.0) ? baseAcc2/baseWsum : 0.0;
+    baseIntensity = clamp(baseIntensity, 0.0, 1.0);
+    baseIntensity2 = clamp(baseIntensity2, 0.0, 1.0);
+
+    // Base layer field analysis
+    vec2 d = vec2(0.01, -0.01);
+    vec2 v1 = myBaseFlow(p0 + d.xy, time);
+    vec2 v2 = myBaseFlow(p0 + d.yx, time);
+    float baseCurl = abs(v1.x - v2.y);
+    float baseGlow = smoothstep(0.2, 0.8, baseCurl) * 0.4;
+
+    // Base layer colors (continuous animation)
+    float baseHue1 = 0.45 + 0.35*(baseIntensity-0.5) + 0.15*sin(length(p0)*1.5 - 0.3*time);
+    float baseHue2 = baseHue1 + 0.2 + 0.1*sin(time*0.2);
+    
+    vec3 col1 = myPalette(baseHue1);
+    vec3 col2 = myPalette2(baseHue2);
+    
+    float mixFactor = 0.5 + 0.3*sin(time*0.15);
+    vec3 baseColor = mix(col1, col2, mixFactor);
+    baseColor *= (0.5 + 0.7*baseIntensity);
+    baseColor += baseGlow * myPalette(baseHue1*0.7);
+    
+    // Add shimmer to base
+    vec2 baseFlowDir = myBaseFlow(p0, time);
+    float shimmer = 0.5 + 0.5*dot(baseFlowDir, normalize(p0));
+    baseColor += 0.1 * shimmer * mix(vec3(0.5, 0.7, 1.0), vec3(1.0, 0.5, 0.7), sin(time*0.3));
+
+    // ============= AUDIO LAYER (Translucent overlay) =============
+    // More sample points for denser audio visualization
+    const int AUDIO_STEPS = 32;
+    float ah = 0.012;
+    float audioAcc = 0.0;
+    float audioWsum = 0.0;
+
+    // LIC for audio-reactive flow
+    for(int i=0; i<AUDIO_STEPS; i++){
+        float fi = float(i)+1.0;
+        float w = exp(-fi*0.12);
+        
+        // Use audio flow
+        vec2 dir = myAudioFlow(p0, time, audioMod);
+        vec2 posF = p0 + dir * (fi*ah);
+        vec2 posB = p0 - dir * (fi*ah);
+        
+        // Higher frequency noise for more detail
+        float nF = myValueNoise2D(posF*12.0 + time*0.2);
+        float nB = myValueNoise2D(posB*12.0 - time*0.2);
+        
+        audioAcc += (nF + nB)*w;
+        audioWsum += 2.0*w;
+    }
+
+    float audioLayerIntensity = (audioWsum > 0.0) ? audioAcc/audioWsum : 0.0;
+    audioLayerIntensity = clamp(audioLayerIntensity, 0.0, 1.0);
+
+    // Audio layer color - bright, translucent overlay
+    vec3 audioColor = vec3(0.0);
+    if(audioIntensity > 0.05) {
+        // Create sparkling points based on audio
+        float sparkle = smoothstep(AUDIO_SPARKLE_THRESHOLD, 0.9, audioLayerIntensity) * audioIntensity;
+        
+        // Audio responsive color
+        vec3 audioTint = mix(
+            vec3(0.7, 0.9, 1.0),  // Cyan-white
+            vec3(1.0, 0.7, 0.9),  // Pink-white
+            0.5 + 0.5*sin(time*0.4 + audioMod*2.0)
+        );
+        
+        audioColor = audioTint * sparkle * AUDIO_BRIGHTNESS;
+        
+        // Add extra bright points
+        float brightPoints = smoothstep(0.85, 0.95, audioLayerIntensity) * audioIntensity;
+        audioColor += vec3(1.0, 0.95, 0.9) * brightPoints * AUDIO_BRIGHTNESS * 0.7;
+    }
+
+    // ============= COMBINE LAYERS =============
+    // Base layer stays constant, audio layer adds on top
+    vec3 finalColor = baseColor + audioColor;
+
+    // Vignette
+    float r = length(uv);
+    float vign = smoothstep(1.4, 0.1, r);
+    finalColor *= vign;
+    
+    // Edge glow
+    float edgeGlow = 1.0 - vign;
+    finalColor += 0.05 * edgeGlow * mix(vec3(0.3, 0.5, 0.8), vec3(0.8, 0.3, 0.5), sin(time*0.25));
+    
+    // Subtle contrast enhancement
+    finalColor = mix(finalColor, smoothstep(vec3(0.0), vec3(1.0), finalColor), 0.15);
+    
+    // Final color grading
+    finalColor = pow(finalColor, vec3(0.95));
+    
+    fragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);
+}
+
+void main() {
+    mainImage(fragColor, gl_FragCoord.xy);
+}

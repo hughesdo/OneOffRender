@@ -1,0 +1,251 @@
+#version 330 core
+
+// PhiFlow Aurea Spiral - Audio Reactive Enhanced
+// Golden ratio spiral with rich audio reactivity and multiple palettes
+// Converted for OneOffRender system
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0;
+
+out vec4 fragColor;
+
+// ========== TWEAKABLE VARIABLES ==========
+// Main Parameters
+const int BASE_PARTICLE_COUNT = 600;
+const int MAX_EXTRA_PARTICLES = 400;
+const float PALETTE_SWITCH_SPEED = 0.08;
+const float BASE_ZOOM = 0.85;
+const float BASE_ROTATION_SPEED = 0.1;
+
+// Audio Responsiveness
+const float BASS_ZOOM_AMOUNT = 0.3;
+const float MID_ROTATION_AMOUNT = 0.2;
+const float TREBLE_SCALE_AMOUNT = 0.5;
+const float BASS_SWIRL_AMOUNT = 0.8;
+const float OVERALL_PARTICLE_BOOST = 1.0;
+
+// Turbulence Parameters
+const float TURBULENCE_STRENGTH = 0.15;
+const float TURBULENCE_FREQUENCY = 8.0;
+const float TURBULENCE_AUDIO_BOOST = 2.0;
+const float TURBULENCE_RADIUS = 0.4; // Only affect particles within this radius
+
+// Visual Effects
+const float GLOW_BASE = 0.06;
+const float GLOW_BASS_BOOST = 0.04;
+const float SATURATION_BOOST = 0.5;
+const float PULSE_FREQUENCY = 15.0;
+const float VIGNETTE_STRENGTH = 1.2;
+// ==========================================
+
+// Golden constants
+const float PI  = 3.14159265358979323846;
+const float TAU = 6.28318530717958647692;
+const float PHI = 1.61803398874989484820;
+const float GOLDEN_ANGLE = TAU * (1.0 - 1.0 / PHI); // ~2.39996
+
+// Utility
+float hash11(float x) {
+    return fract(sin(x * 127.1) * 43758.5453123);
+}
+
+// Turbulence function for mid-frequency distortion
+vec2 turbulence(vec2 p, float intensity) {
+    float noise1 = sin(p.x * TURBULENCE_FREQUENCY + iTime * 2.0) * cos(p.y * TURBULENCE_FREQUENCY * 1.3 + iTime * 1.7);
+    float noise2 = cos(p.x * TURBULENCE_FREQUENCY * 0.7 + iTime * 1.5) * sin(p.y * TURBULENCE_FREQUENCY * 1.1 + iTime * 2.2);
+    return vec2(noise1, noise2) * intensity;
+}
+
+// Enhanced palette system with 10 different themes
+vec3 palette(float t, int paletteId) {
+    vec3 a, b, c, d;
+    
+    if (paletteId == 0) {
+        // Sunset Dreams
+        a = vec3(0.8, 0.5, 0.4);
+        b = vec3(0.2, 0.4, 0.2);
+        c = vec3(1.0, 1.0, 1.0);
+        d = vec3(0.0, 0.33, 0.67);
+    } else if (paletteId == 1) {
+        // Ocean Depths
+        a = vec3(0.2, 0.5, 0.8);
+        b = vec3(0.3, 0.3, 0.5);
+        c = vec3(1.0, 1.0, 0.5);
+        d = vec3(0.8, 0.9, 0.3);
+    } else if (paletteId == 2) {
+        // Forest Whispers
+        a = vec3(0.5, 0.8, 0.2);
+        b = vec3(0.4, 0.3, 0.6);
+        c = vec3(0.8, 1.0, 0.7);
+        d = vec3(0.2, 0.5, 0.1);
+    } else if (paletteId == 3) {
+        // Neon Nights
+        a = vec3(0.9, 0.2, 0.9);
+        b = vec3(0.3, 0.8, 0.1);
+        c = vec3(1.5, 1.0, 1.5);
+        d = vec3(0.0, 0.5, 0.2);
+    } else if (paletteId == 4) {
+        // Fire Dance
+        a = vec3(1.0, 0.5, 0.1);
+        b = vec3(0.5, 0.5, 0.0);
+        c = vec3(1.0, 1.0, 0.5);
+        d = vec3(0.8, 0.0, 0.2);
+    } else if (paletteId == 5) {
+        // Arctic Aurora
+        a = vec3(0.3, 0.8, 0.9);
+        b = vec3(0.6, 0.2, 0.8);
+        c = vec3(1.0, 0.8, 1.2);
+        d = vec3(0.1, 0.7, 0.4);
+    } else if (paletteId == 6) {
+        // Purple Haze
+        a = vec3(0.7, 0.3, 0.9);
+        b = vec3(0.5, 0.6, 0.3);
+        c = vec3(0.8, 1.2, 0.9);
+        d = vec3(0.3, 0.2, 0.8);
+    } else if (paletteId == 7) {
+        // Golden Hour
+        a = vec3(0.9, 0.7, 0.3);
+        b = vec3(0.3, 0.5, 0.7);
+        c = vec3(1.2, 0.8, 0.6);
+        d = vec3(0.0, 0.2, 0.5);
+    } else if (paletteId == 8) {
+        // Deep Space
+        a = vec3(0.1, 0.2, 0.5);
+        b = vec3(0.9, 0.5, 0.8);
+        c = vec3(0.5, 1.0, 1.5);
+        d = vec3(0.2, 0.0, 0.8);
+    } else {
+        // Rainbow Spectrum
+        a = vec3(0.5, 0.5, 0.5);
+        b = vec3(0.5, 0.5, 0.5);
+        c = vec3(1.0, 1.0, 1.0);
+        d = vec3(0.0, 0.33, 0.67);
+    }
+    
+    return a + b * cos(TAU * (c * t + d));
+}
+
+// Smooth circle mask
+float softCircle(vec2 p, float r, float blur) {
+    float d = length(p) - r;
+    return smoothstep(blur, -blur, d);
+}
+
+void main() {
+    // Screen coordinates to UV with Y-flip for correct orientation
+    vec2 fragCoord = vec2(gl_FragCoord.x, iResolution.y - gl_FragCoord.y);
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    float t = iTime;
+
+    // Sample audio from Channel0
+    float bass = texture(iChannel0, vec2(0.02, 0.0)).x;      // Low frequencies
+    float mid = texture(iChannel0, vec2(0.1, 0.0)).x;       // Mid frequencies
+    float treble = texture(iChannel0, vec2(0.3, 0.0)).x;    // High frequencies
+    float overall = texture(iChannel0, vec2(0.0, 0.0)).x;   // Overall amplitude
+
+    // Audio-reactive palette switching
+    float paletteSpeed = PALETTE_SWITCH_SPEED + overall * 0.05; // Faster switching with loud audio
+    int paletteId = int(mod(t * paletteSpeed, 10.0)); // Cycle through 10 palettes
+
+    // Audio-reactive camera motion
+    float audioZoom = BASE_ZOOM + 0.15 * sin(t * 0.25) + bass * BASS_ZOOM_AMOUNT;
+    uv *= audioZoom;
+
+    // Audio-reactive rotation with bass response
+    float rotSpeed = BASE_ROTATION_SPEED + mid * MID_ROTATION_AMOUNT;
+    float angle = rotSpeed * t;
+    float c = cos(angle);
+    float s = sin(angle);
+    mat2 rotMat = mat2(c, -s, s, c);
+    uv = rotMat * uv;
+
+    // Audio-reactive phyllotaxis parameters
+    int N = BASE_PARTICLE_COUNT + int(overall * float(MAX_EXTRA_PARTICLES) * OVERALL_PARTICLE_BOOST); // More points with louder audio
+
+    // Audio-reactive scaling and movement - increased scale for visibility
+    float audioScale = 0.2 * (1.0 + 0.3 * sin(t * 0.2) + treble * TREBLE_SCALE_AMOUNT);
+    float audioSwirl = 0.25 + 0.25 * sin(t * 0.1) + bass * BASS_SWIRL_AMOUNT;
+    float audioK = 1.0 + 0.2 * sin(t * 0.17) + mid * 0.4;
+
+    vec3 col = vec3(0.0);
+    float acc = 0.0;
+
+    // Audio-reactive background pulse
+    vec3 bgPulse = palette(t * 0.1, paletteId) * bass * 0.1;
+    col += bgPulse;
+
+    // Add a base color to ensure we see something
+    col += palette(t * 0.1, paletteId) * 0.1;
+    
+    // Accumulate discs with audio reactivity
+    for (int i = 0; i < 1000; i++) {
+        if (i >= N) break;
+        
+        float fi = float(i);
+        
+        // Audio-reactive angle and radius
+        float ang = fi * GOLDEN_ANGLE + audioSwirl * t + treble * fi * 0.001;
+        float r = audioScale * sqrt(fi) * (1.0 + 0.15 * sin(fi * 0.07 + t * 0.6) + overall * 0.3);
+        
+        vec2 p = r * vec2(cos(ang), sin(ang));
+        
+        // Apply turbulence to particles within a certain radius (mid-frequency reactive)
+        float distanceFromCenter = length(p);
+        if (distanceFromCenter < TURBULENCE_RADIUS) {
+            float turbulenceAmount = TURBULENCE_STRENGTH * mid * TURBULENCE_AUDIO_BOOST;
+            // Fade turbulence based on distance from center
+            float turbulenceFade = 1.0 - (distanceFromCenter / TURBULENCE_RADIUS);
+            turbulenceAmount *= turbulenceFade;
+            
+            p += turbulence(p + vec2(fi * 0.01), turbulenceAmount);
+        }
+        
+        // Audio-reactive disc size and blur - increased size for visibility
+        float baseRad = 0.03 + 0.02 * sin(fi * 0.21 + t);
+        float audioRad = baseRad * (1.0 + bass * 0.5 + sin(fi * 0.1 + t) * mid * 0.3);
+        float audioBlur = 0.01 * (1.0 + treble * 2.0);
+        
+        float mask = softCircle(uv - p, audioRad, audioBlur);
+        
+        // Audio-reactive hue shifting
+        float baseHue = fract(fi * 0.021 + 0.1 * sin(t * 0.37));
+        float audioHue = baseHue + overall * 0.5 + bass * sin(fi * 0.05) * 0.2;
+        
+        // Get color from current palette with audio modulation
+        vec3 c = palette(audioHue + 0.2 * sin(dot(p, p) * 2.0 + t) + mid * 0.3, paletteId);
+        
+        // Audio-reactive intensity - much brighter
+        float intensity = 2.0 + treble * 0.8 + sin(fi * 0.03 + t) * bass * 0.4;
+        c *= intensity;
+
+        col += c * mask * 0.5; // Add particles with good visibility
+        acc += mask;
+    }
+    
+    // Audio-reactive normalization and bloom - less aggressive normalization
+    if (acc > 0.1) {
+        col /= max(acc * 0.5, 1e-3); // Less aggressive normalization
+    }
+    col = pow(col, vec3(0.8 - overall * 0.1)); // Brighter with loud audio
+    
+    // Audio-reactive glow
+    float glowIntensity = GLOW_BASE + bass * GLOW_BASS_BOOST + treble * 0.02;
+    col += glowIntensity * vec3(acc) * palette(t * 0.2, paletteId);
+    
+    // Audio-reactive vignette
+    float vigStrength = VIGNETTE_STRENGTH - overall * 0.3; // Less vignette with loud audio
+    float vig = smoothstep(vigStrength, 0.3, length(uv));
+    col *= vig;
+    
+    // Audio-reactive color saturation
+    float saturation = 1.0 + overall * SATURATION_BOOST + mid * 0.3;
+    vec3 gray = vec3(dot(col, vec3(0.299, 0.587, 0.114)));
+    col = mix(gray, col, saturation);
+    
+    // Audio-reactive final brightness pulse
+    float finalPulse = 1.0 + sin(t * PULSE_FREQUENCY) * bass * 0.1;
+    col *= finalPulse;
+    
+    fragColor = vec4(col, 1.0);
+}

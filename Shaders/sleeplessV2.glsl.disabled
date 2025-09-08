@@ -1,0 +1,104 @@
+#version 330 core
+// The original: sleepless
+// Created by diatribes on 2025-08-17
+// https://www.shadertoy.com/view/WclcRN
+// Audio reactive modifications by @OneHung
+// Fixed for OpenGL compatibility
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0;  // Audio texture
+out vec4 fragColor;
+
+// Audio reactive modifications:
+// TWEAK THESE VALUES:
+#define BASS_SAMPLE_POS 0.05    // Lower = deeper bass (0.01-0.1)
+#define BASS_MULTIPLIER 4.0     // How much brighter on bass hits (2.0-8.0)
+#define COLOR_SHIFT_AMOUNT 8.0  // How much color changes on bass (4.0-12.0)
+#define BASS_THRESHOLD 0.1      // Minimum bass level to trigger (0.05-0.3)
+#define ORB_BRIGHTNESS 0.5      // Base orb brightness (0.5-3.0)
+
+// woke up and couldn't get back to sleep :/
+void mainImage(out vec4 o, vec2 u) {
+    float d = 0.0;
+    float a = 0.0;
+    float e = 0.0;
+    float i = 0.0;
+    float s = 0.0;
+    float t = iTime;
+    vec3  p = vec3(iResolution.xy, iResolution.y);  // More explicit initialization
+    
+    // Get bass frequency from audio channel
+    float bass = texture(iChannel0, vec2(BASS_SAMPLE_POS, 0.25)).x;
+    bass = max(0.0, bass - BASS_THRESHOLD); // Remove noise floor
+    float bassBoost = ORB_BRIGHTNESS * (1.0 + bass * BASS_MULTIPLIER); // Brightness multiplier
+    
+    // scale coords
+    u = (u + u - p.xy) / p.y;
+    
+    // cinema bars
+    if (abs(u.y) > 0.8) { 
+        o = vec4(0.0, 0.0, 0.0, 1.0); 
+        return; 
+    }
+    
+    // camera movement
+    u += vec2(cos(t * 0.4) * 0.3, cos(t * 0.8) * 0.1);
+    
+    // Initialize o properly before use
+    o = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    for(int iter = 0; iter < 128; iter++) {
+        i += 1.0;
+        // accumulate distance
+        d += s = min(0.01 + 0.4 * abs(s), e = max(0.8 * e, 0.01));
+        
+        // purple, blue color with audio reactive color shift
+        vec4 colorShift = vec4(3.0, 1.0, 0.0, 0.0);
+        vec4 colorMod = (1.0 + cos(0.1 * p.z * colorShift + bass * COLOR_SHIFT_AMOUNT));
+        
+        // Protect against division by very small numbers
+        float divisor = max(s + e * 2.0, 0.001);
+        o += colorMod * bassBoost / divisor;
+        
+        // noise loop start, march
+        p = vec3(u * d, d + t); // p = ro + rd * d, p.z + t;
+        
+        // entity (orb)
+        e = length(p - vec3(
+            sin(sin(t * 0.2) + t * 0.4) * 2.0,
+            1.0 + sin(sin(t * 0.5) + t * 0.2) * 2.0,
+            12.0 + t + cos(t * 0.3) * 8.0)) - 0.1;
+        
+        // spin by t, twist by p.z - FIXED: use float constants
+        vec4 angleVec = vec4(0.0, 33.0, 11.0, 0.0);  // Fixed: 33 -> 33.0
+        float angle = 0.1 * t + p.z / 16.0;
+        p.xy *= mat2(cos(angle + angleVec));
+        
+        // mirrored planes 4 units apart
+        s = 4.0 - abs(p.y);
+        
+        // noise starts at .42 up to 16., grow by a+=a
+        for(a = 0.42; a < 16.0; a += a) {
+            // apply turbulence
+            p += cos(0.4 * t + p.yzx) * 0.3;
+            // apply noise with safer division
+            float noiseDiv = max(a, 0.001);
+            s -= abs(dot(sin(0.1 * t + p * a), 0.18 + p - p)) / noiseDiv;
+        }
+    }
+    
+    // tanh tonemap, brightness, light off-screen
+    u += (u.yx * 0.9 + 0.3 - vec2(-1.0, 0.5));
+    
+    // Safer division with minimum value to prevent division by very small numbers
+    float intensity = max(dot(u, u), 0.001);
+    o = tanh(o / 6.0 / intensity);
+    
+    // Ensure alpha is 1.0 for proper blending
+    o.a = 1.0;
+}
+
+void main() {
+    mainImage(fragColor, gl_FragCoord.xy);
+}

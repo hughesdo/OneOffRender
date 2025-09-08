@@ -1,0 +1,60 @@
+{
+  "output": {
+    "video_file": "Output_Video/multi_shader_render.mp4",
+    "directory": "Output_Video",
+    "resolution": {
+      "width": 2560,
+      "height": 1440
+    },
+    "frame_rate": 30
+  },
+  "duration_override": {
+    "enabled": false,
+    "cutoff_time": "01:30"
+  },
+  "rendering": {
+    "streaming": true,
+    "quality": {
+      "crf": 18,
+      "preset": "medium"
+    },
+    "audio": {
+      "codec": "aac",
+      "bitrate": "192k"
+    }
+  },
+  "shader_settings": {
+    "multi_shader": true,
+    "switch_interval": 10.0,
+    "transitions": {
+      "enabled": true,
+      "duration": 1.6,
+      "folder": "Transitions",
+      "config_file": "Transitions/Transitions_Metadata.json",
+      "randomization": {
+        "algorithm": "weighted",
+        "history_size": 2,
+        "distribution_weight": 1.5
+      }
+    },
+    "randomization": {
+      "algorithm": "weighted",
+      "history_size": 3,
+      "distribution_weight": 2.0
+    },
+    "audio_reactivity": {
+      "bass_sensitivity": 1.0,
+      "treble_sensitivity": 1.0,
+      "smoothing": 0.15
+    }
+  },
+  "batch_settings": {
+    "enabled": true,
+    "overwrite_existing": false
+  },
+  "debug": {
+    "save_frames": false,
+    "verbose_logging": true,
+    "show_progress": true
+  }
+}

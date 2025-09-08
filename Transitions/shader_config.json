@@ -1,0 +1,466 @@
+{
+    "Bounce.glsl": {
+        "shadow_colour": [0.0, 0.0, 0.0, 0.6],
+        "shadow_height": 0.075,
+        "bounces": 3.0,
+        "resolution": [1280, 720]
+    },
+    "Angular.glsl": {
+        "resolution": [1280, 720]
+    },
+    "BowTieHorizontal.glsl": {
+        "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+    "BowTieWithParameter.glsl": {
+        "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+	"TrippySwirl1.glsl": {
+        "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+	"TrippySwirl2.glsl": {
+	    "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+	"TrippySwirl3.glsl": {
+	    "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+	"TrippySwirl4.glsl": {
+	    "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+    "BowTieVertical.glsl": {
+        "adjust": 0.5,
+        "reverse": false,
+        "resolution": [1280, 720]
+    },
+    "Burn.glsl": {
+        "color": [0.9, 0.4, 0.2],
+        "resolution": [1280, 720]
+    },
+    "ButterflyWaveScrawler.glsl": {
+        "amplitude": 1.0,
+        "waves": 30.0,
+        "colorSeparation": 0.3,
+        "resolution": [1280, 720]
+    },
+    "CannabisLeaf.glsl": {
+        "r": 0.5,
+        "resolution": [1280, 720]
+    },
+    "Circle.glsl": {
+        "center": [0.5, 0.5],
+        "backColor": [0.1, 0.1, 0.1],
+        "resolution": [1280, 720]
+    },
+    "CircleCrop.glsl": {
+        "bgcolor": [0.0, 0.0, 0.0, 1.0],
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "ColourDistance.glsl": {
+        "power": 5.0,
+        "resolution": [1280, 720]
+    },
+    "Colorphase.glsl": {
+        "fromStep": [0.0, 0.2, 0.4, 0.0],
+        "toStep": [0.6, 0.8, 1.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "Coord-from-in.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Circleopen.glsl": {
+        "smoothness": 0.3,
+        "opening": true,
+        "resolution": [1280, 720]
+    },
+    "DirectionalScaled.glsl": {
+        "direction": [0.0, 1.0],
+        "scale": 0.7,
+        "resolution": [1280, 720]
+    },
+    "DirectionalWarp.glsl": {
+        "smoothness": 0.1,
+        "direction": [-1.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "CrazyParametricFun.glsl": {
+        "a": 4.0,
+        "b": 1.0,
+        "amplitude": 120.0,
+        "smoothness": 0.1,
+        "resolution": [1280, 720]
+    },
+    "DirectionalWipe.glsl": {
+        "direction": [1.0, -1.0],
+        "smoothness": 0.5,
+        "resolution": [1280, 720]
+    },
+    "Crosshatch.glsl": {
+        "center": [0.5, 0.5],
+        "threshold": 3.0,
+        "fadeEdge": 0.1,
+        "resolution": [1280, 720]
+    },
+    "Crosswarp.glsl": {
+        "resolution": [1280, 720]
+    },
+    "CrossZoom.glsl": {
+        "strength": 0.4,
+        "resolution": [1280, 720]
+    },
+    "Cube.glsl": {
+        "persp": 0.7,
+        "unzoom": 0.3,
+        "reflection": 0.4,
+        "floating": 3.0,
+        "resolution": [1280, 720]
+    },
+    "Directional.glsl": {
+        "direction": [0.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "Directional-easing.glsl": {
+        "direction": [0.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "Fade.glsl": {
+        "resolution": [1280, 720]
+    },
+    "FadeGrayscale.glsl": {
+        "intensity": 0.3,
+        "resolution": [1280, 720]
+    },
+    "Displacement.glsl": {
+        "strength": 0.5,
+        "resolution": [1280, 720]
+    },
+    "FadeColor.glsl": {
+        "color": [0.0, 0.0, 0.0],
+        "colorPhase": 0.4,
+        "resolution": [1280, 720]
+    },
+    "Doorway.glsl": {
+        "reflection": 0.4,
+        "perspective": 0.4,
+        "depth": 3.0,
+        "resolution": [1280, 720]
+    },
+    "DreamyZoom.glsl": {
+        "rotation": 6.0,
+        "scale": 1.2,
+        "resolution": [1280, 720]
+    },
+    "DoomScreenTransition.glsl": {
+        "bars": 30,
+        "amplitude": 2.0,
+        "noise": 0.1,
+        "frequency": 0.5,
+        "dripScale": 0.5,
+        "resolution": [1280, 720]
+    },
+    "EdgeTransition.glsl": {
+        "edge_thickness": 0.001,
+        "edge_brightness": 8.0,
+        "resolution": [1280, 720]
+    },
+    "FilmBurn.glsl": {
+        "Seed": 2.31,
+        "resolution": [1280, 720]
+    },
+    "Dreamy.glsl": {
+        "resolution": [1280, 720]
+    },
+    "HorizontalOpen.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Flyeye.glsl": {
+        "size": 0.04,
+        "zoom": 50.0,
+        "colorSeparation": 0.3,
+        "resolution": [1280, 720]
+    },
+    "Kaleidoscope.glsl": {
+        "speed": 1.0,
+        "angle": 1.0,
+        "power": 1.5,
+        "resolution": [1280, 720]
+    },
+    "HorizontalClose.glsl": {
+        "resolution": [1280, 720]
+    },
+    "InvertedPageCurl.glsl": {
+        "resolution": [1280, 720]
+    },
+    "GlitchMemories.glsl": {
+        "resolution": [1280, 720]
+    },
+    "GlitchDisplace.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Hexagonalize.glsl": {
+        "steps": 50,
+        "horizontalHexagons": 20.0,
+        "resolution": [1280, 720]
+    },
+    "GridFlip.glsl": {
+        "size": [4, 4],
+        "pause": 0.1,
+        "dividerWidth": 0.05,
+        "bgcolor": [0.0, 0.0, 0.0, 1.0],
+        "randomness": 0.1,
+        "resolution": [1280, 720]
+    },
+    "Heart.glsl": {
+        "resolution": [1280, 720]
+    },
+    "LeftRight.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Luminance_melt.glsl": {
+        "direction": true,
+        "l_threshold": 0.8,
+        "above": false,
+        "resolution": [1280, 720]
+    },
+    "Overexposure.glsl": {
+        "strength": 0.6,
+        "resolution": [1280, 720]
+    },
+    "Mosaic_transition.glsl": {
+        "mosaicNum": 10.0,
+        "resolution": [1280, 720]
+    },
+    "Mosaic.glsl": {
+        "endx": 2,
+        "endy": -1,
+        "resolution": [1280, 720]
+    },
+    "LinearBlur.glsl": {
+        "intensity": 0.1,
+        "resolution": [1280, 720]
+    },
+    "Multiply_blend.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Morph.glsl": {
+        "strength": 0.1,
+        "resolution": [1280, 720]
+    },
+    "Perlin.glsl": {
+        "scale": 4.0,
+        "smoothness": 0.01,
+        "seed": 12.9898,
+        "resolution": [1280, 720]
+    },
+    "Luma.glsl": {
+        "resolution": [1280, 720]
+    },
+    "RandomNoisex.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Radial.glsl": {
+        "smoothness": 1.0,
+        "resolution": [1280, 720]
+    },
+    "Randomsquares.glsl": {
+        "size": [10, 10],
+        "smoothness": 0.5,
+        "resolution": [1280, 720]
+    },
+    "Rectangle.glsl": {
+        "bgcolor": [0.0, 0.0, 0.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "Pinwheel.glsl": {
+        "speed": 2.0,
+        "resolution": [1280, 720]
+    },
+    "Pixelize.glsl": {
+        "squaresMin": [20, 20],
+        "steps": 50,
+        "resolution": [1280, 720]
+    },
+    "Polar_function.glsl": {
+        "segments": 5,
+        "resolution": [1280, 720]
+    },
+    "PolkaDotsCurtain.glsl": {
+        "dots": 20.0,
+        "center": [0.0, 0.0],
+        "resolution": [1280, 720]
+    },
+    "RectangleCrop.glsl": {
+        "bgcolor": [0.0, 0.0, 0.0, 1.0],
+        "resolution": [1280, 720]
+    },
+    "PowerKaleido.glsl": {
+        "scale": 2.0,
+        "z": 1.5,
+        "speed": 5.0,
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "Scale-in.glsl": {
+        "resolution": [1280, 720]
+    },
+    "SimpleZoom.glsl": {
+        "zoom_quickness": 0.8,
+        "resolution": [1280, 720]
+    },
+    "RotateTransition.glsl": {
+        "resolution": [1280, 720]
+    },
+    "RotateScaleVanish.glsl": {
+        "FadeInSecond": true,
+        "ReverseEffect": false,
+        "ReverseRotation": false,
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "Squareswire.glsl": {
+        "squares": [10, 10],
+        "direction": [1.0, -0.5],
+        "smoothness": 1.6,
+        "resolution": [1280, 720]
+    },
+    "Slides.glsl": {
+        "type": 0,
+        "In": false,
+        "resolution": [1280, 720]
+    },
+    "ripple.glsl": {
+        "amplitude": 100.0,
+        "speed": 50.0,
+        "resolution": [1280, 720]
+    },
+    "Squeeze.glsl": {
+        "colorSeparation": 0.04,
+        "resolution": [1280, 720]
+    },
+    "Rotate_scale_fade.glsl": {
+        "center": [0.5, 0.5],
+        "rotations": 1.0,
+        "scale": 8.0,
+        "backColor": [0.15, 0.15, 0.15, 1.0],
+        "resolution": [1280, 720]
+    },
+    "Rolls.glsl": {
+        "type": 0,
+        "RotDown": false,
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "TangentMotionBlur.glsl": {
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "Swirl.glsl": {
+        "resolution": [1280, 720]
+    },
+    "TVStatic.glsl": {
+        "offset": 0.05,
+        "resolution": [1280, 720]
+    },
+    "TopBottom.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Static_wipe.glsl": {
+        "u_transitionUpToDown": true,
+        "u_max_static_span": 0.5,
+        "resolution": [1280, 720]
+    },
+    "UndulatingBurnOut.glsl": {
+        "smoothness": 0.03,
+        "center": [0.5, 0.5],
+        "color": [0.0, 0.0, 0.0],
+        "resolution": [1280, 720]
+    },
+    "VerticalClose.glsl": {
+        "resolution": [1280, 720]
+    },
+    "StaticFade.glsl": {
+        "n_noise_pixels": 200.0,
+        "static_luminosity": 0.8,
+        "resolution": [1280, 720]
+    },
+    "StereoViewer.glsl": {
+        "zoom": 0.88,
+        "corner_radius": 0.22,
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "Swap.glsl": {
+        "reflection": 0.4,
+        "perspective": 0.2,
+        "depth": 3.0,
+        "resolution": [1280, 720]
+    },
+    "Wind.glsl": {
+        "size": 0.2,
+        "resolution": [1280, 720]
+    },
+    "WipeUp.glsl": {
+        "resolution": [1280, 720]
+    },
+    "WipeRight.glsl": {
+        "resolution": [1280, 720]
+    },
+    "Windowslice.glsl": {
+        "count": 10.0,
+        "smoothness": 0.5,
+        "resolution": [1280, 720]
+    },
+    "X_axis_translation.glsl": {
+        "resolution": [1280, 720]
+    },
+    "WipeLeft.glsl": {
+        "resolution": [1280, 720]
+    },
+    "WaterDrop.glsl": {
+        "amplitude": 30.0,
+        "speed": 30.0,
+        "resolution": [1280, 720]
+    },
+    "Windowblinds.glsl": {
+        "resolution": [1280, 720]
+    },
+    "VerticalOpen.glsl": {
+        "resolution": [1280, 720]
+    },
+    "WipeDown.glsl": {
+        "resolution": [1280, 720]
+    },
+    "ZoomInCircles.glsl": {
+        "ratio": 1.0,
+        "resolution": [1280, 720]
+    },
+    "ZoomRigthWipe.glsl": {
+        "zoom_quickness": 0.8,
+        "resolution": [1280, 720]
+    },
+    "ZoomLeftWipe.glsl": {
+        "zoom_quickness": 0.8,
+        "resolution": [1280, 720]
+    },
+	"PAZe.glsl": {
+    "smoothness": 0.3,
+    "opening": true,
+    "TURB_AMP": 0.9,
+    "TURB_SPEED": 1.3,
+    "TURB_FREQ": 4.0,
+    "TURB_EXP": 1.9,
+    "peakPoint": 0.1,
+    "resolution": [1280, 720]
+	}
+}
