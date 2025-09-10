@@ -43,20 +43,89 @@ echo Installing/updating Python dependencies...
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 
-REM Check for FFmpeg (non-blocking)
+REM Check for FFmpeg/ffprobe
 echo.
 echo Checking for FFmpeg/ffprobe...
 ffprobe -version >nul 2>&1
 if errorlevel 1 (
-    echo WARNING: FFmpeg/ffprobe not found
-    echo.
-    echo The application may still work, but video encoding might fail.
-    echo To install FFmpeg, you can:
-    echo   - Download from: https://ffmpeg.org/download.html
-    echo   - Or use: winget install ffmpeg
-    echo.
+    echo FFmpeg/ffprobe not found in system PATH
+    echo Checking for local FFmpeg installation...
+
+    if not exist "ffmpeg\bin\ffprobe.exe" (
+        echo Downloading FFmpeg for Windows...
+        echo This is a one-time setup that will take a few minutes...
+
+        REM Create ffmpeg directory
+        if not exist "ffmpeg" mkdir ffmpeg
+        if not exist "ffmpeg\bin" mkdir "ffmpeg\bin"
+
+        REM Try to download FFmpeg using curl (available on Windows 10+)
+        echo Attempting download with curl...
+        curl -L -o "ffmpeg-temp.zip" "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" 2>nul
+
+        if exist "ffmpeg-temp.zip" (
+            echo Download successful! Extracting FFmpeg...
+
+            REM Use PowerShell to extract (more reliable than tar on older Windows)
+            powershell -Command "try { Expand-Archive -Path 'ffmpeg-temp.zip' -DestinationPath 'ffmpeg-temp' -Force; exit 0 } catch { exit 1 }" >nul 2>&1
+
+            if errorlevel 1 (
+                echo Extraction failed. Trying alternative method...
+                REM Fallback: try with different PowerShell syntax
+                powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('ffmpeg-temp.zip', 'ffmpeg-temp')" >nul 2>&1
+            )
+
+            REM Move the contents to our ffmpeg directory
+            if exist "ffmpeg-temp" (
+                echo Moving FFmpeg files...
+                for /d %%i in ("ffmpeg-temp\ffmpeg-*") do (
+                    if exist "%%i\bin" (
+                        copy "%%i\bin\*.exe" "ffmpeg\bin\" >nul 2>&1
+                    )
+                )
+
+                REM Cleanup
+                echo Cleaning up temporary files...
+                rmdir /s /q "ffmpeg-temp" >nul 2>&1
+                del "ffmpeg-temp.zip" >nul 2>&1
+
+                if exist "ffmpeg\bin\ffprobe.exe" (
+                    echo FFmpeg installation completed successfully!
+                ) else (
+                    echo WARNING: FFmpeg installation may have failed
+                    echo Please install FFmpeg manually if video encoding doesn't work
+                )
+            ) else (
+                echo WARNING: Failed to extract FFmpeg
+                echo Please install FFmpeg manually if video encoding doesn't work
+                del "ffmpeg-temp.zip" >nul 2>&1
+            )
+        ) else (
+            echo WARNING: Failed to download FFmpeg
+            echo Please install FFmpeg manually if video encoding doesn't work
+            echo You can:
+            echo   - Download from: https://ffmpeg.org/download.html
+            echo   - Or use: winget install ffmpeg
+        )
+    ) else (
+        echo Local FFmpeg installation found!
+    )
+
+    REM Add local FFmpeg to PATH for this session
+    if exist "ffmpeg\bin\ffprobe.exe" (
+        set "PATH=%SCRIPT_DIR%ffmpeg\bin;%PATH%"
+        echo FFmpeg added to PATH for this session
+
+        REM Verify it's working
+        ffprobe -version >nul 2>&1
+        if errorlevel 1 (
+            echo WARNING: Local FFmpeg installation may not be working properly
+        ) else (
+            echo Local FFmpeg verified and working!
+        )
+    )
 ) else (
-    echo FFmpeg/ffprobe found and working!
+    echo FFmpeg/ffprobe found in system PATH!
 )
 
 REM Check if config.json exists
