@@ -109,8 +109,8 @@ class ShaderRenderer:
             return self.get_audio_duration()
             
     def analyze_audio(self, duration):
-        """Analyze audio file for reactivity data."""
-        self.logger.info("Analyzing audio for reactivity...")
+        """Analyze audio file for reactivity data with high-resolution 1024-point FFT."""
+        self.logger.info("Analyzing audio for reactivity (1024-point FFT)...")
 
         try:
             # Load audio
@@ -122,50 +122,64 @@ class ShaderRenderer:
             hop_length = len(y) // total_frames
 
             self.logger.info(f"Audio: {duration:.2f}s, {sr}Hz, {total_frames} frames")
+            self.logger.info(f"FFT: 1024-point, {sr//2}Hz Nyquist, {sr/1024:.1f}Hz per bin")
 
-            # Extract features
-            # Bass (low frequencies)
-            bass_freqs = librosa.stft(y, hop_length=hop_length, n_fft=2048)
-            bass_power = np.mean(np.abs(bass_freqs[:64, :]), axis=0)  # Low frequencies
+            # High-resolution 1024-point FFT (Shadertoy-compatible)
+            stft_data = librosa.stft(y, hop_length=hop_length, n_fft=1024)
 
-            # Treble (high frequencies)
-            treble_power = np.mean(np.abs(bass_freqs[512:, :]), axis=0)  # High frequencies
+            # Get magnitude spectrum (512 usable bins from 1024-point FFT)
+            magnitude_spectrum = np.abs(stft_data[:512, :])  # Only first 512 bins (magnitude only)
 
-            # Normalize
-            if bass_power.max() > 0:
-                bass_power = bass_power / bass_power.max()
-            if treble_power.max() > 0:
-                treble_power = treble_power / treble_power.max()
+            # Apply smoothing similar to Shadertoy (0.8 smoothing factor)
+            smoothed_spectrum = np.zeros_like(magnitude_spectrum)
+            smoothing_factor = 0.8
+
+            for frame_idx in range(magnitude_spectrum.shape[1]):
+                if frame_idx == 0:
+                    smoothed_spectrum[:, frame_idx] = magnitude_spectrum[:, frame_idx]
+                else:
+                    smoothed_spectrum[:, frame_idx] = (
+                        smoothing_factor * smoothed_spectrum[:, frame_idx - 1] +
+                        (1.0 - smoothing_factor) * magnitude_spectrum[:, frame_idx]
+                    )
+
+            # Normalize to [0.0, 1.0] range
+            if smoothed_spectrum.max() > 0:
+                smoothed_spectrum = smoothed_spectrum / smoothed_spectrum.max()
+
+            # Extract legacy bass/treble for backward compatibility
+            bass_power = np.mean(smoothed_spectrum[:32, :], axis=0)  # 0-32 bins (low frequencies)
+            treble_power = np.mean(smoothed_spectrum[256:, :], axis=0)  # 256+ bins (high frequencies)
 
             # Ensure we have the right number of frames
-            if len(bass_power) != total_frames:
+            if smoothed_spectrum.shape[1] != total_frames:
+                # Interpolate full spectrum
+                new_spectrum = np.zeros((512, total_frames))
+                for bin_idx in range(512):
+                    new_spectrum[bin_idx, :] = np.interp(
+                        np.linspace(0, smoothed_spectrum.shape[1]-1, total_frames),
+                        np.arange(smoothed_spectrum.shape[1]),
+                        smoothed_spectrum[bin_idx, :]
+                    )
+                smoothed_spectrum = new_spectrum
+
+                # Interpolate legacy values
                 bass_power = np.interp(np.linspace(0, len(bass_power)-1, total_frames),
                                      np.arange(len(bass_power)), bass_power)
                 treble_power = np.interp(np.linspace(0, len(treble_power)-1, total_frames),
                                        np.arange(len(treble_power)), treble_power)
 
             # Extract raw waveform samples for oscilloscope
-            # Create a sliding window of 256 samples for each frame
             waveform_samples = []
-
-            # Calculate how many audio samples represent the oscilloscope time window
-            # Use a time window that shows about 1/30th of a second of audio (good for visualization)
             oscilloscope_duration = 1.0 / 30.0  # 1/30th second window
-            samples_per_window = int(sr * oscilloscope_duration)
-
-            # Ensure we have at least 256 samples for the texture
-            samples_per_window = max(samples_per_window, 256)
+            samples_per_window = max(int(sr * oscilloscope_duration), 256)
 
             for frame_idx in range(total_frames):
-                # Calculate the center time for this frame
                 frame_time = frame_idx / frame_rate
                 center_sample = int(frame_time * sr)
-
-                # Extract a window of samples centered on this time
                 start_sample = max(0, center_sample - samples_per_window // 2)
                 end_sample = min(len(y), start_sample + samples_per_window)
 
-                # Adjust start if we're near the end of the audio
                 if end_sample - start_sample < samples_per_window:
                     start_sample = max(0, end_sample - samples_per_window)
 
@@ -173,57 +187,75 @@ class ShaderRenderer:
 
                 # Downsample to exactly 256 samples for texture width
                 if len(frame_audio) >= 256:
-                    # Use linear interpolation for smooth downsampling
                     indices = np.linspace(0, len(frame_audio) - 1, 256)
                     frame_waveform = np.interp(indices, np.arange(len(frame_audio)), frame_audio)
                 else:
-                    # Pad with zeros if we have fewer samples (shouldn't happen with our logic above)
                     frame_waveform = np.pad(frame_audio, (0, 256 - len(frame_audio)), 'constant')
 
-                # Normalize to [0, 1] range (oscilloscope expects this)
+                # Normalize to [0, 1] range
                 frame_waveform = (frame_waveform + 1.0) * 0.5
                 waveform_samples.append(frame_waveform)
 
             return {
-                'bass': bass_power,
-                'treble': treble_power,
-                'waveform': waveform_samples,  # New: raw waveform data
+                'bass': bass_power,  # Legacy compatibility
+                'treble': treble_power,  # Legacy compatibility
+                'fft_spectrum': smoothed_spectrum,  # New: Full 512-bin spectrum
+                'waveform': waveform_samples,
                 'total_frames': total_frames,
-                'frame_rate': frame_rate
+                'frame_rate': frame_rate,
+                'sample_rate': sr,
+                'nyquist_freq': sr // 2,
+                'freq_per_bin': sr / 1024.0
             }
-            
+
         except Exception as e:
             self.logger.error(f"Audio analysis failed: {e}")
             return None
             
-    def create_audio_texture(self, bass_value, treble_value, waveform_data=None):
-        """Create audio texture for shader."""
-        # Create a 256x256 texture to support the original oscilloscope algorithm
-        audio_data = np.zeros((256, 256), dtype=np.float32)
+    def create_audio_texture(self, bass_value, treble_value, waveform_data=None, fft_spectrum=None):
+        """Create high-resolution audio texture for shader (Shadertoy-compatible)."""
+        # Create a 512x256 texture for high-resolution FFT data
+        audio_data = np.zeros((256, 512), dtype=np.float32)
 
-        # Row 0: FFT frequency data (original format)
-        # Place bass in lower frequencies (0-63)
-        audio_data[0, :64] = bass_value
+        if fft_spectrum is not None:
+            # Row 0: Full 512-bin FFT spectrum (Shadertoy-compatible)
+            audio_data[0, :512] = fft_spectrum
 
-        # Place treble in higher frequencies (192-255)
-        audio_data[0, 192:] = treble_value
+            # Row 1: Copy of FFT data for compatibility
+            audio_data[1, :512] = fft_spectrum
+        else:
+            # Fallback to legacy format if no FFT spectrum provided
+            # Place bass in lower frequencies (0-63)
+            audio_data[0, :64] = bass_value
+            # Place treble in higher frequencies (256-319, mapped to available space)
+            audio_data[0, 256:320] = treble_value
 
-        # Rows 1-255: Replicate waveform data for oscilloscope algorithm
-        # The original algorithm samples different Y coordinates to create the waveform effect
+        # Rows 2-255: Waveform data for oscilloscope algorithm
         if waveform_data is not None:
-            for y in range(1, 256):
-                audio_data[y, :] = waveform_data
+            # Extend waveform to 512 samples by interpolation for higher resolution
+            if len(waveform_data) == 256:
+                # Interpolate 256 samples to 512 for better resolution
+                extended_waveform = np.interp(
+                    np.linspace(0, 255, 512),
+                    np.arange(256),
+                    waveform_data
+                )
+            else:
+                extended_waveform = waveform_data[:512]  # Truncate if longer
+
+            for y in range(2, 256):
+                audio_data[y, :] = extended_waveform
 
         # Convert to bytes (0-255 range)
         audio_bytes = (audio_data * 255).astype(np.uint8)
 
-        # Create texture (256x256 instead of 256x2)
-        texture = self.ctx.texture((256, 256), 1, audio_bytes.tobytes())
+        # Create texture (512x256 for high-resolution FFT)
+        texture = self.ctx.texture((512, 256), 1, audio_bytes.tobytes())
 
-        # Set texture filtering to prevent interpolation artifacts in oscilloscope
-        texture.filter = (self.ctx.LINEAR, self.ctx.LINEAR)  # Keep linear for smooth waveform
-        texture.repeat_x = False  # Prevent wrapping artifacts
-        texture.repeat_y = False  # Prevent wrapping artifacts
+        # Set texture filtering for smooth interpolation
+        texture.filter = (self.ctx.LINEAR, self.ctx.LINEAR)
+        texture.repeat_x = False
+        texture.repeat_y = False
 
         return texture
 
@@ -635,9 +667,10 @@ class ShaderRenderer:
                     bass_value = audio_data['bass'][frame_idx]
                     treble_value = audio_data['treble'][frame_idx]
                     waveform_data = audio_data['waveform'][frame_idx] if 'waveform' in audio_data else None
+                    fft_spectrum = audio_data['fft_spectrum'][:, frame_idx] if 'fft_spectrum' in audio_data else None
 
                     # Create audio texture
-                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
                     audio_texture.use(0)  # Bind to iChannel0
 
                     # Set uniforms
@@ -809,9 +842,10 @@ class ShaderRenderer:
                     bass_value = audio_data['bass'][frame_idx]
                     treble_value = audio_data['treble'][frame_idx]
                     waveform_data = audio_data['waveform'][frame_idx] if 'waveform' in audio_data else None
+                    fft_spectrum = audio_data['fft_spectrum'][:, frame_idx] if 'fft_spectrum' in audio_data else None
 
                     # Create audio texture
-                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
                     audio_texture.use(0)  # Bind to iChannel0
 
                     # Set uniforms
@@ -1170,7 +1204,8 @@ class ShaderRenderer:
         bass_value = audio_data['bass'][audio_frame_idx]
         treble_value = audio_data['treble'][audio_frame_idx]
         waveform_data = audio_data['waveform'][audio_frame_idx] if 'waveform' in audio_data else None
-        audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+        fft_spectrum = audio_data['fft_spectrum'][:, audio_frame_idx] if 'fft_spectrum' in audio_data else None
+        audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
         audio_texture.use(location=0)
         if 'iChannel0' in program:
             program['iChannel0'].value = 0
@@ -1200,7 +1235,8 @@ class ShaderRenderer:
         bass_value = audio_data['bass'][audio_frame_idx]
         treble_value = audio_data['treble'][audio_frame_idx]
         waveform_data = audio_data['waveform'][audio_frame_idx] if 'waveform' in audio_data else None
-        audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+        fft_spectrum = audio_data['fft_spectrum'][:, audio_frame_idx] if 'fft_spectrum' in audio_data else None
+        audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
         audio_texture.use(location=0)
 
         # Render FROM shader to temporary framebuffer
@@ -1442,9 +1478,10 @@ class ShaderRenderer:
                 bass_value = audio_data['bass'][frame_idx]
                 treble_value = audio_data['treble'][frame_idx]
                 waveform_data = audio_data['waveform'][frame_idx] if 'waveform' in audio_data else None
+                fft_spectrum = audio_data['fft_spectrum'][:, frame_idx] if 'fft_spectrum' in audio_data else None
 
                 # Create audio texture
-                audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+                audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
                 audio_texture.use(0)  # Bind to iChannel0
 
                 # Set uniforms
@@ -1781,9 +1818,10 @@ class ShaderRenderer:
                     bass_value = audio_data['bass'][audio_frame_idx]
                     treble_value = audio_data['treble'][audio_frame_idx]
                     waveform_data = audio_data['waveform'][audio_frame_idx] if 'waveform' in audio_data else None
+                    fft_spectrum = audio_data['fft_spectrum'][:, audio_frame_idx] if 'fft_spectrum' in audio_data else None
 
                     # Create audio texture
-                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data)
+                    audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
                     audio_texture.use(location=0)
 
                     # Set uniforms

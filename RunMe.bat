@@ -11,12 +11,15 @@ set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
 REM Check if Python is available
+echo Checking Python installation...
 python --version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Python is not installed or not in PATH
     echo Please install Python 3.7+ and try again
     pause
     exit /b 1
+) else (
+    echo Python found and working!
 )
 
 REM Create virtual environment if it doesn't exist
@@ -35,10 +38,26 @@ REM Activate virtual environment
 echo Activating virtual environment...
 call venv\Scripts\activate.bat
 
-REM Install dependencies
-echo Installing/updating dependencies...
+REM Install Python dependencies
+echo Installing/updating Python dependencies...
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+
+REM Check for FFmpeg (non-blocking)
+echo.
+echo Checking for FFmpeg/ffprobe...
+ffprobe -version >nul 2>&1
+if errorlevel 1 (
+    echo WARNING: FFmpeg/ffprobe not found
+    echo.
+    echo The application may still work, but video encoding might fail.
+    echo To install FFmpeg, you can:
+    echo   - Download from: https://ffmpeg.org/download.html
+    echo   - Or use: winget install ffmpeg
+    echo.
+) else (
+    echo FFmpeg/ffprobe found and working!
+)
 
 REM Check if config.json exists
 if not exist "config.json" (

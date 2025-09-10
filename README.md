@@ -37,9 +37,11 @@ A sophisticated command-line application that creates stunning audio-reactive vi
 
 2. **What happens automatically**:
    - Sets up Python virtual environment and dependencies
+   - **Downloads and sets up FFmpeg/ffprobe automatically** (first-time only)
+   - Verifies all components are working
    - Discovers all audio files in `Input_Audio/` folder
    - Discovers all shaders in `Shaders/` folder (19 working shaders included)
-   - Analyzes audio for bass/treble frequency data
+   - Analyzes audio for bass/treble frequency data with 1024-point FFT
    - Renders videos with dynamic shader cycling and intelligent transitions
    - Outputs high-quality H.264/AAC videos to `Output_Video/`
 
@@ -49,6 +51,12 @@ A sophisticated command-line application that creates stunning audio-reactive vi
    - Full audio length rendered with synchronized visuals
 
 **Performance**: Fast streaming mode delivers optimal rendering speed with minimal memory usage.
+
+### Manual Verification
+If you want to verify your installation:
+```bash
+python verify_ffmpeg.py
+```
 
 ## Directory Structure
 
@@ -221,29 +229,53 @@ The system includes over 100 transition effects:
 
 ## Audio-Reactive System
 
-### Real-Time Audio Analysis
-- **STFT Processing**: Short-Time Fourier Transform for frequency analysis
-- **Bass Extraction**: Low frequencies (0-250 Hz) for rhythm detection
-- **Treble Extraction**: High frequencies (2000+ Hz) for detail enhancement
-- **Smoothing**: Configurable smoothing to prevent jarring transitions
+### High-Resolution Audio Analysis
+- **1024-Point FFT**: Shadertoy-compatible frequency analysis with 512 usable bins
+- **Real-Time Processing**: 60fps-capable audio analysis with 0.8 smoothing factor
+- **Full Spectrum**: Complete frequency range from 0Hz to Nyquist frequency
+- **Magnitude Spectrum**: Normalized floating-point values [0.0 - 1.0]
+- **Frequency Resolution**: Sample rate / 1024 Hz per bin (e.g., 43Hz per bin at 44.1kHz)
 
 ### Audio Texture Format
-Shaders receive audio data via a 256x256 texture:
+Shaders receive high-resolution audio data via a 512x256 texture:
 ```glsl
-uniform sampler2D iChannel0; // Audio texture
+uniform sampler2D iChannel0; // High-resolution audio texture (512x256)
 uniform float iTime;         // Current time
 uniform vec2 iResolution;    // Screen resolution
 
-// Row 0 (Y=0.0): FFT frequency analysis data
-// Sample bass frequencies (pixels 0-63)
-float bass = texture(iChannel0, vec2(0.1, 0.0)).r;
+// Row 0 (Y=0.0): Full 512-bin FFT spectrum (Shadertoy-compatible)
+// Get specific frequency bin (0-511)
+float freq_bin_100 = texture(iChannel0, vec2(100.5/512.0, 0.0)).r;
 
-// Sample treble frequencies (pixels 192-255)
-float treble = texture(iChannel0, vec2(0.9, 0.0)).r;
+// Get normalized frequency (0.0 = 0Hz, 1.0 = Nyquist)
+float mid_freq = texture(iChannel0, vec2(0.5, 0.0)).r;
 
-// Rows 1-255: Raw waveform data for oscilloscope effects
-// The Y coordinate can vary to sample the waveform spatially
+// Legacy compatibility - bass and treble ranges
+float bass = texture(iChannel0, vec2(0.1, 0.0)).r;    // Low frequencies
+float treble = texture(iChannel0, vec2(0.9, 0.0)).r;  // High frequencies
+
+// Rows 2-255: High-resolution waveform data (512 samples wide)
 float waveform = texture(iChannel0, vec2(x_coord, y_coord)).r;
+```
+
+### Advanced Audio Functions
+```glsl
+// Get frequency range average
+float getFrequencyRange(float start_freq, float end_freq) {
+    float sum = 0.0;
+    int samples = 16;
+    for (int i = 0; i < samples; i++) {
+        float freq = mix(start_freq, end_freq, float(i) / float(samples - 1));
+        sum += texture(iChannel0, vec2(freq, 0.0)).r;
+    }
+    return sum / float(samples);
+}
+
+// Specific frequency bands (at 44.1kHz sample rate)
+float sub_bass = getFrequencyRange(0.0, 0.05);      // 0-1kHz
+float bass = getFrequencyRange(0.05, 0.15);         // 1-3kHz
+float mids = getFrequencyRange(0.15, 0.5);          // 3-11kHz
+float treble = getFrequencyRange(0.5, 1.0);         // 11-22kHz
 ```
 
 ### Shader Compatibility
@@ -325,10 +357,17 @@ For faster rendering or testing:
 ## System Requirements
 
 ### Prerequisites
-- **Python 3.7+**: Automatically installed by RunMe.bat if needed
-- **FFmpeg**: For video encoding (included or auto-downloaded)
+- **Python 3.7+**: Must be installed and in PATH
+- **Internet connection**: For first-time FFmpeg download (one-time setup)
 - **OpenGL 3.3+**: For GPU-accelerated shader rendering
-- **Windows**: Tested on Windows 10/11
+- **Windows**: Tested on Windows 10/11 (primary support)
+- **4GB+ RAM**: Recommended for smooth rendering
+
+### Automatic Dependencies
+RunMe.bat handles these automatically:
+- **FFmpeg/ffprobe**: Downloaded and configured automatically
+- **Python packages**: All requirements.txt dependencies installed
+- **Virtual environment**: Created and managed automatically
 
 ### Performance
 - **Fast Streaming Mode**: 3-5x faster than traditional frame-by-frame rendering
@@ -357,14 +396,16 @@ For faster rendering or testing:
 
 ### Core Technologies
 - **Rendering Engine**: ModernGL (OpenGL 3.3+) for GPU-accelerated shader processing
-- **Audio Analysis**: librosa with STFT for real-time frequency extraction
+- **Audio Analysis**: librosa with 1024-point FFT for high-resolution frequency extraction
 - **Video Encoding**: FFmpeg with H.264/AAC for production-quality output
 - **Shader Management**: Runtime discovery, pre-compilation, and seamless switching
+- **FFT Processing**: Shadertoy-compatible 512-bin magnitude spectrum with 0.8 smoothing
 
 ### Performance Features
 - **Fast Streaming Mode**: Raw video data processing (3-5x faster than frame-by-frame)
-- **Memory Optimization**: Minimal temporary file usage
-- **GPU Acceleration**: Hardware-accelerated shader rendering
+- **High-Resolution FFT**: 1024-point FFT processing at 60fps with real-time smoothing
+- **Memory Optimization**: Minimal temporary file usage with efficient spectrum caching
+- **GPU Acceleration**: Hardware-accelerated shader rendering with 512x256 audio textures
 - **Batch Processing**: Automatic multi-file processing with progress tracking
 
 ### Quality Assurance
