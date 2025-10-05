@@ -1,0 +1,112 @@
+ffmpeg -y -i layer1_raw.mp4 -f rawvideo -vcodec rawvideo -s 2560x1440 -pix_fmt rgb24 -r 30 -i layer0_raw.rgb -filter_complex "[1:v]colorkey=0x00d600:0.5:0.3[fg];[0:v][fg]overlay=0:0:format=auto" -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_DH_TEST2.mp4
+
+
+
+
+
+ffmpeg -y -i layer1_raw.mp4 ^
+  -f rawvideo -pixel_format rgb24 -video_size 2560x1440 -framerate 30 -i layer0_raw.rgb ^
+  -filter_complex "
+    [1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];
+    [fga]alphaextract,boxblur=2:1[matte];          /* soften jaggies a touch */
+    [fgc][matte]alphamerge[fg];                    /* reapply cleaned alpha   */
+    [0:v][fg]overlay=0:0:format=auto
+  " ^
+  -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_clean.mp4
+
+fix this line:
+ffmpeg -y -f rawvideo -vcodec rawvideo -s 2560x1440 -pix_fmt rgb24 -r 30 -i e:\TEMPSHIT\timeline_render_tt822uf5\layer0_raw.rgb -vf chromakey=0x00d800:0.5:0.3 -c:v libx264 -crf 18 -preset medium -pix_fmt yuva420p e:\TEMPSHIT\timeline_render_tt822uf5\layer0_composite.mp4
+ffmpeg -y -i e:\TEMPSHIT\timeline_render_tt822uf5\layer1_raw.mp4 -f rawvideo -pixel_format rgb24 -video_size 2560x1440 -framerate 30 -i e:\TEMPSHIT\timeline_render_tt822uf5\layer0_raw.rgb -filter_complex "[1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];[fga]alphaextract,boxblur=2:1[matte];[fgc][matte]alphamerge[fg];[0:v][fg]overlay=0:0:format=auto" -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p e:\TEMPSHIT\timeline_render_tt822uf5\layer0_composite.mp4
+
+
+
+ffmpeg -y -i layer1_raw.mp4 -f rawvideo -pixel_format rgb24 -video_size 2560x1440 -framerate 30 -i layer0_raw.rgb -filter_complex "[1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];[fga]alphaextract,boxblur=2:1[matte];[fgc][matte]alphamerge[fg];[0:v][fg]overlay=0:0:format=auto" -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_clean.mp4
+
+
+
+
+what I'm going to tell agent:
+
+The chroma key approach is completely wrong. We need to change the rendering pipeline in render_timeline.py:
+
+Problem:
+The current code creates layer0_composite.mp4 separately with chroma key, then composites it with layer1_raw.mp4. This doesn't work - the alpha channel is lost.
+
+Solution:
+Combine the chroma key and compositing into a single FFmpeg command that:
+
+Takes both layer1_raw.mp4 (shaders) and layer0_raw.rgb (green screen raw) as inputs
+Applies chroma key to the raw green screen video
+Composites it on top of shaders
+Outputs the final composite
+Changes Needed:
+1. Update composite_layers() method (around line 320-340):
+
+Change from the current two-step process:
+
+Step 1: convert_raw_to_mp4_with_chromakey() creates layer0_composite.mp4
+Step 2: composite_layers() overlays it on layer1_raw.mp4
+To a single-step process in composite_layers():
+
+New FFmpeg command:
+cmd = [
+    'ffmpeg',
+    '-y',
+    '-i', str(shader_layer_path),  # layer1_raw.mp4
+    '-f', 'rawvideo',
+    '-pixel_format', 'rgb24',
+    '-video_size', f'{width}x{height}',
+    '-framerate', str(frame_rate),
+    '-i', str(self.temp_dir / "layer0_raw.rgb"),  # Raw green screen
+    '-filter_complex',
+    '[1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];'
+    '[fga]alphaextract,boxblur=2:1[matte];'
+    '[fgc][matte]alphamerge[fg];'
+    '[0:v][fg]overlay=0:0:format=auto',
+    '-c:v', 'libx264',
+    '-crf', '18',
+    '-preset', 'medium',
+    '-pix_fmt', 'yuv420p',
+    str(output_path)
+]
+
+
+Key parameters:
+
+colorkey=0x00d600:0.38:0.0 - Removes rgb(0, 214, 0) green
+boxblur=2:1 - Softens edges to reduce jaggies
+alphamerge - Reapplies cleaned alpha channel
+2. Update render_greenscreen_layer() method (around line 1552-1610):
+
+Remove the call to convert_raw_to_mp4_with_chromakey(). Just return the path to the raw RGB file instead of creating an MP4.
+
+Change from:
+
+self.convert_raw_to_mp4_with_chromakey(
+    self.temp_dir / "layer0_raw.rgb",
+    output_path,
+    width, height, frame_rate
+)
+
+
+To:
+# Don't convert to MP4 - return raw file path
+# Chroma key will be applied during compositing
+return str(self.temp_dir / "layer0_raw.rgb")
+
+3. Update composite_layers() signature (around line 295):
+
+The method needs to know the resolution and frame rate to process the raw RGB file. Add these parameters or get them from the manifest.
+
+4. Optional: Keep convert_raw_to_mp4_with_chromakey() for debugging
+
+You can keep this method but don't use it in the main pipeline. It's useful for testing."
+
+The fix is to merge the chroma key and composite steps into one FFmpeg command that:
+
+Takes layer1_raw.mp4 + layer0_raw.rgb as inputs
+Applies colorkey=0x00d600:0.38:0.0 with alpha extraction and blur
+Overlays on shaders in one pass
+Outputs final composite directly
+This avoids the alpha channel loss that happens when creating layer0_composite.mp4 separately.
+

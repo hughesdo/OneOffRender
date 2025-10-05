@@ -66,3 +66,6 @@ Thumbs.db
 
 # FFmpeg temporary files
 *.ffmpeg_temp*
+
+# Shader staging folder - development/testing shaders in various states
+/Shaders/Shaders in Different Stages/

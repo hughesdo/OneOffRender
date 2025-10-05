@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "project_name": "timeline_fixes_test",
+  "audio": {
+    "path": "Input_Audio/Todd Rundgren - Healing Pt. 3 test.mp3",
+    "duration": 30.0
+  },
+  "resolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "frame_rate": 30,
+  "timeline": {
+    "duration": 30.0,
+    "elements": [
+      {
+        "id": "shader_001",
+        "type": "shader",
+        "name": "01d-kabuto_Fixed.glsl",
+        "startTime": 0.0,
+        "endTime": 10.0,
+        "duration": 10.0,
+        "layer": 0,
+        "path": "Shaders/01d-kabuto_Fixed.glsl"
+      },
+      {
+        "id": "shader_002",
+        "type": "shader",
+        "name": "Colorflow orbV1_Fixed.glsl",
+        "startTime": 8.4,
+        "endTime": 20.0,
+        "duration": 11.6,
+        "layer": 0,
+        "path": "Shaders/Colorflow orbV1_Fixed.glsl"
+      },
+      {
+        "id": "shader_003",
+        "type": "shader",
+        "name": "the_fractal_Fixed.glsl",
+        "startTime": 18.4,
+        "endTime": 30.0,
+        "duration": 11.6,
+        "layer": 0,
+        "path": "Shaders/the_fractal_Fixed.glsl"
+      },
+      {
+        "id": "video_001",
+        "type": "video",
+        "name": "Baby Bill Xylophone",
+        "startTime": 5.0,
+        "endTime": 15.0,
+        "duration": 10.0,
+        "layer": 1,
+        "path": "Input_Video/Baby Bill is playing a xylopho.mp4",
+        "greenscreen": {
+          "enabled": true,
+          "color": [0, 255, 0],
+          "threshold": 0.5,
+          "smoothness": 0.3
+        }
+      },
+      {
+        "id": "video_002",
+        "type": "video",
+        "name": "Shader Video",
+        "startTime": 20.0,
+        "endTime": 28.0,
+        "duration": 8.0,
+        "layer": 1,
+        "path": "Input_Video/shader_video.mp4",
+        "greenscreen": {
+          "enabled": true,
+          "color": [0, 255, 0],
+          "threshold": 0.5,
+          "smoothness": 0.3
+        }
+      }
+    ]
+  }
+}

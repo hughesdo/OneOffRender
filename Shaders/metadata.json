@@ -1,0 +1,317 @@
+[
+  {
+    "name": "01d-kabuto_Fixed.glsl",
+    "preview_image": "01d-kabuto_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive tunnel with spheres and planes. Bass frequencies control sphere size, audio modulates colors and textures throughout the raymarched scene.",
+    "audio_reactive": true
+  },
+  {
+    "name": "charstiles_Fixed.glsl",
+    "preview_image": "charstiles_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sphere grid tunnel with plasma effects. Audio frequency data drives color intensity and visual brightness throughout the raymarched scene.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorflow orbV1_Fixed.glsl",
+    "preview_image": "Colorflow orbV1_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Highly audio-reactive orb with turbulent glow. Bass/mid/treble frequencies control sphere size, turbulence, glow intensity, and overall brightness dynamically.",
+    "audio_reactive": true
+  },
+  {
+    "name": "EVOKE 2019 Shader Showdown_Fixed.glsl",
+    "preview_image": "EVOKE 2019 Shader Showdown_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Complex fractal tunnel scene from EVOKE 2019. This shader is static with no audio reactivity, featuring intricate raymarched geometry and volumetric clouds.",
+    "audio_reactive": false
+  },
+  {
+    "name": "fragmentcompofix_skycolorspinner_300es_Fixed.glsl",
+    "preview_image": "fragmentcompofix_skycolorspinner_300es_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sky spinner with voronoi patterns. Audio controls spinner rotation, FOV, star field flicker, sky texture scrolling, and glow intensity.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Quasi Crystals2_Fixed.glsl",
+    "preview_image": "Quasi Crystals2_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Quasi-crystal patterns using log-polar coordinates. This shader is static with no audio reactivity, displaying animated geometric wave interference patterns.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Quasi-crystals_Fixed.glsl",
+    "preview_image": "Quasi-crystals_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Animated quasi-crystal with HSV coloring. This shader is static with no audio reactivity, showing plane wave interference in log-polar space.",
+    "audio_reactive": false
+  },
+  {
+    "name": "reflected structure by musk for TDF 2021_Optimized.glsl",
+    "preview_image": "reflected structure by musk for TDF 2021_Optimized.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive reflected structure with wave patterns. Audio modulates color transitions, wave intensity, camera rotation, and overall brightness with reflections.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Reflecting Crystals_Fixed.glsl",
+    "preview_image": "Reflecting Crystals_Fixed.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal crystals with gyroid sphere and reflections. This shader is static with no audio reactivity, featuring IFS fractals and multiple reflection passes.",
+    "audio_reactive": false
+  },
+  {
+    "name": "semifinal2-blueberry_Fixed.glsl",
+    "preview_image": "semifinal2-blueberry_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive 2D/3D hybrid with pulsing patterns. Audio controls sphere size, pattern colors, circle radii, brightness, and switches between 2D and 3D scenes.",
+    "audio_reactive": true
+  },
+  {
+    "name": "semifinal2-tapped_Fixed.glsl",
+    "preview_image": "semifinal2-tapped_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive circular pattern array with noise. Audio affects circle radius, movement offsets, and color intensity creating pulsing organic formations.",
+    "audio_reactive": true
+  },
+  {
+    "name": "tdf-16ms_glsl-graphics-compo_nunu-00_Fixed.glsl",
+    "preview_image": "tdf-16ms_glsl-graphics-compo_nunu-00_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Procedural noise patterns with domain warping. This shader is static with no audio reactivity, showcasing value, gradient, and Perlin noise techniques.",
+    "audio_reactive": false
+  },
+  {
+    "name": "the_fractal_Fixed.glsl",
+    "preview_image": "the_fractal_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive Menger sponge fractal tunnel. Audio controls movement speed, rotation, time modulation, and color intensity throughout the animated fractal journey.",
+    "audio_reactive": true
+  },
+  {
+    "name": "the_grid_Fixed.glsl",
+    "preview_image": "the_grid_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive grid tunnel with depth of field. Audio affects camera offset, DOF, BPM, rotation, grid thickness, pattern modulation, and background colors.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Waveform.glsl",
+    "preview_image": "WaveForm.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive 3D waveform visualization with reflections. Raymarched scene where audio data creates a flowing waveform surface with mirror reflections and color cycling.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 001.glsl",
+    "preview_image": "Xor Mashup 001.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive molten heart with speak overlay. Combines techno god background with dynamic overlay effects, bass controls radius and ring width, treble affects color shifts.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 003.glsl",
+    "preview_image": "Xor Mashup 003.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive volumetric glow with mosaic patterns. Features dynamic movement, frequency-based color modulation, and complex geometric transformations driven by audio data.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Base Vortex.glsl",
+    "preview_image": "Base Vortex.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive tunnel vortex effect with rotating geometry. Bass frequencies control tunnel depth and rotation speed, creating dynamic visual flow synchronized to music.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Bubble Colors.glsl",
+    "preview_image": "Bubble Colors.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful bubble patterns with gentle pulsing. Bass and kick frequencies drive bubble size and color intensity for smooth, organic visual effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorful Columns.glsl",
+    "preview_image": "Colorful Columns.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful column visualization with frequency-based height mapping. Each column responds to specific frequency ranges creating a dynamic spectrum display.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorful Columns_V2.glsl",
+    "preview_image": "Colorful Columns_V2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Enhanced version of Colorful Columns with improved anti-flickering and smoother audio processing. Features averaged sampling for more stable visual response.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cosmic Energy Streams1.glsl",
+    "preview_image": "Cosmic Energy Streams1.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive cosmic energy streams with flowing tendrils and dynamic lighting. Bass, mid, and high frequencies control stream intensity and particle effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cosmic Nebula2.glsl",
+    "preview_image": "Cosmic Nebula2.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive deep space nebula with stellar formation effects. Features gas clouds and star brightness that respond to audio input for cosmic ambiance.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Flowing Mathematical Patterns2.glsl",
+    "preview_image": "Flowing Mathematical Patterns2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive mathematical flow patterns with advanced beat detection. Features multi-method beat analysis and bass-reactive color shifting for complex visual mathematics.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork Bass Vorte PAEz 125.1.glsl",
+    "preview_image": "Fork Bass Vorte PAEz 125.1.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive vortex tunnel variant with enhanced bass response. Features improved audio processing with smooth clamping to prevent extreme visual fluctuations.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Gyroid Art.glsl",
+    "preview_image": "Gyroid Art.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Mathematical gyroid surface visualization with smooth organic forms. This shader is static with no audio reactivity, showcasing pure geometric beauty and mathematical precision.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Iridescent Breathing Orbs.glsl",
+    "preview_image": "Iridescent Breathing Orbs.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive iridescent orbs with breathing animation. Bass and treble frequencies control orb size and color shifts, creating mesmerizing organic pulsing effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Luminous Nebulae.glsl",
+    "preview_image": "Luminous Nebulae.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive luminous nebula with color-changing effects. Treble and mid-treble frequencies drive color palette transitions and nebula brightness for cosmic ambiance.",
+    "audio_reactive": true
+  },
+  {
+    "name": "MoltenHeart.glsl",
+    "preview_image": "MoltenHeart.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive molten heart with dual-layer raymarching. Bass and treble frequencies control layered effects, ring width, and sphere radius for intense visual impact.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Petal Drift.glsl",
+    "preview_image": "Petal Drift.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive drifting Gaussian petals with gentle lighting. Multi-frequency analysis drives petal movement, color palette switching, and global rotation effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "sleeplessV4.glsl",
+    "preview_image": "sleeplessV4.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive orb visualization with bass-driven brightness. Features configurable bass sampling and threshold controls for dynamic orb intensity and glow effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Sonic Nebula.glsl",
+    "preview_image": "Sonic Nebula.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sonic nebula effect with multi-frequency response. Bass, mid, and treble frequencies control nebula density, color, and movement for dynamic space visuals.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Volumetric Glow2.glsl",
+    "preview_image": "Volumetric Glow2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive volumetric glow with subtle brightness pulsing. Bass and mid frequencies drive glow intensity and color modulation for atmospheric lighting effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 002.glsl",
+    "preview_image": "Xor Mashup 002.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive XOR pattern mashup with gentle enhancement. Bass, mid, and kick frequencies control pattern intensity and brightness for rhythmic visual effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Funky Flight.GLSL",
+    "preview_image": "Funky Flight.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Funky flight path visualization with smooth camera movement through 3D space. This shader is static with no audio reactivity, featuring dynamic flight trajectory and perspective effects.",
+    "audio_reactive": false
+  }
+]

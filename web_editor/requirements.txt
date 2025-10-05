@@ -1,0 +1,5 @@
+Flask>=3.0.0
+flask-cors>=4.0.0
+librosa>=0.10.1
+Pillow>=10.2.0
+
