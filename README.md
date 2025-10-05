@@ -789,4 +789,10 @@ This file provides:
 
 ## License
 
-This is a standalone application derived from the DISCO GLSL Video Processor project.
+This project is shared under the [Creative Commons Attribution–NonCommercial 4.0 International License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
+
+You are free to share and adapt this work for non-commercial purposes, provided you give appropriate credit to the original author.
+
+While the Python rendering system in this project is my own work, I frequently borrow and build upon shaders created by others. Attribution is very important to me. I've included an `attributions.txt` file in the project root to acknowledge those works.
+
+If I have unintentionally missed crediting your work, please reach out here or on X at [@OneHung](https://x.com/OneHung). My sincere apologies — I'll make sure to correct any omissions promptly.
