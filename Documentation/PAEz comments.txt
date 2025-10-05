@@ -1,0 +1,38 @@
+i didnt have ffprobe installed
+
+
+your audio is totally wrong.
+The first visual was Paze (whos that guy?) xor mashup 03.  The ball did nothing.
+Shadertoy does a 1024 fft and throws away the last 512 bins with .8 smoothing.  Your sampling bass and trebble and ignoring the rest.
+
+And 20 minutes for 1.5 minutes ;P
+
+
+
+Technical Request
+"I need to increase our FFT resolution to match Shadertoy's implementation. Currently our FFT resolution is too low for the audio-reactive effects I'm trying to achieve."
+More Detailed Version
+"Could you help me implement a 1024-point FFT for audio analysis, similar to what Shadertoy uses? Here are the specs I'm looking for:
+
+1024-point FFT (instead of our current lower resolution)
+Real-time processing at 60fps if possible
+Magnitude spectrum only (no phase data needed)
+Frequency range: 0Hz to Nyquist frequency (half the sample rate)
+Output format: Normalized values [0.0 - 1.0]
+Frequency bins: 512 usable bins (since it's magnitude-only)
+
+The goal is to have enough frequency resolution to create smooth audio-reactive visuals. Right now the FFT resolution is too coarse and the effects look choppy.
+Reference: This should work similar to Shadertoy's audio input system where frequency data is accessible as a texture/array with good resolution across the spectrum."
+Key Technical Points to Mention
+
+Current FFT size (if you know it)
+Target: 1024-point FFT
+Need magnitude spectrum only
+Real-time performance requirements
+Output should be normalized floating-point values
+
+
+
+
+My requirements seem to be missing ffprobe. The RunMe.bat script already installs missing Python libraries, so it should also handle this dependency. I need the script to fully initialize the environment and set up all requirements for first-time users, making the tool easy to use out of the box. Right now, the only missing piece appears to be ffprobe.
+

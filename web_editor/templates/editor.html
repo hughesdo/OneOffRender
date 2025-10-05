@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneOffRender - Video Editor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>OneOffRender Video Editor</h1>
+            <div class="header-actions">
+                <button id="saveProjectBtn" class="btn btn-secondary" disabled>Save Project</button>
+                <button id="renderBtn" class="btn btn-primary" disabled>Render Video</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Left Panel: Music Selection (Collapsible) -->
+            <aside id="musicPanel" class="left-panel expanded">
+                <div class="panel-header">
+                    <h2>Music Selection</h2>
+                    <button id="collapseMusicBtn" class="collapse-btn" style="display: none;">◀</button>
+                </div>
+                <div class="panel-content">
+                    <div id="audioFileList" class="file-list">
+                        <p class="loading-message">Loading audio files...</p>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="settings-section">
+                    <div class="settings-header">
+                        <h3>Settings</h3>
+                    </div>
+                    <div class="settings-content">
+                        <!-- Resolution Selector -->
+                        <div class="setting-group">
+                            <label for="resolutionSelect">Resolution (16:9)</label>
+                            <select id="resolutionSelect" class="setting-select">
+                                <option value="3840x2160">3840×2160 (4K UHD)</option>
+                                <option value="2560x1440" selected>2560×1440 (QHD)</option>
+                                <option value="1920x1080">1920×1080 (Full HD)</option>
+                                <option value="1600x900">1600×900 (HD+)</option>
+                                <option value="1366x768">1366×768 (WXGA)</option>
+                                <option value="1280x720">1280×720 (HD)</option>
+                                <option value="1024x576">1024×576</option>
+                                <option value="960x540">960×540 (qHD)</option>
+                                <option value="854x480">854×480 (FWVGA)</option>
+                            </select>
+                        </div>
+
+                        <!-- Frame Rate Display -->
+                        <div class="setting-group">
+                            <label for="frameRateInput">Frame Rate (fps)</label>
+                            <input
+                                type="number"
+                                id="frameRateInput"
+                                class="setting-input"
+                                value="30"
+                                disabled
+                                title="Frame rate is currently fixed at 30 fps"
+                            />
+                            <span class="setting-note">Fixed at 30 fps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsed-label" style="display: none;">
+                    <span>Music</span>
+                    <span>Settings</span>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Video Viewer and Timeline -->
+            <main class="center-panel disabled">
+                <!-- Video Viewer -->
+                <section class="video-viewer">
+                    <div class="viewer-container">
+                        <video id="videoPreview" controls>
+                            <source src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="viewer-overlay">
+                            <p>Select music to begin editing</p>
+                        </div>
+                        <div id="renderProgressOverlay" class="render-progress-overlay" style="display: none;">
+                            <div class="render-progress-box">
+                                <h3>Rendering Video...</h3>
+                                <div class="progress-bar-bg">
+                                    <div id="renderProgressBar" class="progress-bar-fill"></div>
+                                </div>
+                                <p id="renderProgressText">0%</p>
+                                <p id="renderStageText">Initializing...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="playback-controls">
+                        <button id="playBtn" class="control-btn" disabled>▶</button>
+                        <button id="pauseBtn" class="control-btn" disabled>⏸</button>
+                        <span id="currentTime" class="time-display">00:00</span>
+                        <span class="time-separator">/</span>
+                        <span id="totalTime" class="time-display">00:00</span>
+                    </div>
+                </section>
+
+                <!-- Timeline Editor -->
+                <section class="timeline-editor">
+                    <div class="timeline-header">
+                        <h3>Timeline</h3>
+                        <div class="timeline-controls">
+                            <span id="zoomDisplay" class="zoom-display">Zoom: 1.0x</span>
+                            <button id="zoomInBtn" class="control-btn" disabled>+</button>
+                            <button id="zoomOutBtn" class="control-btn" disabled>-</button>
+                            <button id="undoBtn" class="control-btn" disabled>↶</button>
+                            <button id="redoBtn" class="control-btn" disabled>↷</button>
+                        </div>
+                    </div>
+                    <div class="timeline-container">
+                        <div class="timeline-names-column">
+                            <!-- Element names will be added here dynamically -->
+                        </div>
+                        <div class="timeline-tracks-container">
+                            <div class="timeline-ruler">
+                                <!-- Time markers will be added here dynamically -->
+                            </div>
+                            <div class="timeline-tracks">
+                                <!-- Timeline layers will be added here dynamically -->
+                            </div>
+                            <div class="timeline-playhead"></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Right Panel: Asset Selection (Tabbed) -->
+            <aside class="right-panel disabled">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="shaders">Shaders</button>
+                    <button class="tab-btn" data-tab="videos">Videos</button>
+                    <button class="tab-btn" data-tab="transitions">Transitions</button>
+                </div>
+
+                <!-- Shaders Tab -->
+                <div id="shadersTab" class="tab-content active">
+                    <div class="asset-list">
+                        <select id="shaderSelect" class="asset-select">
+                            <option value="">Select a shader...</option>
+                        </select>
+                    </div>
+                    <div id="shaderPreview" class="asset-preview" style="display: none;">
+                        <div class="preview-image-container">
+                            <img id="shaderPreviewImage" src="" alt="Shader Preview" draggable="true">
+                            <div class="drag-overlay">Drag to timeline</div>
+                        </div>
+                        <div class="asset-metadata">
+                            <div class="metadata-field">
+                                <label>Rating:</label>
+                                <div class="shader-rating-row">
+                                    <div class="star-rating">
+                                        <span class="star" data-value="1">☆</span>
+                                        <span class="star" data-value="2">☆</span>
+                                        <span class="star" data-value="3">☆</span>
+                                        <span class="star" data-value="4">☆</span>
+                                        <span class="star" data-value="5">☆</span>
+                                    </div>
+                                    <span id="audioIcon" class="audio-icon" style="display: none;" title="Audio-reactive shader">🎵</span>
+                                </div>
+                            </div>
+                            <div class="metadata-field">
+                                <label>Description:</label>
+                                <textarea id="shaderDescription" maxlength="256" rows="4"></textarea>
+                                <div class="char-count"><span id="descCharCount">0</span>/256</div>
+                            </div>
+                            <button id="saveShaderMetadata" class="btn btn-small">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Videos Tab -->
+                <div id="videosTab" class="tab-content">
+                    <div id="videoGrid" class="video-grid">
+                        <p class="loading-message">Loading videos...</p>
+                    </div>
+                </div>
+
+                <!-- Transitions Tab -->
+                <div id="transitionsTab" class="tab-content">
+                    <div id="transitionList" class="transition-list">
+                        <p class="loading-message">Loading transitions...</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Overlay for disabled state -->
+    <div id="disabledOverlay" class="disabled-overlay">
+        <div class="overlay-message">
+            <h2>Select Music to Begin</h2>
+            <p>Choose an audio file from the left panel to start editing</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+</body>
+</html>
+

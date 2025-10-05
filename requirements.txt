@@ -1,6 +1,14 @@
+# Core rendering dependencies
 numpy>=1.21.0
 Pillow>=8.3.0
 moderngl>=5.6.0
 librosa>=0.9.0
 ffmpeg-python>=0.2.0
 scipy>=1.7.0
+
+# Web editor dependencies
+Flask>=3.0.0
+flask-cors>=4.0.0
+
+# Additional dependencies for enhanced functionality
+# (These may be used by some components or future features)

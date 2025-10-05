@@ -1,0 +1,20 @@
+ffmpeg -y -i layer1_raw.mp4 -f rawvideo -vcodec rawvideo -s 2560x1440 -pix_fmt rgb24 -r 30 -i layer0_raw.rgb -filter_complex "[1:v]colorkey=0x00d600:0.5:0.3[fg];[0:v][fg]overlay=0:0:format=auto" -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_DH_TEST2.mp4
+
+
+
+
+
+ffmpeg -y -i layer1_raw.mp4 ^
+  -f rawvideo -pixel_format rgb24 -video_size 2560x1440 -framerate 30 -i layer0_raw.rgb ^
+  -filter_complex "
+    [1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];
+    [fga]alphaextract,boxblur=2:1[matte];          /* soften jaggies a touch */
+    [fgc][matte]alphamerge[fg];                    /* reapply cleaned alpha   */
+    [0:v][fg]overlay=0:0:format=auto
+  " ^
+  -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_clean.mp4
+
+
+
+
+ffmpeg -y -i layer1_raw.mp4 -f rawvideo -pixel_format rgb24 -video_size 2560x1440 -framerate 30 -i layer0_raw.rgb -filter_complex "[1:v]format=rgba,colorkey=0x00d600:0.38:0.0,split[fga][fgc];[fga]alphaextract,boxblur=2:1[matte];[fgc][matte]alphamerge[fg];[0:v][fg]overlay=0:0:format=auto" -c:v libx264 -crf 18 -preset medium -pix_fmt yuv420p layer0_composite_clean.mp4

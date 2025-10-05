@@ -260,21 +260,83 @@ class ShaderRenderer:
         return texture
 
     def discover_shaders(self):
-        """Discover all available shader files in the Shaders directory."""
+        """Discover all available shader files in the Shaders directory with smart filtering."""
         shaders_dir = Path("Shaders")
         if not shaders_dir.exists():
             self.logger.error("Shaders directory not found")
             return []
 
         # Find all .glsl files
-        shader_files = list(shaders_dir.glob("*.glsl"))
+        all_shader_files = list(shaders_dir.glob("*.glsl"))
 
-        if not shader_files:
+        if not all_shader_files:
             self.logger.error("No shader files found in Shaders directory")
             return []
 
-        self.logger.info(f"Discovered {len(shader_files)} shader(s): {[s.name for s in shader_files]}")
+        # Smart filtering: prioritize _Fixed versions and exclude problematic originals
+        shader_files = self.filter_and_prioritize_shaders(all_shader_files)
+
+        if not shader_files:
+            self.logger.error("No usable shader files found after filtering")
+            return []
+
+        self.logger.info(f"Discovered {len(shader_files)} usable shader(s): {[s.name for s in shader_files]}")
         return shader_files
+
+    def filter_and_prioritize_shaders(self, all_shader_files):
+        """Filter and prioritize shader files, preferring _Fixed versions over originals."""
+        # Known problematic shaders that should be excluded if they don't have _Fixed versions
+        problematic_shaders = {
+            'twigl_fix0.glsl',  # Now fixed, but was problematic
+            'Traveler2.glsl',   # Character encoding issues
+            'the_fractal.glsl', # Character encoding issues
+            'Reflecting Crystals.glsl', # Character encoding issues
+            'infinite-keys.glsl', # Character encoding issues
+            'EVOKE 2019 Shader Showdown.glsl', # Has _Fixed version
+        }
+
+        # Build a map of base names to files
+        shader_map = {}
+        for shader_file in all_shader_files:
+            name = shader_file.name
+
+            # Skip disabled shaders
+            if name.endswith('.disable') or name.endswith('.disabled'):
+                continue
+
+            # Determine base name (remove _Fixed suffix if present)
+            if name.endswith('_Fixed.glsl'):
+                base_name = name[:-11] + '.glsl'  # Remove '_Fixed.glsl', add '.glsl'
+            else:
+                base_name = name
+
+            if base_name not in shader_map:
+                shader_map[base_name] = {'original': None, 'fixed': None}
+
+            if name.endswith('_Fixed.glsl'):
+                shader_map[base_name]['fixed'] = shader_file
+            else:
+                shader_map[base_name]['original'] = shader_file
+
+        # Select the best version of each shader
+        selected_shaders = []
+        for base_name, versions in shader_map.items():
+            fixed_version = versions['fixed']
+            original_version = versions['original']
+
+            if fixed_version is not None:
+                # Always prefer _Fixed version if available
+                selected_shaders.append(fixed_version)
+                if original_version and self.config.get('debug', {}).get('verbose_logging', False):
+                    self.logger.debug(f"Using {fixed_version.name} instead of {original_version.name}")
+            elif original_version is not None:
+                # Use original only if it's not in the problematic list
+                if base_name not in problematic_shaders:
+                    selected_shaders.append(original_version)
+                else:
+                    self.logger.warning(f"Skipping problematic shader {base_name} (no _Fixed version available)")
+
+        return selected_shaders
 
     def discover_audio_files(self):
         """Discover all audio files in the Input_Audio directory."""
@@ -706,16 +768,25 @@ class ShaderRenderer:
             # Now use FFmpeg to combine raw video with audio
             success = self.combine_raw_video_audio(temp_video_file, width, height, frame_rate, duration)
 
-            # Cleanup raw file
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file regardless of success/failure
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file {temp_video_file}: {cleanup_error}")
 
             return success
 
         except Exception as e:
             self.logger.error(f"Fast render failed: {e}")
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file in case of exception
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file after error: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file after error {temp_video_file}: {cleanup_error}")
             return False
 
     def render_fast_multi_shader(self, audio_data, duration):
@@ -881,16 +952,25 @@ class ShaderRenderer:
             # Now use FFmpeg to combine raw video with audio
             success = self.combine_raw_video_audio(temp_video_file, width, height, frame_rate, duration)
 
-            # Cleanup raw file
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file regardless of success/failure
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file {temp_video_file}: {cleanup_error}")
 
             return success
 
         except Exception as e:
             self.logger.error(f"Multi-shader render failed: {e}")
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file in case of exception
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file after error: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file after error {temp_video_file}: {cleanup_error}")
             return False
 
     def combine_raw_video_audio(self, raw_video_file, width, height, frame_rate, duration):
@@ -1177,16 +1257,25 @@ class ShaderRenderer:
             # Combine raw video with audio
             success = self.combine_raw_video_audio(temp_video_file, width, height, frame_rate, duration)
 
-            # Cleanup
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file regardless of success/failure
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file {temp_video_file}: {cleanup_error}")
 
             return success
 
         except Exception as e:
             self.logger.error(f"Transition render failed: {e}")
-            if temp_video_file.exists():
-                temp_video_file.unlink()
+            # Always cleanup raw file in case of exception
+            try:
+                if temp_video_file.exists():
+                    temp_video_file.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file after error: {temp_video_file}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file after error {temp_video_file}: {cleanup_error}")
             return False
 
     def render_shader_frame(self, shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file):
@@ -1859,11 +1948,14 @@ class ShaderRenderer:
             duration_seconds = len(audio_data['bass']) / audio_data['frame_rate']
             success = self.combine_raw_video_audio(raw_file_path, width, height, frame_rate, duration_seconds)
 
-            # Cleanup raw file
+            # Always cleanup raw file regardless of success/failure
             try:
-                os.remove(raw_file_path)
-            except:
-                pass
+                raw_path = Path(raw_file_path)
+                if raw_path.exists():
+                    raw_path.unlink()
+                    self.logger.debug(f"Cleaned up temporary raw file: {raw_file_path}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Failed to cleanup raw file {raw_file_path}: {cleanup_error}")
 
             return success
 

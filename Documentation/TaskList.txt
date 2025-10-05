@@ -1,0 +1,99 @@
+Project Task List: OneOffRender – Standalone Command-Line Shader Video Generator
+Purpose:
+Create a standalone, minimal command-line application based on the existing web-based shader video generator. This version is designed for simplified one-off rendering: it takes a GLSL shader and an audio file, produces audio-reactive visuals, and merges them into a final output video.
+
+Project Scope & Constraints
+New code will live in the folder: \Disco\OneOffRender
+
+No modifications to the original web application
+
+Fully self-contained app with its own:
+
+requirements.txt
+
+README.md
+
+RunMe.bat
+
+config.json
+
+Directory Structure
+Copy
+Edit
+\Disco\OneOffRender
++---Input_Audio
+¦       Molten Heart Music.mp3
++---Input_Video
++---Output_Video
++---Shaders
+        MoltenHeart.glsl
+Tasks
+Initialize New Project Environment
+
+Create folder structure above
+
+Set up requirements.txt with required packages (e.g., ffmpeg-python, numpy, Pillow, etc.)
+
+Write README.md with instructions, usage examples, and config documentation
+
+Create RunMe.bat script to run the application with one click
+
+Develop Core Python Script
+
+Read settings from config.json
+
+Load the shader and audio input
+
+Generate video frames (based on audio reactivity)
+
+Ensure rendering respects audio length or optional cutoff (see next section)
+
+Merge video and audio into final .mp4 file
+
+Output to Output_Video/
+
+Design and Implement config.json
+look at our existing webnased designs and decied what all the config.json should contain.  
+
+If duration_override.enabled == true, parse cutoff_time (MM:SS) and convert to seconds
+
+Limit rendering and merging to this duration instead of full audio length
+
+If enabled == false, use full duration of the input audio file
+
+FFmpeg Integration
+
+Ensure FFmpeg command used to mux audio + video includes:
+
+-t <seconds> if duration_override.enabled == true
+
+Otherwise, omit -t to use full audio duration or ending on teh audio file length.  
+
+
+
+Verify full rendering when duration_override.enabled == false
+
+Verify early cutoff and proper merging when enabled with valid time
+
+Check rendering quality, timing, and synced audio
+
+Documentation
+
+In README.md, clearly explain:
+
+All config options (especially duration_override)
+
+Default behavior vs. optional behavior
+
+Supported shader parameters
+
+Example use cases
+
+Final Review
+
+Confirm entire system runs from OneOffRender only
+
+Ensure all paths are relative within the folder
+
+Package up for easy use or transfer
+
