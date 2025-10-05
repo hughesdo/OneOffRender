@@ -6,6 +6,14 @@ A sophisticated video creation system that creates stunning audio-reactive video
 - **🔧 OneOff Renderer**: Quick command-line tool for testing individual shaders
 - **⚡ Batch Processor**: Automated rendering with random shader cycling
 
+
+Here’s a demo video showing how it works:
+
+[![Video Demo](https://img.youtube.com/vi/5goL8kGSU3M/0.jpg)](https://youtu.be/5goL8kGSU3M)
+
+Watch the video on YouTube: [OneOffRender for recording audio reactive shaders](https://youtu.be/5goL8kGSU3M)
+
+
 ---
 
 ## 📦 Installation & Setup
