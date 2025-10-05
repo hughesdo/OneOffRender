@@ -1,0 +1,269 @@
+# OneOffRender Shader Attributions
+
+This file acknowledges the original creators of the shaders included in this project. While the Python rendering system is original work, the visual effects are built upon the incredible creativity of the shader community.
+
+## Attribution Format
+Each entry includes:
+- Shader name (as it appears in the project)
+- Original creator/author
+- Original source URL (when available)
+- Additional notes about modifications or inspirations
+
+---
+
+## SHADER ATTRIBUTIONS
+
+### XorDev (@XorDev) - Multiple Shaders
+**Twitter/X**: https://x.com/XorDev
+
+**Bouncing Vectors.glsl**
+- Original: "Vectors" by XorDev
+- Source: https://x.com/XorDev/status/1972423422711111894
+- Audio reactive modifications by PAEz
+
+**Volumetric Glow.glsl**
+- Original: "Volumetric: Glow" by XorDev
+- Sources: 
+  - https://x.com/XorDev/status/1959077729082462559
+  - https://t.co/Mikpt1ZVHw
+  - https://x.com/XorDev/status/1933267977136443558
+- Audio reactive modifications by PAEz
+
+**Volumetric Glow2.glsl**
+- Original: "Volumetric: Glow" by XorDev
+- Source: https://x.com/XorDev/status/1947676805546361160
+- Converted for OneOffRender system
+
+**Waveform.glsl**
+- Original: "Waveform" by XorDev
+- Converted for OneOffRender system with audio compatibility fixes
+
+**Waveform_fixed-but-upside_down_the fix is in this not app.glsl**
+- Original: "Waveform" by XorDev
+- Alternative version with different coordinate handling
+
+**Xor Mashup 001.glsl**
+- Original: "Molten Heart of a Techno God" + "Speak" by XorDev
+- Sources:
+  - https://x.com/XorDev/status/1950246183219175512
+  - https://shadertoy.com/view/33tSzl
+  - Playlist: https://www.shadertoy.com/playlist/N3SyzR
+
+**Xor Mashup 002.glsl**
+- Original: Mix of "Radial" and "Siri" by XorDev
+- Created by PAEz (2025-08-14)
+- ShaderToy: https://www.shadertoy.com/view/WXVSWt
+- Sources:
+  - https://x.com/XorDev/status/1955363029505413337
+  - https://x.com/XorDev/status/1950328339241316751
+
+**Xor Mashup 003.glsl**
+- Original code by XorDev
+- Sources:
+  - https://x.com/XorDev/status/1959077729082462559
+  - https://t.co/Mikpt1ZVHw
+  - https://x.com/XorDev/status/1933267977136443558
+- Audio reactive modifications by PAEz
+
+### diatribes - Multiple Shaders
+**ShaderToy Profile**: (Handle: diatribes)
+
+**sleeplessV4.glsl**
+- Original: "sleepless" by diatribes
+- Created: 2025-08-17
+- ShaderToy: https://www.shadertoy.com/view/WclcRN
+- Audio reactive modifications by @OneHung
+- Fixed for OpenGL/WebGL compatibility
+
+**Bubble Colors.glsl**
+- Original: "Bubble Colors" by diatribes
+- Created: 2025-06-20
+- ShaderToy: https://www.shadertoy.com/view/wcGXWR
+- Converted for OneOffRender system
+
+**Funky Flight.GLSL**
+- Original Author: diatribes
+- ShaderToy ID: tfsBzn
+- ShaderToy: https://www.shadertoy.com/view/tfsBzn
+
+### musk - Demoscene Artist
+
+**reflected structure by musk for TDF 2021_Optimized.glsl**
+- Original: "Reflected Structure" by musk
+- Created for: TDF 2021 (The Gathering Demo Party)
+- Optimized version with reduced complexity for better performance
+
+### shadertoyjiang
+
+**Gyroid Art.glsl**
+- Original: ShaderToy shader by shadertoyjiang
+- ShaderToy: https://www.shadertoy.com/view/X32czG
+- Real-time ray marched gyroid surface
+- Converted for OneOffRender system
+
+### EVOKE 2019 Shader Showdown Winner
+
+**EVOKE 2019 Shader Showdown_Fixed.glsl**
+- Original: Winning shader from EVOKE 2019 Shader Showdown
+- ShaderToy: https://www.shadertoy.com/view/wtSXDw
+- Converted from ShaderToy format to OneOffRender
+
+### Unknown/Demoscene Origins
+
+**01d-kabuto_Fixed.glsl**
+- Original: "01d-kabuto" (demoscene shader)
+- Converted from demoscene format to OneOffRender
+- Author: kabuto (demoscene handle)
+
+**02b-xt95_Fixed.glsl**
+- Original: "02b-xt95" (demoscene shader)
+- Converted from demoscene format to OneOffRender
+- Author: xt95 (demoscene handle)
+
+**charstiles_Fixed.glsl**
+- Original: "charstiles" (demoscene shader)
+- Converted from demoscene format to OneOffRender
+
+**tdf-16ms_glsl-graphics-compo_nunu-00_Fixed.glsl**
+- Original: TDF competition entry by nunu
+- Complex noise-based pattern shader
+- Converted from GLSL Sandbox format to OneOffRender
+
+**semifinal2-blueberry_Fixed.glsl**
+- Original: "semifinal2-blueberry" (demoscene shader)
+- Converted from demoscene format to OneOffRender
+
+**semifinal2-tapped_Fixed.glsl**
+- Original: "semifinal2-tapped" (demoscene shader)
+- Converted from demoscene format to OneOffRender
+
+### ShaderToy Community (Various Authors)
+
+**Colorflow orbV1_Fixed.glsl**
+- Converted from ShaderToy format to OneOffRender
+- Original author information not preserved in current version
+
+**Quasi Crystals2_Fixed.glsl**
+- Converted from ShaderToy format to OneOffRender
+- Based on quasicrystal mathematical concepts
+
+**Quasi-crystals_Fixed.glsl**
+- Converted from ShaderToy format to OneOffRender
+- Raw basic ShaderToy port with HSV coloring
+- References:
+  - https://mainisusuallyafunction.blogspot.com/2011/10/quasicrystals-as-sums-of-waves-in-plane.html
+  - https://wealoneonearth.blogspot.com/search/label/quasicrysta
+
+**Reflecting Crystals_Fixed.glsl**
+- Original: ShaderToy shader
+- ShaderToy: https://www.shadertoy.com/view/7l3SRB
+- Uses techniques from Inigo Quilez: https://iquilezles.org/articles/smin
+
+### Original Creations & Inspirations
+
+**Cosmic Nebula2.glsl**
+- Original implementation for OneOffRender
+- Influences acknowledged: Inigo Quilez (noise techniques), cosmic photography references
+- Deep space gas clouds with stellar formation and audio reactivity
+
+**Petal Drift.glsl**
+- Original implementation for OneOffRender
+- Influences acknowledged: 
+  - Inigo Quilez (analytic gradients)
+  - P_Malin (color sensibility)
+  - BigWings (motion layering concepts)
+- Drifting Gaussian petals with gentle lighting
+
+**MoltenHeart.glsl**
+- Audio-reactive raymarching shader with layered effects
+- Features dual-layer raymarching with bass and treble reactivity
+- Original implementation for OneOffRender
+
+**Base Vortex.glsl**
+- Audio-Reactive Tunnel Effect
+- Original implementation for OneOffRender
+
+**Colorful Columns.glsl**
+- Audio-Reactive Colorful Columns with enhanced colors
+- Original implementation for OneOffRender
+
+**Colorful Columns_V2.glsl**
+- Enhanced version of Colorful Columns
+- Original implementation for OneOffRender
+
+**Cosmic Energy Streams1.glsl**
+- Original implementation for OneOffRender
+- Flowing energy patterns with audio reactivity
+
+**Flowing Mathematical Patterns2.glsl**
+- Audio-Reactive mathematical visualization
+- Adapted for OneOffRender with bass-reactive color shifting
+
+**Iridescent Breathing Orbs.glsl**
+- Audio-reactive shader adapted for OneOffRender
+- Original ShaderToy shader converted to work with OneOffRender audio texture format
+
+**Luminous Nebulae.glsl**
+- Audio-Reactive nebula shader with dynamic color palettes
+- Colors change based on treble frequencies
+
+**Sonic Nebula.glsl**
+- Audio-driven nebula effects
+- Original implementation for OneOffRender
+
+**spectrum_TEST.glsl**
+- Spectrum visualization test shader
+- Created by @OneHung, inspired by @PAEz
+- Testing shader for audio spectrum compatibility
+
+### Additional Technical Contributors
+
+**PAEz** - Audio Reactive Modifications
+- Made numerous shaders audio reactive
+- Created mashup versions of XorDev shaders
+- Contributed to audio integration and testing
+
+**@OneHung** - System Integration
+- Audio reactive modifications and compatibility fixes
+- OpenGL/WebGL compatibility improvements
+- OneOffRender system integration
+
+---
+
+## ACKNOWLEDGMENTS
+
+### Technique Inspirations
+- **Inigo Quilez**: Noise techniques, analytic gradients, SDF functions
+- **P_Malin**: Color sensibility and palette techniques  
+- **BigWings**: Motion layering concepts
+
+### Mathematical References
+- Quasicrystal mathematical concepts and implementations
+- Various demoscene and ShaderToy community techniques
+
+### Community Platforms
+- **ShaderToy**: Primary source for many original shaders
+- **Demoscene Community**: Source of competition and demo shaders
+- **Twitter/X**: Platform for shader sharing and discovery
+
+---
+
+## MISSING ATTRIBUTIONS
+
+If you are the original creator of any shader in this collection and your attribution is missing or incorrect, please contact:
+- GitHub: Open an issue at https://github.com/hughesdo/OneOffRender
+- Twitter/X: @OneHung
+
+I sincerely apologize for any omissions and will promptly correct them.
+
+---
+
+## LICENSE COMPATIBILITY
+
+All shaders have been modified for compatibility with the OneOffRender system and include audio-reactive features. The original creative work remains credited to the respective authors. This project operates under Creative Commons Attribution–NonCommercial 4.0 International License (CC BY-NC 4.0).
+
+---
+
+*Last Updated: October 5, 2025*
+*Total Shaders: 35+*
+*Contributors Acknowledged: 10+ individual creators plus community inspirations*
