@@ -605,7 +605,12 @@ class Timeline {
         // Use event delegation for timeline elements
         this.container.addEventListener('mousedown', (e) => {
             const elementDiv = e.target.closest('.timeline-element');
-            if (!elementDiv) return;
+
+            // If clicking on empty timeline area (not on an element), seek playhead
+            if (!elementDiv) {
+                this.seekToPosition(e);
+                return;
+            }
 
             const elementId = elementDiv.dataset.id;
             const element = this.layers.find(el => el.id === elementId);
@@ -648,6 +653,34 @@ class Timeline {
                 this.endDragOrResize();
             }
         });
+
+        // Click on ruler to seek
+        if (this.rulerContainer) {
+            this.rulerContainer.addEventListener('click', (e) => {
+                this.seekToPosition(e);
+            });
+        }
+    }
+
+    /**
+     * Seek playhead to clicked position on timeline
+     */
+    seekToPosition(e) {
+        const rect = this.container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const timelineWidth = this.container.offsetWidth;
+        const clickedTime = (clickX / timelineWidth) * this.duration;
+
+        // Clamp to valid range
+        const newTime = Math.max(0, Math.min(clickedTime, this.duration));
+
+        // Update playhead position
+        this.setPlayheadPosition(newTime);
+
+        // Notify editor to update video/audio position
+        if (window.editor) {
+            window.editor.seekTo(newTime);
+        }
     }
 
     /**

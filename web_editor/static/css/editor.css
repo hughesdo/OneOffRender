@@ -376,11 +376,12 @@ body {
 }
 
 #videoPreview {
-    width: 100%;
     max-width: 100%;
     max-height: 100%;
+    width: auto;
     height: auto;
     object-fit: contain;  /* Maintains aspect ratio, fits within container */
+    display: block;
 }
 
 .viewer-overlay {
