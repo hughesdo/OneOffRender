@@ -11,10 +11,10 @@ class VideoEditor {
         this.transitions = [];
         this.currentShader = null;
 
-        // Audio playback
-        this.audioElement = new Audio();
+        // Playback state (using single video element for both audio and video)
         this.isPlaying = false;
         this.playbackInterval = null;
+        this.hasRenderedVideo = false; // Track if we have a rendered video loaded
 
         this.initializeUI();
         this.loadAssets();
@@ -659,7 +659,7 @@ class VideoEditor {
     }
 
     /**
-     * Play video
+     * Play audio/video (unified player)
      */
     play() {
         if (!this.selectedAudio) {
@@ -671,55 +671,56 @@ class VideoEditor {
             return; // Already playing
         }
 
-        // Set audio source if not already set
-        if (!this.audioElement.src || !this.audioElement.src.includes(this.selectedAudio.name)) {
-            this.audioElement.src = this.selectedAudio.path;
+        // Use the video element for both audio-only and video playback
+        // Set audio source if not already set (and no rendered video loaded)
+        if (!this.hasRenderedVideo && (!this.videoPreview.src || !this.videoPreview.src.includes(this.selectedAudio.name))) {
+            this.videoPreview.src = this.selectedAudio.path;
         }
 
         // Start from current playhead position
-        this.audioElement.currentTime = this.timeline.playheadPosition;
+        this.videoPreview.currentTime = this.timeline.playheadPosition;
 
-        // Play audio
-        this.audioElement.play().then(() => {
+        // Play audio/video
+        this.videoPreview.play().then(() => {
             this.isPlaying = true;
 
             // Update button states
             this.playBtn.style.opacity = '0.5';
             this.pauseBtn.style.opacity = '1';
 
-            // Update playhead position as audio plays
+            // Update playhead position as media plays
             this.playbackInterval = setInterval(() => {
-                if (this.audioElement.currentTime >= this.selectedAudio.duration) {
-                    // Reached end of audio
+                if (this.videoPreview.currentTime >= this.selectedAudio.duration) {
+                    // Reached end of audio/video
                     this.pause();
                     // Reset playhead to beginning
                     this.timeline.playheadPosition = 0;
                     this.timeline.updatePlayhead();
                     this.currentTimeDisplay.textContent = '00:00';
                 } else {
-                    this.timeline.playheadPosition = this.audioElement.currentTime;
+                    this.timeline.playheadPosition = this.videoPreview.currentTime;
                     this.timeline.updatePlayhead();
 
                     // Update current time display
-                    this.currentTimeDisplay.textContent = API.formatDuration(this.audioElement.currentTime);
+                    this.currentTimeDisplay.textContent = API.formatDuration(this.videoPreview.currentTime);
                 }
             }, 50); // Update every 50ms
         }).catch(error => {
-            console.error('Error playing audio:', error);
-            alert('Failed to play audio: ' + error.message);
+            console.error('Error playing media:', error);
+            alert('Failed to play: ' + error.message);
         });
     }
 
     /**
-     * Pause video
+     * Pause audio/video (unified player)
      */
     pause() {
         if (!this.isPlaying) {
             return; // Already paused
         }
 
-        // Pause audio
-        this.audioElement.pause();
+        // Pause audio/video
+        this.videoPreview.pause();
         this.isPlaying = false;
 
         // Update button states
@@ -731,6 +732,24 @@ class VideoEditor {
             clearInterval(this.playbackInterval);
             this.playbackInterval = null;
         }
+    }
+
+    /**
+     * Seek to specific time position
+     */
+    seekTo(time) {
+        if (!this.selectedAudio) {
+            return;
+        }
+
+        // Update video/audio current time
+        this.videoPreview.currentTime = time;
+
+        // Update time display
+        this.currentTimeDisplay.textContent = API.formatDuration(time);
+
+        // If playing, the playback interval will continue updating from new position
+        // If paused, just update the position
     }
 
     /**
@@ -901,9 +920,13 @@ class VideoEditor {
                 clearInterval(this.renderPollInterval);
                 this.renderProgressOverlay.style.display = 'none';
 
-                // Load video into player
+                // Load rendered video into player
                 const projectName = this.timeline.audioFileName.replace(/\.[^/.]+$/, ''); // Remove extension
                 this.videoPreview.src = `/api/render/output/${projectName}.mp4`;
+                this.hasRenderedVideo = true; // Mark that we now have a rendered video
+
+                // Hide the overlay since we now have video content
+                this.viewerOverlay.style.display = 'none';
 
                 alert('Rendering complete! Video loaded in preview.');
                 this.currentRenderPID = null;
