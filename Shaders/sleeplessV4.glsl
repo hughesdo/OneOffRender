@@ -38,9 +38,9 @@ void mainImage(out vec4 o, vec2 u) {
     float bass = texture(iChannel0, vec2(BASS_SAMPLE_POS, 0.25)).x;
     bass = max(0.0, bass - BASS_THRESHOLD); // Remove noise floor
     float bassBoost = ORB_BRIGHTNESS * (1.0 + bass * BASS_MULTIPLIER); // Brightness multiplier
-    
-    // Scale coords
-    u = (u + u - p.xy) / p.y;
+
+    // Scale coords - Zoom out 1.5x for wider cloud visibility
+    u = (u + u - p.xy) / (p.y * 1.5);
     
     // Cinema bars
     //if (abs(u.y) > 0.8) { 
@@ -67,7 +67,7 @@ void mainImage(out vec4 o, vec2 u) {
         );
         p.xy *= rot;
 
-        s = 4.0 - abs(p.y);
+        s = 6.0 - abs(p.y);  // Extend clouds vertically for more coverage
 
         a = 0.42;
         while (a < 16.0) {

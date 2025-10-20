@@ -148,6 +148,7 @@ class TimelineRenderer:
             self.logger.info("\n" + "="*80)
             self.logger.info("--- Rendering Layer 1: Shaders & Transitions ---")
             self.logger.info("="*80)
+            self.logger.info(f"PROGRESS: 0.0% | STAGE: Starting Layer 1 | ITEM: Shaders & Transitions | TIME: 0.0s/{duration:.1f}s")
             layer1_start = time.time()
             layer1_video = self.render_shader_layer()
             layer1_elapsed = time.time() - layer1_start
@@ -158,6 +159,7 @@ class TimelineRenderer:
             self.logger.info("\n" + "="*80)
             self.logger.info("--- Rendering Layer 0: Green Screen Videos ---")
             self.logger.info("="*80)
+            self.logger.info(f"PROGRESS: 60.0% | STAGE: Starting Layer 0 | ITEM: Green Screen Videos | TIME: 0.0s/{duration:.1f}s")
             layer0_start = time.time()
             layer0_video = self.render_greenscreen_layer()
             layer0_elapsed = time.time() - layer0_start
@@ -171,6 +173,7 @@ class TimelineRenderer:
             self.logger.info("\n" + "="*80)
             self.logger.info("--- Compositing Layers ---")
             self.logger.info("="*80)
+            self.logger.info(f"PROGRESS: 75.0% | STAGE: Compositing layers | ITEM: Applying chroma key | TIME: 0.0s/{duration:.1f}s")
             composite_start = time.time()
             composite_video = self.composite_layers(layer1_video, layer0_video)
             composite_elapsed = time.time() - composite_start
@@ -181,6 +184,7 @@ class TimelineRenderer:
             self.logger.info("\n" + "="*80)
             self.logger.info("--- Adding Audio Track ---")
             self.logger.info("="*80)
+            self.logger.info(f"PROGRESS: 85.0% | STAGE: Adding audio | ITEM: Muxing with FFmpeg | TIME: 0.0s/{duration:.1f}s")
             audio_start = time.time()
             final_video = self.add_audio(composite_video)
             audio_elapsed = time.time() - audio_start
@@ -575,9 +579,231 @@ class TimelineRenderer:
             self.logger.error(f"Failed to load audio: {e}")
             return None
 
+    def load_metadata(self):
+        """Load shader metadata from Shaders/metadata.json."""
+        metadata_path = Path("Shaders") / "metadata.json"
+        if not metadata_path.exists():
+            self.logger.warning("Shaders/metadata.json not found")
+            return {}
+
+        try:
+            with open(metadata_path, 'r') as f:
+                metadata_list = json.load(f)
+
+            # Convert list to dict keyed by shader name
+            metadata_dict = {}
+            for entry in metadata_list:
+                metadata_dict[entry['name']] = entry
+
+            return metadata_dict
+        except Exception as e:
+            self.logger.error(f"Failed to load metadata: {e}")
+            return {}
+
+    def load_cubemap_from_files(self, basename, filter_mode='linear', mipmap=False):
+        """Load 6 images as a cubemap texture from the Cubemaps/ folder."""
+        try:
+            from PIL import Image
+            import numpy as np
+
+            cubemaps_dir = Path("Cubemaps")
+
+            # Define face suffixes in ModernGL order: +X, -X, +Y, -Y, +Z, -Z
+            face_suffixes = ['px', 'nx', 'py', 'ny', 'pz', 'nz']
+            face_names = ['positive X (right)', 'negative X (left)',
+                         'positive Y (top)', 'negative Y (bottom)',
+                         'positive Z (front)', 'negative Z (back)']
+
+            # Load all 6 faces
+            faces = []
+            face_size = None
+
+            for suffix, name in zip(face_suffixes, face_names):
+                # Try common image extensions
+                face_path = None
+                for ext in ['.png', '.jpg', '.jpeg', '.bmp', '.tga']:
+                    potential_path = cubemaps_dir / f"{basename}_{suffix}{ext}"
+                    if potential_path.exists():
+                        face_path = potential_path
+                        break
+
+                if not face_path:
+                    self.logger.error(f"Cubemap face not found: {basename}_{suffix}.* ({name})")
+                    return None
+
+                # Load image
+                img = Image.open(face_path)
+                img = img.convert('RGB')
+
+                # Validate size
+                if img.size[0] != img.size[1]:
+                    self.logger.error(f"Cubemap face must be square: {face_path.name} is {img.size[0]}x{img.size[1]}")
+                    return None
+
+                if face_size is None:
+                    face_size = img.size[0]
+                elif img.size[0] != face_size:
+                    self.logger.error(f"All cubemap faces must be same size: {face_path.name} is {img.size[0]}x{img.size[0]}, expected {face_size}x{face_size}")
+                    return None
+
+                # Convert to numpy array
+                img_data = np.array(img, dtype=np.uint8)
+
+                # Flip vertically for OpenGL coordinate system
+                img_data = np.flipud(img_data)
+
+                faces.append(img_data)
+                self.logger.info(f"    Loaded cubemap face: {face_path.name} ({name})")
+
+            # Concatenate all 6 faces into single data array
+            combined_data = b''.join([face.tobytes() for face in faces])
+
+            # Create cubemap texture
+            cubemap = self.ctx.texture_cube(
+                size=(face_size, face_size),
+                components=3,
+                data=combined_data,
+                dtype='f1'
+            )
+
+            # Set filtering
+            if filter_mode == 'linear':
+                cubemap.filter = (moderngl.LINEAR, moderngl.LINEAR)
+            else:
+                cubemap.filter = (moderngl.NEAREST, moderngl.NEAREST)
+
+            # Generate mipmaps if requested
+            if mipmap:
+                cubemap.build_mipmaps()
+
+            self.logger.info(f"    ✓ Loaded cubemap: {basename} ({face_size}x{face_size}, 6 faces)")
+            return cubemap
+
+        except Exception as e:
+            self.logger.error(f"Failed to load cubemap {basename}: {e}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+            return None
+
+    def load_texture_from_file(self, texture_path, filter_mode='linear', wrap_mode='repeat', mipmap=False):
+        """Load an image file as a ModernGL texture."""
+        try:
+            from PIL import Image
+            import numpy as np
+
+            # Load image
+            img = Image.open(texture_path)
+            img = img.convert('RGB')  # Ensure RGB format
+            img_data = np.array(img, dtype=np.uint8)
+
+            # Flip vertically (OpenGL expects bottom-left origin)
+            img_data = np.flipud(img_data)
+
+            # Create texture
+            texture = self.ctx.texture(img.size, 3, img_data.tobytes())
+
+            # Set filtering
+            if filter_mode == 'linear':
+                texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
+            else:
+                texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
+
+            # Set wrapping
+            if wrap_mode == 'repeat':
+                texture.repeat_x = True
+                texture.repeat_y = True
+            elif wrap_mode == 'clamp':
+                texture.repeat_x = False
+                texture.repeat_y = False
+
+            # Generate mipmaps if requested
+            if mipmap:
+                texture.build_mipmaps()
+
+            self.logger.info(f"    ✓ Loaded texture: {texture_path.name} ({img.size[0]}x{img.size[1]})")
+            return texture
+
+        except Exception as e:
+            self.logger.error(f"    Failed to load texture {texture_path}: {e}")
+            return None
+
+    def detect_and_load_textures(self, shader_path, metadata=None):
+        """Detect and load texture files for a shader from metadata."""
+        textures = {}
+
+        if not metadata or not metadata.get('texture'):
+            return textures
+
+        texture_config = metadata['texture']
+        textures_dir = Path("Textures")
+
+        # Phase 1: Simple string (single texture)
+        if isinstance(texture_config, str):
+            texture_file = textures_dir / texture_config
+            if texture_file.exists():
+                texture = self.load_texture_from_file(texture_file)
+                if texture:
+                    textures['iChannel1'] = texture
+                    self.logger.info(f"    Loaded texture to iChannel1: {texture_config}")
+            else:
+                self.logger.warning(f"    Texture file not found: {texture_file}")
+
+        # Phase 2/3: Dict mapping channels to filenames or config
+        elif isinstance(texture_config, dict):
+            for channel, config in texture_config.items():
+                # Simple filename string
+                if isinstance(config, str):
+                    texture_file = textures_dir / config
+                    if texture_file.exists():
+                        texture = self.load_texture_from_file(texture_file)
+                        if texture:
+                            textures[channel] = texture
+                            self.logger.info(f"    Loaded texture to {channel}: {config}")
+                    else:
+                        self.logger.warning(f"    Texture file not found: {texture_file}")
+
+                # Phase 3: Advanced config dict (includes cubemap support)
+                elif isinstance(config, dict):
+                    # Check if this is a cubemap
+                    if config.get('type') == 'cubemap':
+                        # Load cubemap using basename
+                        basename = config.get('basename')
+                        if basename:
+                            cubemap = self.load_cubemap_from_files(
+                                basename,
+                                filter_mode=config.get('filter', 'linear'),
+                                mipmap=config.get('mipmap', False)
+                            )
+                            if cubemap:
+                                textures[channel] = cubemap
+                                self.logger.info(f"    Loaded cubemap to {channel}: {basename}")
+                        else:
+                            self.logger.error(f"    Cubemap config missing 'basename' for {channel}")
+
+                    # Regular 2D texture with advanced config
+                    elif 'file' in config:
+                        texture_file = textures_dir / config['file']
+                        if texture_file.exists():
+                            texture = self.load_texture_from_file(
+                                texture_file,
+                                filter_mode=config.get('filter', 'linear'),
+                                wrap_mode=config.get('wrap', 'repeat'),
+                                mipmap=config.get('mipmap', False)
+                            )
+                            if texture:
+                                textures[channel] = texture
+                                self.logger.info(f"    Loaded texture to {channel}: {config['file']}")
+                        else:
+                            self.logger.warning(f"    Texture file not found: {texture_file}")
+
+        return textures
+
     def precompile_shaders(self, elements):
-        """Precompile all shaders and transitions for the layer."""
+        """Precompile all shaders and transitions for the layer, including buffer support."""
         self.logger.info("Precompiling shaders and transitions...")
+
+        # Load metadata once for all shaders
+        metadata_dict = self.load_metadata()
 
         compiled = {}
         shader_elements = [el for el in elements if el['type'] in ['shader', 'transition']]
@@ -589,16 +815,52 @@ class TimelineRenderer:
             self.logger.info(f"  Compiling {shader_name}...")
 
             try:
+                # Compile main shader
                 program = self.load_shader_from_file(shader_path)
-                if program:
-                    compiled[element['id']] = {
-                        'program': program,
-                        'element': element,
-                        'path': shader_path
-                    }
-                    self.logger.info(f"  ✓ {shader_name}")
-                else:
+                if not program:
                     self.logger.warning(f"  ✗ Failed to compile {shader_name}")
+                    continue
+
+                # Load textures for this shader
+                textures = {}
+                if element['type'] == 'shader':  # Only main shaders have textures
+                    metadata = metadata_dict.get(shader_name)
+                    if metadata:
+                        textures = self.detect_and_load_textures(shader_path, metadata)
+
+                # Detect and compile buffer shaders (only for shader elements, not transitions)
+                buffers = {}
+                if element['type'] == 'shader':
+                    buffer_ids = self.detect_shader_buffers(shader_path)
+
+                    if buffer_ids:
+                        self.logger.info(f"    Detected buffers: {', '.join(buffer_ids)}")
+                        for buffer_id in buffer_ids:
+                            buffer_file = shader_path.parent / f"{shader_path.stem}.buffer.{buffer_id}.glsl"
+                            self.logger.info(f"    Compiling buffer {buffer_id}...")
+                            buffer_program = self.load_shader_from_file(buffer_file)
+
+                            if buffer_program is not None:
+                                buffers[buffer_id] = {
+                                    'program': buffer_program,
+                                    'path': buffer_file,
+                                    'texture_current': None,
+                                    'texture_previous': None,
+                                    'fbo_current': None,
+                                    'fbo_previous': None
+                                }
+                                self.logger.info(f"    ✓ Buffer {buffer_id} compiled successfully")
+                            else:
+                                self.logger.warning(f"    ✗ Failed to compile buffer {buffer_id}")
+
+                compiled[element['id']] = {
+                    'program': program,
+                    'element': element,
+                    'path': shader_path,
+                    'buffers': buffers,
+                    'textures': textures
+                }
+                self.logger.info(f"  ✓ {shader_name}")
 
             except Exception as e:
                 self.logger.error(f"  ✗ Error compiling {shader_name}: {e}")
@@ -872,6 +1134,45 @@ class TimelineRenderer:
 
         return selected_shader
 
+    def detect_shader_buffers(self, shader_path, metadata=None):
+        """
+        Detect buffer files for a shader using hybrid approach.
+
+        Args:
+            shader_path: Path to main shader file
+            metadata: Optional metadata dict for this shader
+
+        Returns:
+            List of buffer IDs ['A', 'B', ...] or empty list
+        """
+        # 1. Check metadata first
+        if metadata and metadata.get('buffer'):
+            buffer_config = metadata['buffer']
+            if isinstance(buffer_config, bool) and buffer_config:
+                # Phase 1: Boolean, auto-discover files
+                pass
+            elif isinstance(buffer_config, dict):
+                # Phase 2/3: Explicit configuration
+                if 'files' in buffer_config:
+                    # Extract buffer IDs from filenames
+                    found_buffers = []
+                    for file in buffer_config['files']:
+                        # Extract buffer ID from filename like "Shader.buffer.A.glsl"
+                        if '.buffer.' in file:
+                            buffer_id = file.split('.buffer.')[1].split('.')[0]
+                            found_buffers.append(buffer_id)
+                    return found_buffers
+
+        # 2. Fallback: Auto-discover by file naming
+        base_name = shader_path.stem
+        found_buffers = []
+        for buffer_id in ['A', 'B', 'C', 'D']:
+            buffer_file = shader_path.parent / f"{base_name}.buffer.{buffer_id}.glsl"
+            if buffer_file.exists():
+                found_buffers.append(buffer_id)
+
+        return found_buffers
+
     def load_shader_from_file(self, shader_path):
         """Load and compile a GLSL shader."""
         try:
@@ -922,6 +1223,13 @@ class TimelineRenderer:
         fbo = self.ctx.framebuffer(
             color_attachments=[self.ctx.texture((width, height), 4)]
         )
+
+        # Initialize buffer textures for all shaders with buffers
+        resolution = (width, height)
+        for shader_id, shader_data in compiled_shaders.items():
+            if shader_data.get('buffers'):
+                self.logger.info(f"Initializing buffers for {shader_data['element']['name']}")
+                self.initialize_buffer_textures(shader_data, resolution)
 
         # Create vertex buffer for full-screen quad
         vertices = np.array([
@@ -1032,10 +1340,14 @@ class TimelineRenderer:
                         self.logger.warning(f"No shader found at {time_seconds:.2f}s - rendering black")
                         self.render_black_frame(fbo, raw_file)
 
-                # Progress indicator
-                if frame_idx % (frame_rate * 5) == 0:  # Every 5 seconds
-                    progress = (frame_idx / total_frames) * 100
-                    self.logger.info(f"  Progress: {progress:.1f}% ({time_seconds:.1f}s)")
+                # Progress indicator - more frequent and detailed
+                if frame_idx % (frame_rate * 2) == 0:  # Every 2 seconds
+                    # Layer 1 (shaders) represents 0-60% of total progress
+                    layer_progress = (frame_idx / total_frames) * 100
+                    progress = (layer_progress * 0.60)  # Scale to 60% of total
+                    # Structured progress output for web UI parsing
+                    current_shader_name = current_element['name'] if current_element else "None"
+                    self.logger.info(f"PROGRESS: {progress:.1f}% | STAGE: Rendering shader | ITEM: {current_shader_name} | TIME: {time_seconds:.1f}s/{duration:.1f}s")
 
             raw_file.close()
 
@@ -1095,8 +1407,141 @@ class TimelineRenderer:
         current_element = self.find_element_at_time(elements, time_seconds)
         return current_element, None, None, None
 
+    def initialize_buffer_textures(self, shader_data, resolution):
+        """Initialize ping-pong textures and framebuffers for all buffers."""
+        for buffer_id, buffer_data in shader_data.get('buffers', {}).items():
+            # Create two textures for ping-pong rendering
+            buffer_data['texture_current'] = self.ctx.texture(resolution, 3)
+            buffer_data['texture_previous'] = self.ctx.texture(resolution, 3)
+
+            # Set texture parameters
+            for tex in [buffer_data['texture_current'], buffer_data['texture_previous']]:
+                tex.filter = (self.ctx.LINEAR, self.ctx.LINEAR)
+                tex.repeat_x = False
+                tex.repeat_y = False
+
+            # Create framebuffers
+            buffer_data['fbo_current'] = self.ctx.framebuffer(
+                color_attachments=[buffer_data['texture_current']]
+            )
+            buffer_data['fbo_previous'] = self.ctx.framebuffer(
+                color_attachments=[buffer_data['texture_previous']]
+            )
+
+            self.logger.debug(f"Initialized buffer {buffer_id} textures: {resolution}")
+
+    def swap_buffer_textures(self, buffer_data):
+        """Swap current and previous textures for ping-pong rendering."""
+        buffer_data['texture_current'], buffer_data['texture_previous'] = \
+            buffer_data['texture_previous'], buffer_data['texture_current']
+        buffer_data['fbo_current'], buffer_data['fbo_previous'] = \
+            buffer_data['fbo_previous'], buffer_data['fbo_current']
+
+    def render_buffer_pass(self, buffer_data, vbo, audio_texture, time_seconds, resolution):
+        """Render a single buffer pass with feedback support."""
+        buffer_data['fbo_current'].use()
+
+        program = buffer_data['program']
+        vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
+
+        # Bind audio to iChannel0
+        audio_texture.use(location=0)
+        if 'iChannel0' in program:
+            program['iChannel0'].value = 0
+
+        # Bind previous frame to iChannel1 (feedback)
+        if buffer_data['texture_previous']:
+            buffer_data['texture_previous'].use(location=1)
+            if 'iChannel1' in program:
+                program['iChannel1'].value = 1
+
+        # Set uniforms
+        if 'iTime' in program:
+            program['iTime'].value = time_seconds
+        if 'iResolution' in program:
+            program['iResolution'].value = resolution
+
+        # Clear and render
+        self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+        vao.render()
+
+    def render_shader_frame_with_buffers(self, shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file):
+        """Render a frame with multi-pass buffer support."""
+        time_seconds = frame_idx / frame_rate
+        resolution = (fbo.width, fbo.height)
+
+        # Create audio texture
+        audio_texture = None
+        if audio_data:
+            audio_frame_idx = min(frame_idx, len(audio_data['bass']) - 1)
+            bass_value = audio_data['bass'][audio_frame_idx]
+            treble_value = audio_data['treble'][audio_frame_idx]
+            waveform_data = audio_data['waveform'][audio_frame_idx] if 'waveform' in audio_data else None
+            fft_spectrum = audio_data['fft_spectrum'][:, audio_frame_idx] if 'fft_spectrum' in audio_data else None
+            audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
+
+        # Render all buffer passes in order (A, B, C, D)
+        if audio_texture:
+            for buffer_id in ['A', 'B', 'C', 'D']:
+                if buffer_id in shader_data.get('buffers', {}):
+                    self.render_buffer_pass(
+                        shader_data['buffers'][buffer_id],
+                        vbo,
+                        audio_texture,
+                        time_seconds,
+                        resolution
+                    )
+
+        # Render main image using buffer outputs
+        fbo.use()
+        program = shader_data['program']
+        vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
+
+        # Bind audio to iChannel0
+        if audio_texture:
+            audio_texture.use(location=0)
+            if 'iChannel0' in program:
+                program['iChannel0'].value = 0
+
+        # Bind buffer outputs to iChannel1, iChannel2, etc.
+        channel = 1
+        for buffer_id in ['A', 'B', 'C', 'D']:
+            if buffer_id in shader_data.get('buffers', {}):
+                shader_data['buffers'][buffer_id]['texture_current'].use(location=channel)
+                if f'iChannel{channel}' in program:
+                    program[f'iChannel{channel}'].value = channel
+                channel += 1
+
+        # Set uniforms
+        if 'iTime' in program:
+            program['iTime'].value = time_seconds
+        if 'iResolution' in program:
+            program['iResolution'].value = resolution
+
+        # Clear and render
+        self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+        vao.render()
+
+        # Read pixels and write to raw file
+        pixels = fbo.read(components=3)
+        raw_file.write(pixels)
+
+        # Swap ping-pong buffers for next frame
+        for buffer_id, buffer_data in shader_data.get('buffers', {}).items():
+            self.swap_buffer_textures(buffer_data)
+
+        # Cleanup
+        if audio_texture:
+            audio_texture.release()
+
     def render_shader_frame(self, shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file):
         """Render a single frame using a shader."""
+        # Check if shader has buffers
+        if shader_data.get('buffers'):
+            self.render_shader_frame_with_buffers(shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file)
+            return
+
+        # Standard single-pass rendering
         program = shader_data['program']
         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
@@ -1121,6 +1566,19 @@ class TimelineRenderer:
             audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
             audio_texture.use(location=0)
             program['iChannel0'].value = 0
+
+        # Bind custom textures to iChannel1, iChannel2, etc.
+        textures = shader_data.get('textures', {})
+        if textures:
+            for texture_channel in sorted(textures.keys()):
+                if texture_channel.startswith('iChannel'):
+                    try:
+                        requested_channel = int(texture_channel.replace('iChannel', ''))
+                        textures[texture_channel].use(location=requested_channel)
+                        if texture_channel in program:
+                            program[texture_channel].value = requested_channel
+                    except ValueError:
+                        self.logger.error(f"Invalid channel name: {texture_channel}")
 
         # Render to framebuffer
         fbo.use()
@@ -1458,41 +1916,19 @@ class TimelineRenderer:
             return None
 
     def scale_and_position_video_frame(self, frame_data, target_width, target_height):
-        """Scale and position video frame according to requirements."""
+        """Scale video frame to fill entire canvas at composition aspect ratio."""
         from PIL import Image
 
         # Convert numpy array to PIL Image
         frame_height, frame_width = frame_data.shape[:2]
         frame_image = Image.fromarray(frame_data, 'RGB')
 
-        # Scale height to match target height (maintain aspect ratio)
-        scale_factor = target_height / frame_height
-        new_width = int(frame_width * scale_factor)
-        new_height = target_height
-
-        scaled_image = frame_image.resize((new_width, new_height), Image.LANCZOS)
-
-        # Constrain width to exactly 1/3 of target width
-        target_video_width = target_width // 3
-
-        if new_width != target_video_width:
-            # Scale again to fit exactly 1/3 width
-            final_scale = target_video_width / new_width
-            final_height = int(new_height * final_scale)
-            scaled_image = scaled_image.resize((target_video_width, final_height), Image.LANCZOS)
-
-        # Create canvas and center the video
-        canvas = Image.new('RGB', (target_width, target_height), (0, 214, 0))  # Green background rgb(0, 214, 0)
-
-        # Calculate position to center horizontally
-        x_offset = (target_width - target_video_width) // 2
-        y_offset = (target_height - scaled_image.height) // 2
-
-        # Paste scaled video onto canvas
-        canvas.paste(scaled_image, (x_offset, y_offset))
+        # Scale video to exactly match target dimensions (composition aspect ratio)
+        # This ensures the green screen video fills the entire canvas
+        scaled_image = frame_image.resize((target_width, target_height), Image.LANCZOS)
 
         # Convert back to numpy array
-        return np.array(canvas)
+        return np.array(scaled_image)
 
     def apply_chromakey_to_frame(self, frame_data, element):
         """Apply chroma key to normalize green colors to rgb(0, 214, 0) for consistent FFmpeg processing."""
@@ -1684,10 +2120,13 @@ class TimelineRenderer:
                     # No active video - render neon green fill for chroma key
                     self.render_green_fill_frame(width, height, raw_file)
 
-                # Progress indicator
-                if frame_idx % (frame_rate * 5) == 0:  # Every 5 seconds
-                    progress = (frame_idx / total_frames) * 100
-                    self.logger.info(f"  Layer 0 (green screen) Progress: {progress:.1f}% ({time_seconds:.1f}s)")
+                # Progress indicator - more frequent and detailed
+                if frame_idx % (frame_rate * 2) == 0:  # Every 2 seconds
+                    # Layer 0 (green screen) represents 60-75% of total progress
+                    layer_progress = (frame_idx / total_frames) * 100
+                    progress = 60.0 + (layer_progress * 0.15)  # Scale to 15% of total, offset by 60%
+                    current_video_name = active_element['name'] if active_element else "None"
+                    self.logger.info(f"PROGRESS: {progress:.1f}% | STAGE: Rendering green screen | ITEM: {current_video_name} | TIME: {time_seconds:.1f}s/{duration:.1f}s")
 
             raw_file.close()
 

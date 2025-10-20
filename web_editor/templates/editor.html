@@ -84,6 +84,10 @@
                             <source src="" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
+                        <!-- Separate video element for green screen preview overlay -->
+                        <video id="greenScreenPreview" class="green-screen-overlay" style="display: none;">
+                            <source src="" type="video/mp4">
+                        </video>
                         <div class="viewer-overlay">
                             <p>Select music to begin editing</p>
                         </div>
@@ -99,8 +103,7 @@
                         </div>
                     </div>
                     <div class="playback-controls">
-                        <button id="playBtn" class="control-btn" disabled>▶</button>
-                        <button id="pauseBtn" class="control-btn" disabled>⏸</button>
+                        <button id="playPauseBtn" class="control-btn play-pause-btn" disabled title="Play/Pause (Space)">▶</button>
                         <span id="currentTime" class="time-display">00:00</span>
                         <span class="time-separator">/</span>
                         <span id="totalTime" class="time-display">00:00</span>
@@ -113,10 +116,11 @@
                         <h3>Timeline</h3>
                         <div class="timeline-controls">
                             <span id="zoomDisplay" class="zoom-display">Zoom: 1.0x</span>
-                            <button id="zoomInBtn" class="control-btn" disabled>+</button>
-                            <button id="zoomOutBtn" class="control-btn" disabled>-</button>
-                            <button id="undoBtn" class="control-btn" disabled>↶</button>
-                            <button id="redoBtn" class="control-btn" disabled>↷</button>
+                            <button id="zoomInBtn" class="control-btn" disabled title="Zoom In">+</button>
+                            <button id="zoomOutBtn" class="control-btn" disabled title="Zoom Out">-</button>
+                            <button id="zoomResetBtn" class="control-btn at-default" disabled title="Reset Zoom to 1:1">⊙</button>
+                            <button id="undoBtn" class="control-btn" disabled title="Undo">↶</button>
+                            <button id="redoBtn" class="control-btn" disabled title="Redo">↷</button>
                         </div>
                     </div>
                     <div class="timeline-container">

@@ -1,0 +1,28 @@
+
+get your picture:
+https://polyhaven.com/hdris/night
+https://polyhaven.com/a/rogland_clear_night
+
+cube map it
+https://jaxry.github.io/panorama-to-cubemap/
+
+Then for fuck sake top and bottom are fucked! 
+
+In the skybox viewer, use the file inputs labeled:
+
+Right (px)
+Left (nx)
+Top (py)
+Bottom (ny)
+Front (pz)
+Back (nz)
+
+
+just to note I think they are always to be like this:
+
+Right (px)
+Left (nx)
+Bottom (py)
+Top (ny)
+Front (pz)
+Back (nz)

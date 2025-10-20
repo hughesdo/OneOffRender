@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "project_name": "RAVE-BANNGER1_30",
+  "audio": {
+    "path": "Input_Audio/RAVE-BANNGER1_30.wav",
+    "duration": 30
+  },
+  "resolution": {
+    "width": 854,
+    "height": 480
+  },
+  "frame_rate": 30,
+  "timeline": {
+    "duration": 30,
+    "elements": [
+      {
+        "id": "element_1760816003517_8fm0ryajl",
+        "type": "shader",
+        "name": "sleeplessV4.glsl",
+        "startTime": 0,
+        "endTime": 9.545,
+        "duration": 9.545,
+        "layer": 1,
+        "path": "Shaders/sleeplessV4.glsl"
+      },
+      {
+        "id": "element_1760816077787_ozvdrdtf3",
+        "type": "transition",
+        "name": "Displacement",
+        "startTime": 9.545,
+        "endTime": 11.145,
+        "duration": 1.6,
+        "layer": 1,
+        "path": "Transitions/Displacement.glsl"
+      },
+      {
+        "id": "element_1760816125482_3vj4o5drh",
+        "type": "shader",
+        "name": "Audio Reactive Magical Orb-2.glsl",
+        "startTime": 11.145,
+        "endTime": 21.145,
+        "duration": 10,
+        "layer": 1,
+        "path": "Shaders/Audio Reactive Magical Orb-2.glsl"
+      },
+      {
+        "id": "element_1760816139144_g32om9pkm",
+        "type": "transition",
+        "name": "CannabisLeaf",
+        "startTime": 21.145,
+        "endTime": 22.745,
+        "duration": 1.6,
+        "layer": 1,
+        "path": "Transitions/CannabisLeaf.glsl"
+      },
+      {
+        "id": "element_1760816154811_3jpgyml8d",
+        "type": "shader",
+        "name": "Volumetric Glow2.glsl",
+        "startTime": 22.745,
+        "endTime": 30,
+        "duration": 7.254999999999999,
+        "layer": 1,
+        "path": "Shaders/Volumetric Glow2.glsl"
+      },
+      {
+        "id": "element_1760816179997_cf5cg6ktp",
+        "type": "video",
+        "name": "Redhead_Rave_Green.mp4",
+        "startTime": 11.207857142857144,
+        "endTime": 21.207857142857144,
+        "duration": 10,
+        "layer": 0,
+        "path": "Input_Video/Redhead_Rave_Green.mp4"
+      }
+    ]
+  }
+}

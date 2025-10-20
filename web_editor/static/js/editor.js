@@ -36,9 +36,9 @@ class VideoEditor {
         // Center panel elements
         this.centerPanel = document.querySelector('.center-panel');
         this.videoPreview = document.getElementById('videoPreview');
+        this.greenScreenPreview = document.getElementById('greenScreenPreview');
         this.viewerOverlay = document.querySelector('.viewer-overlay');
-        this.playBtn = document.getElementById('playBtn');
-        this.pauseBtn = document.getElementById('pauseBtn');
+        this.playPauseBtn = document.getElementById('playPauseBtn');
         this.currentTimeDisplay = document.getElementById('currentTime');
         this.totalTimeDisplay = document.getElementById('totalTime');
         
@@ -61,6 +61,7 @@ class VideoEditor {
         // Timeline controls
         this.zoomInBtn = document.getElementById('zoomInBtn');
         this.zoomOutBtn = document.getElementById('zoomOutBtn');
+        this.zoomResetBtn = document.getElementById('zoomResetBtn');
         this.zoomDisplay = document.getElementById('zoomDisplay');
         this.undoBtn = document.getElementById('undoBtn');
         this.redoBtn = document.getElementById('redoBtn');
@@ -75,6 +76,10 @@ class VideoEditor {
         this.renderStageText = document.getElementById('renderStageText');
         this.currentRenderPID = null;
         this.renderPollInterval = null;
+
+        // Green screen preview state
+        this.currentGreenScreen = null; // Currently active green screen element
+        this.greenScreenVideoPath = null; // Path to green screen video file
 
         this.setupEventListeners();
     }
@@ -105,15 +110,22 @@ class VideoEditor {
         // Shader drag and drop
         this.shaderPreviewImage.addEventListener('dragstart', (e) => this.onShaderDragStart(e));
         
-        // Timeline controls
-        this.zoomInBtn.addEventListener('click', () => this.zoomTimeline(1.5));
-        this.zoomOutBtn.addEventListener('click', () => this.zoomTimeline(0.67));
+        // Timeline controls - finer zoom increments (0.1x steps)
+        this.zoomInBtn.addEventListener('click', () => this.zoomIn());
+        this.zoomOutBtn.addEventListener('click', () => this.zoomOut());
+        this.zoomResetBtn.addEventListener('click', () => this.resetZoom());
         this.undoBtn.addEventListener('click', () => this.timeline.undo());
         this.redoBtn.addEventListener('click', () => this.timeline.redo());
         
-        // Playback controls
-        this.playBtn.addEventListener('click', () => this.play());
-        this.pauseBtn.addEventListener('click', () => this.pause());
+        // Playback controls - single toggle button
+        this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+
+        // Recalculate zoom limits on window resize
+        window.addEventListener('resize', () => {
+            if (this.timeline.duration > 0) {
+                this.timeline.calculateMinZoom();
+            }
+        });
         
         // Header buttons
         this.saveProjectBtn.addEventListener('click', () => this.saveProject());
@@ -258,16 +270,15 @@ class VideoEditor {
         // Enable buttons
         this.saveProjectBtn.disabled = false;
         this.renderBtn.disabled = false;
-        this.playBtn.disabled = false;
-        this.pauseBtn.disabled = false;
+        this.playPauseBtn.disabled = false;
         this.zoomInBtn.disabled = false;
         this.zoomOutBtn.disabled = false;
+        this.zoomResetBtn.disabled = false;
         this.undoBtn.disabled = false;
         this.redoBtn.disabled = false;
 
-        // Initialize button states (paused by default)
-        this.playBtn.style.opacity = '1';
-        this.pauseBtn.style.opacity = '0.5';
+        // Initialize button state (paused by default - show play icon)
+        this.updatePlayPauseButton(false);
         
         // Show collapse button
         this.collapseMusicBtn.style.display = 'block';
@@ -638,20 +649,79 @@ class VideoEditor {
     }
 
     /**
-     * Zoom timeline
+     * Zoom in with fine granularity (0.1x steps)
      */
-    zoomTimeline(factor) {
+    zoomIn() {
         const oldZoom = this.timeline.zoom;
-        this.timeline.zoom *= factor;
 
-        // Clamp zoom between 0.1 and 20.0
-        this.timeline.zoom = Math.max(0.1, Math.min(20.0, this.timeline.zoom));
+        // Use adaptive zoom steps: smaller steps at lower zoom, larger at higher zoom
+        let step;
+        if (this.timeline.zoom < 1.0) {
+            step = 0.1;  // Fine control when zoomed out
+        } else if (this.timeline.zoom < 5.0) {
+            step = 0.25; // Medium steps at medium zoom
+        } else {
+            step = 0.5;  // Larger steps at high zoom
+        }
 
-        console.log(`Timeline zoom: ${oldZoom.toFixed(2)} → ${this.timeline.zoom.toFixed(2)} (factor: ${factor})`);
+        this.timeline.zoom += step;
 
-        // Update zoom display
+        // Clamp to max zoom (frame level)
+        this.timeline.zoom = Math.min(this.timeline.MAX_ZOOM, this.timeline.zoom);
+
+        this.updateZoomDisplay(oldZoom);
+    }
+
+    /**
+     * Zoom out with fine granularity (0.1x steps)
+     */
+    zoomOut() {
+        const oldZoom = this.timeline.zoom;
+
+        // Use adaptive zoom steps
+        let step;
+        if (this.timeline.zoom <= 1.0) {
+            step = 0.1;  // Fine control when zoomed out
+        } else if (this.timeline.zoom <= 5.0) {
+            step = 0.25; // Medium steps at medium zoom
+        } else {
+            step = 0.5;  // Larger steps at high zoom
+        }
+
+        this.timeline.zoom -= step;
+
+        // Clamp to min zoom (full timeline view)
+        this.timeline.zoom = Math.max(this.timeline.MIN_ZOOM, this.timeline.zoom);
+
+        this.updateZoomDisplay(oldZoom);
+    }
+
+    /**
+     * Reset zoom to default 1.0x
+     */
+    resetZoom() {
+        const oldZoom = this.timeline.zoom;
+        this.timeline.zoom = 1.0;
+        this.updateZoomDisplay(oldZoom);
+    }
+
+    /**
+     * Update zoom display and re-render timeline
+     */
+    updateZoomDisplay(oldZoom) {
+        console.log(`Timeline zoom: ${oldZoom.toFixed(2)} → ${this.timeline.zoom.toFixed(2)}`);
+
+        // Update zoom display with percentage
         this.zoomDisplay.textContent = `Zoom: ${this.timeline.zoom.toFixed(1)}x`;
 
+        // Highlight reset button when at default zoom
+        if (Math.abs(this.timeline.zoom - 1.0) < 0.01) {
+            this.zoomResetBtn.classList.add('at-default');
+        } else {
+            this.zoomResetBtn.classList.remove('at-default');
+        }
+
+        // Re-render timeline and ruler
         this.timeline.render();
         this.timeline.renderRuler();
 
@@ -672,21 +742,29 @@ class VideoEditor {
         }
 
         // Use the video element for both audio-only and video playback
-        // Set audio source if not already set (and no rendered video loaded)
-        if (!this.hasRenderedVideo && (!this.videoPreview.src || !this.videoPreview.src.includes(this.selectedAudio.name))) {
-            this.videoPreview.src = this.selectedAudio.path;
-        }
+        // Check if there's a green screen video at current playhead position
+        const greenScreenAtStart = this.timeline.getGreenScreenAtTime(this.timeline.playheadPosition);
 
-        // Start from current playhead position
-        this.videoPreview.currentTime = this.timeline.playheadPosition;
+        if (greenScreenAtStart && !this.hasRenderedVideo) {
+            // Start with green screen video
+            this.startGreenScreenPreview(greenScreenAtStart, this.timeline.playheadPosition);
+            this.currentGreenScreen = greenScreenAtStart;
+        } else {
+            // Set audio source if not already set (and no rendered video loaded)
+            if (!this.hasRenderedVideo && (!this.videoPreview.src || !this.videoPreview.src.includes(this.selectedAudio.name))) {
+                this.videoPreview.src = this.selectedAudio.path;
+            }
+
+            // Start from current playhead position
+            this.videoPreview.currentTime = this.timeline.playheadPosition;
+        }
 
         // Play audio/video
         this.videoPreview.play().then(() => {
             this.isPlaying = true;
 
-            // Update button states
-            this.playBtn.style.opacity = '0.5';
-            this.pauseBtn.style.opacity = '1';
+            // Update button to show pause icon
+            this.updatePlayPauseButton(true);
 
             // Update playhead position as media plays
             this.playbackInterval = setInterval(() => {
@@ -703,6 +781,9 @@ class VideoEditor {
 
                     // Update current time display
                     this.currentTimeDisplay.textContent = API.formatDuration(this.videoPreview.currentTime);
+
+                    // Check for green screen video at current playhead position
+                    this.updateGreenScreenPreview(this.timeline.playheadPosition);
                 }
             }, 50); // Update every 50ms
         }).catch(error => {
@@ -723,14 +804,46 @@ class VideoEditor {
         this.videoPreview.pause();
         this.isPlaying = false;
 
-        // Update button states
-        this.playBtn.style.opacity = '1';
-        this.pauseBtn.style.opacity = '0.5';
+        // Pause green screen preview if playing
+        if (this.greenScreenPreview && !this.greenScreenPreview.paused) {
+            this.greenScreenPreview.pause();
+        }
+
+        // Update button to show play icon
+        this.updatePlayPauseButton(false);
 
         // Stop playhead updates
         if (this.playbackInterval) {
             clearInterval(this.playbackInterval);
             this.playbackInterval = null;
+        }
+    }
+
+    /**
+     * Toggle between play and pause
+     */
+    togglePlayPause() {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
+        }
+    }
+
+    /**
+     * Update play/pause button icon and state
+     */
+    updatePlayPauseButton(isPlaying) {
+        if (isPlaying) {
+            // Show pause icon when playing
+            this.playPauseBtn.textContent = '⏸';
+            this.playPauseBtn.classList.add('playing');
+            this.playPauseBtn.title = 'Pause (Space)';
+        } else {
+            // Show play icon when paused
+            this.playPauseBtn.textContent = '▶';
+            this.playPauseBtn.classList.remove('playing');
+            this.playPauseBtn.title = 'Play (Space)';
         }
     }
 
@@ -748,8 +861,149 @@ class VideoEditor {
         // Update time display
         this.currentTimeDisplay.textContent = API.formatDuration(time);
 
+        // Update green screen preview at new position
+        this.updateGreenScreenPreview(time);
+
         // If playing, the playback interval will continue updating from new position
         // If paused, just update the position
+    }
+
+    /**
+     * Update green screen video preview based on playhead position
+     * Handles visual display and audio playback of green screen videos
+     */
+    updateGreenScreenPreview(currentTime) {
+        // Check if there's a green screen video at current playhead position
+        const greenScreen = this.timeline.getGreenScreenAtTime(currentTime);
+
+        // Check if preview is enabled for this green screen video (default to enabled)
+        const previewEnabled = !greenScreen || greenScreen.previewEnabled !== false;
+
+        // Compare by element ID to avoid reloading same video
+        const currentId = this.currentGreenScreen ? this.currentGreenScreen.id : null;
+        const newId = greenScreen ? greenScreen.id : null;
+
+        // If green screen changed (entered/exited a segment or different video)
+        if (currentId !== newId) {
+            if (greenScreen && previewEnabled) {
+                // Entered a green screen segment or switched to different video (with preview enabled)
+                this.startGreenScreenPreview(greenScreen, currentTime);
+            } else {
+                // Exited green screen segment or preview is disabled
+                this.stopGreenScreenPreview();
+            }
+            this.currentGreenScreen = greenScreen;
+        } else if (greenScreen && previewEnabled && this.isPlaying) {
+            // Still in same green screen segment with preview enabled, ensure video is synced
+            this.syncGreenScreenAudio(greenScreen, currentTime);
+        } else if (greenScreen && !previewEnabled && this.greenScreenPreview.style.display !== 'none') {
+            // Preview was disabled while in segment, stop preview
+            this.stopGreenScreenPreview();
+        }
+    }
+
+    /**
+     * Handle green screen preview toggle event from timeline
+     */
+    onGreenScreenPreviewToggled(element) {
+        // If this is the currently active green screen, update preview immediately
+        if (this.currentGreenScreen && this.currentGreenScreen.id === element.id) {
+            if (element.previewEnabled === false) {
+                // Preview was disabled, stop showing it
+                this.stopGreenScreenPreview();
+                this.currentGreenScreen = null;
+            } else {
+                // Preview was enabled, start showing it
+                this.startGreenScreenPreview(element, this.timeline.playheadPosition);
+            }
+        }
+    }
+
+    /**
+     * Start green screen video preview
+     */
+    startGreenScreenPreview(greenScreen, currentTime) {
+        console.log(`Starting green screen preview: ${greenScreen.data.name} at ${currentTime.toFixed(2)}s`);
+
+        // Calculate offset within the green screen video
+        const offset = currentTime - greenScreen.startTime;
+
+        // Load green screen video source into overlay video element
+        const videoPath = `/api/videos/file/${greenScreen.data.name}`;
+
+        // Only change source if different video (avoid reloading same video)
+        const needsSourceChange = this.greenScreenVideoPath !== videoPath;
+
+        if (needsSourceChange) {
+            console.log(`Loading new green screen video: ${greenScreen.data.name}`);
+            this.greenScreenPreview.src = videoPath;
+            this.greenScreenVideoPath = videoPath;
+
+            // Wait for video to load before seeking
+            this.greenScreenPreview.addEventListener('loadedmetadata', () => {
+                this.greenScreenPreview.currentTime = offset;
+
+                // Show green screen overlay
+                this.greenScreenPreview.style.display = 'block';
+
+                // Play video if currently playing
+                if (this.isPlaying) {
+                    this.greenScreenPreview.play().catch(err => {
+                        console.warn('Failed to play green screen video:', err);
+                    });
+                }
+            }, { once: true });
+        } else {
+            // Same video, just seek to correct position
+            this.greenScreenPreview.currentTime = offset;
+
+            // Show green screen overlay (in case it was hidden)
+            this.greenScreenPreview.style.display = 'block';
+
+            // Play video if currently playing
+            if (this.isPlaying && this.greenScreenPreview.paused) {
+                this.greenScreenPreview.play().catch(err => {
+                    console.warn('Failed to play green screen video:', err);
+                });
+            }
+        }
+    }
+
+    /**
+     * Stop green screen video preview
+     */
+    stopGreenScreenPreview() {
+        console.log('Stopping green screen preview');
+
+        // Hide and pause green screen overlay
+        if (this.greenScreenPreview) {
+            this.greenScreenPreview.pause();
+            this.greenScreenPreview.style.display = 'none';
+            this.greenScreenPreview.src = '';
+        }
+
+        this.greenScreenVideoPath = null;
+    }
+
+    /**
+     * Sync green screen video with current playback position
+     */
+    syncGreenScreenAudio(greenScreen, currentTime) {
+        const offset = currentTime - greenScreen.startTime;
+
+        // Check if video is significantly out of sync (> 200ms to avoid constant seeking)
+        const drift = Math.abs(this.greenScreenPreview.currentTime - offset);
+        if (drift > 0.2) {
+            console.log(`Green screen sync drift detected: ${drift.toFixed(3)}s, correcting...`);
+            this.greenScreenPreview.currentTime = offset;
+        }
+
+        // Ensure video is playing if main playback is playing
+        if (this.isPlaying && this.greenScreenPreview.paused) {
+            this.greenScreenPreview.play().catch(err => {
+                console.warn('Failed to sync green screen video:', err);
+            });
+        }
     }
 
     /**
@@ -786,6 +1040,10 @@ class VideoEditor {
         if (!confirm('Start rendering the video? This may take several minutes.')) {
             return;
         }
+
+        // Enable all green screen previews before rendering
+        // This ensures green screen videos are included in the render
+        this.timeline.enableAllGreenScreenPreviews();
 
         try {
             // Get resolution from settings
@@ -840,8 +1098,8 @@ class VideoEditor {
             this.renderProgressOverlay.style.display = 'flex';
             this.currentRenderPID = response.process_id;
 
-            // Poll every 10 seconds
-            this.renderPollInterval = setInterval(() => this.pollRenderStatus(), 10000);
+            // Poll every 2 seconds for responsive progress updates
+            this.renderPollInterval = setInterval(() => this.pollRenderStatus(), 2000);
             this.pollRenderStatus(); // Call immediately
         } catch (error) {
             console.error('Render error:', error);
@@ -910,10 +1168,20 @@ class VideoEditor {
             const response = await fetch(`/api/render/status/${this.currentRenderPID}`);
             const data = await response.json();
 
-            // Update UI
+            // Update progress bar
             this.renderProgressBar.style.width = `${data.progress}%`;
+
+            // Update percentage text
             this.renderProgressText.textContent = `${Math.round(data.progress)}%`;
-            this.renderStageText.textContent = data.stage;
+
+            // Update stage text with detailed information
+            if (data.current_item && data.current_item !== 'None' && data.current_item !== '') {
+                // Show detailed status with current item
+                this.renderStageText.textContent = `${data.stage}: ${data.current_item}`;
+            } else {
+                // Show just the stage
+                this.renderStageText.textContent = data.stage;
+            }
 
             // Handle completion
             if (data.status === 'completed') {
@@ -927,6 +1195,10 @@ class VideoEditor {
 
                 // Hide the overlay since we now have video content
                 this.viewerOverlay.style.display = 'none';
+
+                // Disable all green screen previews after render completes
+                // This allows user to preview the rendered composite without green screen overlays
+                this.timeline.disableAllGreenScreenPreviews();
 
                 alert('Rendering complete! Video loaded in preview.');
                 this.currentRenderPID = null;

@@ -1,5 +1,6 @@
-# Exclude all .rar files
+# Exclude all .rar and .zip files
 *.rar
+*.zip
 
 # Python
 __pycache__/
@@ -54,15 +55,26 @@ Thumbs.db
 *.temp
 *.log
 
-# Output videos (optional - uncomment if you don't want to track output videos)
-# Output_Video/*.mp4
-# Output_Video/*.avi
-# Output_Video/*.mov
+# Output videos (generated content - excluded from git)
+# Exclude everything in Output_Video folder
+Output_Video/*
+# But keep the folder itself
+!Output_Video/.gitkeep
 
 # Large audio files (optional - uncomment if you don't want to track large audio files)
 # Input_Audio/*.mp3
 # Input_Audio/*.wav
 # Input_Audio/*.flac
+
+# Large video files (optional - uncomment if you don't want to track large video files)
+# Input_Video/*.mp4
+# Input_Video/*.mov
+# Input_Video/*.avi
+
+# Large video files (excluded from git to reduce repo size)
+Input_Video/*.mp4
+Input_Video/*.mov
+Input_Video/*.avi
 
 # FFmpeg temporary files
 *.ffmpeg_temp*
