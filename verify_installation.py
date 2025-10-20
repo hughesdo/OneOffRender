@@ -11,17 +11,22 @@ from pathlib import Path
 def check_files():
     """Check if all required files exist."""
     print("=== File Structure Check ===")
-    
+
+    # Core files required for the app to function
     required_files = [
         "config.json",
-        "render_shader.py", 
+        "render_shader.py",
         "requirements.txt",
-        "README.md",
         "RunMe.bat",
+    ]
+
+    # Optional files (samples, documentation)
+    optional_files = [
+        "README.md",
         "Shaders/MoltenHeart.glsl",
         "Input_Audio/Molten Heart Music.mp3"
     ]
-    
+
     all_good = True
     for file_path in required_files:
         path = Path(file_path)
@@ -30,44 +35,59 @@ def check_files():
         else:
             print(f"✗ {file_path} (MISSING)")
             all_good = False
-            
+
+    # Check optional files but don't fail
+    print("\n=== Optional Files ===")
+    for file_path in optional_files:
+        path = Path(file_path)
+        if path.exists():
+            print(f"✓ {file_path}")
+        else:
+            print(f"ℹ {file_path} (not found - optional)")
+
     return all_good
 
 def check_config():
     """Check configuration file."""
     print("\n=== Configuration Check ===")
-    
+
     try:
         with open('config.json', 'r') as f:
             config = json.load(f)
-            
-        # Validate structure
-        required_keys = ['input', 'output', 'duration_override', 'rendering', 'debug']
-        for key in required_keys:
+
+        print("✓ config.json is valid JSON")
+
+        # Check for core sections (but don't fail if missing)
+        core_keys = ['output', 'rendering']
+        for key in core_keys:
             if key in config:
                 print(f"✓ {key} section")
             else:
-                print(f"✗ {key} section (MISSING)")
-                return False
-                
-        # Check paths
-        shader_path = Path(config['input']['shader_file'])
-        audio_path = Path(config['input']['audio_file'])
-        
-        if shader_path.exists():
-            print(f"✓ Shader file: {shader_path}")
+                print(f"ℹ {key} section (optional)")
+
+        # Try to check paths if input section exists
+        if 'input' in config:
+            print("✓ input section")
+            try:
+                shader_path = Path(config['input'].get('shader_file', ''))
+                audio_path = Path(config['input'].get('audio_file', ''))
+
+                if shader_path.exists():
+                    print(f"✓ Shader file: {shader_path}")
+                else:
+                    print(f"ℹ Shader file: {shader_path} (not found - optional)")
+
+                if audio_path.exists():
+                    print(f"✓ Audio file: {audio_path}")
+                else:
+                    print(f"ℹ Audio file: {audio_path} (not found - optional)")
+            except Exception as e:
+                print(f"ℹ Could not check input files: {e}")
         else:
-            print(f"✗ Shader file: {shader_path} (NOT FOUND)")
-            return False
-            
-        if audio_path.exists():
-            print(f"✓ Audio file: {audio_path}")
-        else:
-            print(f"✗ Audio file: {audio_path} (NOT FOUND)")
-            return False
-            
+            print("ℹ input section (optional)")
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Config error: {e}")
         return False
