@@ -17,14 +17,23 @@ class Timeline {
         this.dragStartTime = 0;
         this.audioFileName = ''; // Store audio file name for display
 
-        // Zoom thresholds for dynamic tick mark scaling
+        // Playhead dragging state
+        this.isDraggingPlayhead = false;
+
+        // Zoom thresholds for dynamic tick mark scaling (hierarchical)
         this.ZOOM_THRESHOLDS = {
-            SHOW_10S: 1.0,
-            SHOW_5S: 2.5,
-            SHOW_1S: 5.0,
-            SHOW_FRAMES: 10.0
+            SHOW_MINUTES: 0.5,    // < 0.5x: Show minute markers
+            SHOW_30S: 0.5,        // 0.5x+: Show 30-second markers
+            SHOW_10S: 1.0,        // 1.0x+: Show 10-second markers
+            SHOW_5S: 2.5,         // 2.5x+: Show 5-second markers
+            SHOW_1S: 5.0,         // 5.0x+: Show 1-second markers
+            SHOW_FRAMES: 10.0     // 10.0x+: Show frame-level markers
         };
         this.FRAME_RATE = 30; // Assume 30fps for frame-level ticks
+
+        // Zoom limits
+        this.MIN_ZOOM = 0.5;  // Zoomed out to see full timeline
+        this.MAX_ZOOM = 20.0; // Zoomed in to frame level
 
         this.container = document.querySelector('.timeline-tracks');
         this.rulerContainer = document.querySelector('.timeline-ruler');
@@ -32,6 +41,36 @@ class Timeline {
         this.namesColumn = document.querySelector('.timeline-names-column');
 
         this.setupEventListeners();
+    }
+
+    /**
+     * Calculate minimum zoom to show full audio duration in viewport
+     */
+    calculateMinZoom() {
+        if (!this.duration || this.duration <= 0) {
+            this.MIN_ZOOM = 0.1; // Fallback minimum
+            return;
+        }
+
+        try {
+            // Get viewport width (timeline scroll container)
+            const scrollContainer = this.container.parentElement;
+            const viewportWidth = scrollContainer ? scrollContainer.clientWidth : 1000;
+
+            // Timeline width formula: duration * zoom * 100
+            // At MIN_ZOOM, timeline should fit in viewport with some padding
+            // MIN_ZOOM = (viewportWidth * 0.95) / (duration * 100)
+            const calculatedMinZoom = (viewportWidth * 0.95) / (this.duration * 100);
+
+            // Clamp to reasonable bounds (0.05x to 0.5x)
+            // For very long audio (10+ minutes), allow zooming out further
+            this.MIN_ZOOM = Math.max(0.05, Math.min(0.5, calculatedMinZoom));
+
+            console.log(`Calculated MIN_ZOOM: ${this.MIN_ZOOM.toFixed(3)} for duration ${this.duration}s (viewport: ${viewportWidth}px)`);
+        } catch (e) {
+            console.warn('Failed to calculate MIN_ZOOM, using default:', e);
+            this.MIN_ZOOM = 0.1;
+        }
     }
 
     /**
@@ -45,6 +84,9 @@ class Timeline {
         this.playheadPosition = 0;
         this.history = [];
         this.historyIndex = -1;
+
+        // Calculate dynamic minimum zoom to show full audio duration
+        this.calculateMinZoom();
 
         this.render();
         this.renderRuler();
@@ -406,15 +448,20 @@ class Timeline {
         const div = document.createElement('div');
         div.className = `timeline-element ${element.type}`;
         div.dataset.id = element.id;
-        
+
         if (this.selectedElement === element.id) {
             div.classList.add('selected');
+        }
+
+        // Add preview-disabled class for green screen videos with preview disabled
+        if (element.layer === 0 && element.type === 'video' && element.previewEnabled === false) {
+            div.classList.add('preview-disabled');
         }
 
         // Calculate position and width
         const left = (element.startTime / this.duration) * 100;
         const width = (element.duration / this.duration) * 100;
-        
+
         div.style.left = `${left}%`;
         div.style.width = `${width}%`;
 
@@ -439,7 +486,7 @@ class Timeline {
     }
 
     /**
-     * Render the timeline ruler with dynamic tick marks based on zoom level
+     * Render the timeline ruler with hierarchical dynamic tick marks based on zoom level
      */
     renderRuler() {
         if (!this.rulerContainer) return;
@@ -451,52 +498,61 @@ class Timeline {
 
         console.log(`renderRuler: zoom=${this.zoom.toFixed(2)}, timelineWidth=${timelineWidth}px`);
 
-        // Always draw 30s major ticks (base layer)
-        this.drawTickLayer(30, {
-            className: 'tick-30s',
-            labeled: true
-        });
-        console.log('✓ Drew 30s ticks');
+        // Hierarchical tick rendering based on zoom level
+        // Use dynamic threshold for minute markers based on MIN_ZOOM
+        const minuteThreshold = Math.max(this.MIN_ZOOM * 1.5, 0.3);
 
-        // Conditionally draw finer layers based on zoom
-        if (this.zoom >= this.ZOOM_THRESHOLDS.SHOW_10S) {
-            this.drawTickLayer(10, {
-                className: 'tick-10s',
-                labeled: false
-            });
-            console.log('✓ Drew 10s ticks (zoom >= 1.0)');
-        }
+        if (this.zoom < minuteThreshold) {
+            // Very zoomed out: Show minutes with appropriate minor ticks
+            if (this.duration > 600) {
+                // For very long audio (10+ minutes), show 2-minute major ticks
+                this.drawTickLayer(120, { className: 'tick-major', labeled: true, format: 'minutes' });
+                this.drawTickLayer(60, { className: 'tick-minor', labeled: false });
+                console.log('✓ 2-minute-level ticks (very long audio)');
+            } else {
+                // Standard: 1-minute major ticks
+                this.drawTickLayer(60, { className: 'tick-major', labeled: true, format: 'minutes' });
+                this.drawTickLayer(30, { className: 'tick-minor', labeled: false });
+                console.log('✓ Minute-level ticks (zoomed out)');
+            }
 
-        if (this.zoom >= this.ZOOM_THRESHOLDS.SHOW_5S) {
-            this.drawTickLayer(5, {
-                className: 'tick-5s',
-                labeled: false
-            });
-            console.log('✓ Drew 5s ticks (zoom >= 2.5)');
-        }
+        } else if (this.zoom < this.ZOOM_THRESHOLDS.SHOW_10S) {
+            // Default zoom (0.5x - 1.0x): Show 30s major, 10s minor
+            this.drawTickLayer(30, { className: 'tick-major', labeled: true, format: 'seconds' });
+            this.drawTickLayer(10, { className: 'tick-minor', labeled: false });
+            console.log('✓ 30-second ticks (zoom 0.5-1.0)');
 
-        if (this.zoom >= this.ZOOM_THRESHOLDS.SHOW_1S) {
-            this.drawTickLayer(1, {
-                className: 'tick-1s',
-                labeled: false
-            });
-            console.log('✓ Drew 1s ticks (zoom >= 5.0)');
-        }
+        } else if (this.zoom < this.ZOOM_THRESHOLDS.SHOW_5S) {
+            // Medium zoom (1.0x - 2.5x): Show 10s major, 5s minor
+            this.drawTickLayer(10, { className: 'tick-major', labeled: true, format: 'seconds' });
+            this.drawTickLayer(5, { className: 'tick-minor', labeled: false });
+            console.log('✓ 10-second ticks (zoom 1.0-2.5)');
 
-        if (this.zoom >= this.ZOOM_THRESHOLDS.SHOW_FRAMES) {
+        } else if (this.zoom < this.ZOOM_THRESHOLDS.SHOW_1S) {
+            // High zoom (2.5x - 5.0x): Show 5s major, 1s minor
+            this.drawTickLayer(5, { className: 'tick-major', labeled: true, format: 'seconds' });
+            this.drawTickLayer(1, { className: 'tick-minor', labeled: false });
+            console.log('✓ 5-second ticks (zoom 2.5-5.0)');
+
+        } else if (this.zoom < this.ZOOM_THRESHOLDS.SHOW_FRAMES) {
+            // Very high zoom (5.0x - 10.0x): Show 1s major, 0.5s minor
+            this.drawTickLayer(1, { className: 'tick-major', labeled: true, format: 'seconds' });
+            this.drawTickLayer(0.5, { className: 'tick-minor', labeled: false });
+            console.log('✓ 1-second ticks (zoom 5.0-10.0)');
+
+        } else {
+            // Extreme zoom (≥ 10.0x): Show 1s major, frame-level minor
+            this.drawTickLayer(1, { className: 'tick-major', labeled: true, format: 'seconds' });
             const frameInterval = 1 / this.FRAME_RATE; // 1/30s for 30fps
-            this.drawTickLayer(frameInterval, {
-                className: 'tick-frame',
-                labeled: false
-            });
-            console.log('✓ Drew frame ticks (zoom >= 10.0)');
+            this.drawTickLayer(frameInterval, { className: 'tick-frame', labeled: false });
+            console.log('✓ Frame-level ticks (zoom >= 10.0)');
         }
 
         console.log(`renderRuler complete: ${this.rulerContainer.children.length} elements added`);
     }
 
     /**
-     * Draw a layer of tick marks at specified interval
+     * Draw a layer of tick marks at specified interval with proper time labels
      */
     drawTickLayer(interval, options) {
         // Safety check for valid interval
@@ -505,7 +561,7 @@ class Timeline {
             return;
         }
 
-        console.log(`drawTickLayer: interval=${interval}s, className=${options.className}`);
+        console.log(`drawTickLayer: interval=${interval}s, className=${options.className}, labeled=${options.labeled}`);
 
         // Performance optimization: only render visible ticks for very fine intervals
         let startTime = 0;
@@ -519,8 +575,8 @@ class Timeline {
                 const viewportWidth = this.rulerContainer.parentElement.clientWidth || containerRect.width;
 
                 // Calculate visible time range
-                startTime = Math.max(0, (scrollLeft / (this.zoom * 100)) * this.duration);
-                endTime = Math.min(this.duration, ((scrollLeft + viewportWidth) / (this.zoom * 100)) * this.duration);
+                startTime = Math.max(0, (scrollLeft / (this.zoom * 100)));
+                endTime = Math.min(this.duration, ((scrollLeft + viewportWidth) / (this.zoom * 100)));
 
                 // Extend range slightly to ensure smooth scrolling
                 startTime = Math.max(0, startTime - interval * 5);
@@ -543,26 +599,22 @@ class Timeline {
             // Round to avoid floating point precision issues
             time = Math.round(time * this.FRAME_RATE) / this.FRAME_RATE;
 
-            // Skip if this exact time already has a 30s tick (avoid duplicates)
-            if (interval !== 30 && Math.abs(time % 30) < 0.001) {
-                continue;
-            }
-
             // Skip negative times
             if (time < 0) {
                 continue;
             }
 
+            // Create tick marker
             const marker = document.createElement('div');
             marker.className = `time-marker ${options.className}`;
             marker.style.left = `${(time / this.duration) * 100}%`;
             this.rulerContainer.appendChild(marker);
 
-            // Add time label only for 30s ticks
-            if (options.labeled && Math.abs(time % 30) < 0.001) {
+            // Add time label for major ticks
+            if (options.labeled) {
                 const label = document.createElement('div');
                 label.className = 'time-label';
-                label.textContent = API.formatDuration(time);
+                label.textContent = this.formatTimeLabel(time, options.format);
                 label.style.left = `${(time / this.duration) * 100}%`;
                 this.rulerContainer.appendChild(label);
             }
@@ -579,12 +631,45 @@ class Timeline {
     }
 
     /**
-     * Update playhead position
+     * Format time label based on zoom level and format type
+     */
+    formatTimeLabel(timeSeconds, format) {
+        if (format === 'minutes') {
+            // Minutes:Seconds format (e.g., "1:30", "2:00")
+            const minutes = Math.floor(timeSeconds / 60);
+            const seconds = Math.floor(timeSeconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } else if (format === 'seconds') {
+            // Seconds format (e.g., "30s", "45s", "60s")
+            if (timeSeconds >= 60) {
+                // For times >= 1 minute, show minutes:seconds
+                const minutes = Math.floor(timeSeconds / 60);
+                const seconds = Math.floor(timeSeconds % 60);
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                // For times < 1 minute, show seconds
+                return `${Math.floor(timeSeconds)}s`;
+            }
+        } else if (format === 'frames') {
+            // Frame format (e.g., "f30", "f60", "f90")
+            const frameNumber = Math.round(timeSeconds * this.FRAME_RATE);
+            return `f${frameNumber}`;
+        } else {
+            // Default: use API.formatDuration
+            return API.formatDuration(timeSeconds);
+        }
+    }
+
+    /**
+     * Update playhead position (uses pixel positioning to account for zoom)
      */
     updatePlayhead() {
         if (this.playhead && this.duration > 0) {
-            const position = (this.playheadPosition / this.duration) * 100;
-            this.playhead.style.left = `${position}%`;
+            // Calculate pixel position based on time and zoom factor
+            // timelineWidth = duration * zoom * 100
+            // position = (playheadPosition / duration) * timelineWidth
+            const pixelPosition = (this.playheadPosition / this.duration) * (this.duration * this.zoom * 100);
+            this.playhead.style.left = `${pixelPosition}px`;
         }
     }
 
@@ -627,14 +712,22 @@ class Timeline {
             e.preventDefault();
         });
 
-        // Right-click context menu for delete
+        // Right-click context menu for delete and preview toggle
         this.container.addEventListener('contextmenu', (e) => {
             const elementDiv = e.target.closest('.timeline-element');
             if (elementDiv) {
                 e.preventDefault();
                 const elementId = elementDiv.dataset.id;
-                if (confirm('Delete this element?')) {
-                    this.removeElement(elementId);
+                const element = this.layers.find(el => el.id === elementId);
+
+                // Show different menu for green screen videos (Layer 0)
+                if (element && element.layer === 0 && element.type === 'video') {
+                    this.showGreenScreenContextMenu(e, element);
+                } else {
+                    // Standard delete confirmation for other elements
+                    if (confirm('Delete this element?')) {
+                        this.removeElement(elementId);
+                    }
                 }
             }
         });
@@ -645,12 +738,16 @@ class Timeline {
                 this.handleDrag(e);
             } else if (this.isResizing) {
                 this.handleResize(e);
+            } else if (this.isDraggingPlayhead) {
+                this.handlePlayheadDrag(e);
             }
         });
 
         document.addEventListener('mouseup', (e) => {
             if (this.isDragging || this.isResizing) {
                 this.endDragOrResize();
+            } else if (this.isDraggingPlayhead) {
+                this.endPlayheadDrag();
             }
         });
 
@@ -658,6 +755,15 @@ class Timeline {
         if (this.rulerContainer) {
             this.rulerContainer.addEventListener('click', (e) => {
                 this.seekToPosition(e);
+            });
+        }
+
+        // Drag playhead to scrub
+        if (this.playhead) {
+            this.playhead.addEventListener('mousedown', (e) => {
+                this.startPlayheadDrag(e);
+                e.preventDefault();
+                e.stopPropagation();
             });
         }
     }
@@ -681,6 +787,50 @@ class Timeline {
         if (window.editor) {
             window.editor.seekTo(newTime);
         }
+    }
+
+    /**
+     * Start dragging the playhead
+     */
+    startPlayheadDrag(e) {
+        this.isDraggingPlayhead = true;
+        this.playhead.classList.add('dragging');
+
+        // Pause playback while scrubbing
+        if (window.editor && window.editor.isPlaying) {
+            window.editor.pause();
+        }
+    }
+
+    /**
+     * Handle playhead dragging (scrubbing)
+     */
+    handlePlayheadDrag(e) {
+        if (!this.isDraggingPlayhead) return;
+
+        // Calculate time from mouse position
+        const rect = this.container.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const timelineWidth = this.container.offsetWidth;
+        const newTime = Math.max(0, Math.min((mouseX / timelineWidth) * this.duration, this.duration));
+
+        // Update playhead position
+        this.setPlayheadPosition(newTime);
+
+        // Seek video/audio to new position (real-time scrubbing)
+        if (window.editor) {
+            window.editor.seekTo(newTime);
+        }
+    }
+
+    /**
+     * End playhead dragging
+     */
+    endPlayheadDrag() {
+        if (!this.isDraggingPlayhead) return;
+
+        this.isDraggingPlayhead = false;
+        this.playhead.classList.remove('dragging');
     }
 
     /**
@@ -904,6 +1054,153 @@ class Timeline {
      */
     generateId() {
         return `element_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Get green screen video element at specific time (Layer 0 only)
+     * Returns the video element if playhead is within its time range, null otherwise
+     */
+    getGreenScreenAtTime(time) {
+        // Find all video elements on Layer 0 (green screen layer)
+        const greenScreenVideos = this.layers.filter(el =>
+            el.layer === 0 &&
+            el.type === 'video' &&
+            time >= el.startTime &&
+            time < (el.startTime + el.duration)
+        );
+
+        // Return the first matching video (should only be one due to collision detection)
+        return greenScreenVideos.length > 0 ? greenScreenVideos[0] : null;
+    }
+
+    /**
+     * Show context menu for green screen video elements
+     */
+    showGreenScreenContextMenu(e, element) {
+        // Remove any existing context menu
+        const existingMenu = document.querySelector('.greenscreen-context-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+
+        // Create context menu
+        const menu = document.createElement('div');
+        menu.className = 'greenscreen-context-menu';
+        menu.style.position = 'fixed';
+        menu.style.left = `${e.clientX}px`;
+        menu.style.top = `${e.clientY}px`;
+        menu.style.zIndex = '10000';
+
+        // Get current preview state (default to enabled if not set)
+        const previewEnabled = element.previewEnabled !== false;
+
+        // Toggle Preview option
+        const toggleOption = document.createElement('div');
+        toggleOption.className = 'context-menu-item';
+        toggleOption.textContent = previewEnabled ? '✓ Preview Enabled' : '☐ Preview Disabled';
+        toggleOption.addEventListener('click', () => {
+            this.toggleGreenScreenPreview(element.id);
+            menu.remove();
+        });
+        menu.appendChild(toggleOption);
+
+        // Separator
+        const separator = document.createElement('div');
+        separator.className = 'context-menu-separator';
+        menu.appendChild(separator);
+
+        // Delete option
+        const deleteOption = document.createElement('div');
+        deleteOption.className = 'context-menu-item';
+        deleteOption.textContent = 'Delete';
+        deleteOption.addEventListener('click', () => {
+            if (confirm('Delete this green screen video?')) {
+                this.removeElement(element.id);
+            }
+            menu.remove();
+        });
+        menu.appendChild(deleteOption);
+
+        // Add to document
+        document.body.appendChild(menu);
+
+        // Close menu when clicking outside
+        const closeMenu = (event) => {
+            if (!menu.contains(event.target)) {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closeMenu), 0);
+    }
+
+    /**
+     * Toggle preview state for a green screen video element
+     */
+    toggleGreenScreenPreview(elementId) {
+        const element = this.layers.find(el => el.id === elementId);
+        if (!element) return;
+
+        // Toggle preview state (default to enabled if not set)
+        element.previewEnabled = element.previewEnabled === false ? true : false;
+
+        console.log(`Green screen preview ${element.previewEnabled ? 'enabled' : 'disabled'} for: ${element.name}`);
+
+        // Save state and re-render timeline to update visual styling
+        this.saveState();
+        this.render();
+
+        // Notify editor to update preview if currently showing this video
+        if (window.editor) {
+            window.editor.onGreenScreenPreviewToggled(element);
+        }
+    }
+
+    /**
+     * Disable preview for all green screen videos (called after render completes)
+     */
+    disableAllGreenScreenPreviews() {
+        let changed = false;
+        this.layers.forEach(el => {
+            if (el.layer === 0 && el.type === 'video') {
+                if (el.previewEnabled !== false) {
+                    el.previewEnabled = false;
+                    changed = true;
+                }
+            }
+        });
+
+        if (changed) {
+            console.log('Disabled preview for all green screen videos');
+            this.saveState();
+            this.render();
+
+            // Stop any active green screen preview
+            if (window.editor) {
+                window.editor.stopGreenScreenPreview();
+            }
+        }
+    }
+
+    /**
+     * Enable preview for all green screen videos (called before render starts)
+     */
+    enableAllGreenScreenPreviews() {
+        let changed = false;
+        this.layers.forEach(el => {
+            if (el.layer === 0 && el.type === 'video') {
+                if (el.previewEnabled === false) {
+                    el.previewEnabled = true;
+                    changed = true;
+                }
+            }
+        });
+
+        if (changed) {
+            console.log('Enabled preview for all green screen videos');
+            this.saveState();
+            this.render();
+        }
     }
 
     /**

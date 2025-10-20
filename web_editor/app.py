@@ -198,6 +198,16 @@ def get_video_thumbnail(filename):
     return send_from_directory(THUMBNAILS_DIR, filename)
 
 
+@app.route('/api/videos/file/<path:filename>')
+def serve_video_file(filename):
+    """Serve a video file for preview."""
+    try:
+        return send_from_directory(INPUT_VIDEO_DIR, filename)
+    except Exception as e:
+        logger.error(f"Error serving video file {filename}: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 404
+
+
 @app.route('/api/transitions/list')
 def list_transitions():
     """List all available transition shaders from metadata JSON with filtering and sorting."""
@@ -386,40 +396,109 @@ def generate_thumbnail(video_path, thumbnail_path):
 
 @app.route('/api/render/status/<int:process_id>')
 def get_render_status(process_id):
-    """Read render_output.log and return progress."""
+    """Read render_output.log and return detailed progress."""
     try:
         log_file = Path('render_output.log')
         if not log_file.exists():
-            return jsonify({'status': 'starting', 'progress': 0, 'stage': 'Initializing...'})
+            return jsonify({
+                'status': 'starting',
+                'progress': 0,
+                'stage': 'Initializing...',
+                'current_item': '',
+                'detail': 'Starting render process...'
+            })
 
-        # Read last 50 lines only (efficient)
+        # Read last 100 lines (increased for better context)
         with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
-            lines = f.readlines()[-50:]
+            lines = f.readlines()[-100:]
 
         progress = 0
         stage = 'Starting...'
+        current_item = ''
+        detail = ''
         status = 'running'
 
+        import re
+
+        # Parse lines in reverse to get most recent status
         for line in reversed(lines):
+            # Check for completion
             if '=== Rendering Completed' in line:
-                return jsonify({'status': 'completed', 'progress': 100, 'stage': 'Complete!'})
+                return jsonify({
+                    'status': 'completed',
+                    'progress': 100,
+                    'stage': 'Complete!',
+                    'current_item': 'Finished',
+                    'detail': 'Rendering completed successfully'
+                })
+
+            # Check for errors
             if 'Rendering failed:' in line or 'ERROR' in line:
-                return jsonify({'status': 'failed', 'progress': progress, 'stage': 'Error occurred', 'error': line.strip()})
-            if 'Progress:' in line:
-                import re
-                match = re.search(r'Progress: ([\d.]+)%', line)
+                return jsonify({
+                    'status': 'failed',
+                    'progress': progress,
+                    'stage': 'Error occurred',
+                    'current_item': '',
+                    'detail': line.strip(),
+                    'error': line.strip()
+                })
+
+            # Parse structured progress lines (new format)
+            # Format: "PROGRESS: 45.2% | STAGE: Rendering shader | ITEM: Cosmic Nebula2.glsl | TIME: 30.0s/180.0s"
+            progress_match = re.search(r'PROGRESS:\s*([\d.]+)%\s*\|\s*STAGE:\s*([^|]+)\s*\|\s*ITEM:\s*([^|]+)\s*\|\s*TIME:\s*([^|]+)', line)
+            if progress_match:
+                progress = float(progress_match.group(1))
+                stage = progress_match.group(2).strip()
+                current_item = progress_match.group(3).strip()
+                time_info = progress_match.group(4).strip()
+                detail = f"{stage}: {current_item} ({time_info})"
+                break  # Found most recent structured progress
+
+            # Fallback: Parse old-style progress lines
+            if 'Progress:' in line and not progress_match:
+                match = re.search(r'Progress:\s*([\d.]+)%', line)
                 if match:
                     progress = float(match.group(1))
-            if '--- Rendering Layer 1' in line:
-                stage = 'Rendering shaders...'
-            elif '--- Rendering Layer 0' in line:
-                stage = 'Rendering videos...'
-            elif '--- Compositing' in line:
-                stage = 'Compositing layers...'
-            elif '--- Adding Audio' in line:
-                stage = 'Adding audio...'
 
-        return jsonify({'status': status, 'progress': progress, 'stage': stage})
+            # Parse stage markers (fallback for old format)
+            if '--- Rendering Layer 1' in line and not stage:
+                stage = 'Rendering shaders & transitions'
+            elif '--- Rendering Layer 0' in line and not stage:
+                stage = 'Rendering green screen videos'
+            elif '--- Compositing' in line and not stage:
+                stage = 'Compositing layers'
+                detail = 'Applying chroma key and merging layers'
+            elif '--- Adding Audio' in line and not stage:
+                stage = 'Adding audio track'
+                detail = 'Muxing audio with FFmpeg'
+
+            # Parse transition start messages
+            if '▶️ Starting transition:' in line and not current_item:
+                match = re.search(r'Starting transition:\s*([^\(]+)', line)
+                if match:
+                    current_item = f"Transition: {match.group(1).strip()}"
+
+            # Parse shader compilation
+            if 'Compiling' in line and 'shader' in line.lower() and not current_item:
+                match = re.search(r'Compiling\s+(.+?)\.\.\.', line)
+                if match:
+                    current_item = match.group(1).strip()
+
+        # Build detail message if not already set
+        if not detail:
+            if current_item:
+                detail = f"{stage}: {current_item}"
+            else:
+                detail = stage
+
+        return jsonify({
+            'status': status,
+            'progress': progress,
+            'stage': stage,
+            'current_item': current_item,
+            'detail': detail
+        })
+
     except Exception as e:
         logger.error(f"Error getting render status: {e}")
         return jsonify({'status': 'error', 'error': str(e)}), 500

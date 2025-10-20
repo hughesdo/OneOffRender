@@ -125,6 +125,14 @@ The **Web Editor** is the most comprehensive and user-friendly way to create vid
 - **Video layers**: Green screen video overlays with chroma key support
 - **Music layer**: Audio track with waveform visualization
 
+#### Green Screen Video Features
+- **Drag & drop green screen videos**: Layer videos with automatic chroma keying
+- **Preview toggle**: Right-click to enable/disable preview without affecting render
+- **Pre-render preview**: See green screen videos synced with audio before rendering
+- **Advanced chroma key**: Single-pass compositing with precise color matching (rgb(0, 214, 0))
+- **Auto-management**: Preview automatically disabled after render, re-enabled before next render
+- **Visual indicators**: Ghostly appearance (50% opacity, diagonal stripes) when preview disabled
+
 #### Advanced Controls
 - **Undo/Redo**: Full history support for all edits
 - **Timeline controls**: Play, pause, scrub through your composition
@@ -779,6 +787,8 @@ All documentation is now organized in the `Documentation/` folder:
 - **Render Pipeline**: `Documentation/RENDER_PIPELINE_IMPLEMENTATION.md`
 - **Layer System**: `Documentation/SHADERS_TRANSITIONS_LAYER_IMPLEMENTATION.md`
 - **Green Screen**: `Documentation/GREEN_SCREEN_VIDEOS_LAYER_IMPLEMENTATION.md`
+- **Green Screen Preview Toggle**: `Documentation/GREEN_SCREEN_PREVIEW_TOGGLE.md`
+- **Chroma Key Implementation**: `Documentation/chromakey note.md`
 
 #### Additional Resources
 - **Bug Fixes**: Multiple bug fix documentation files

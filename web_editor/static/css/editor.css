@@ -360,10 +360,12 @@ body {
 /* Video Viewer */
 .video-viewer {
     height: 40%;
+    min-height: 0;     /* Allow flex item to shrink */
     background-color: var(--bg-medium);
     border-bottom: 2px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    overflow: hidden;  /* Prevent children from breaking out */
 }
 
 .viewer-container {
@@ -373,6 +375,8 @@ body {
     justify-content: center;
     position: relative;
     background-color: #000;
+    overflow: hidden;  /* Prevent content from breaking out */
+    min-height: 0;     /* Allow flex item to shrink below content size */
 }
 
 #videoPreview {
@@ -382,6 +386,18 @@ body {
     height: auto;
     object-fit: contain;  /* Maintains aspect ratio, fits within container */
     display: block;
+    flex-shrink: 1;      /* Allow video to shrink if needed */
+}
+
+/* Green screen preview overlay */
+.green-screen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 10;  /* Above main video player */
 }
 
 .viewer-overlay {
@@ -408,6 +424,31 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+/* Play/Pause toggle button styling */
+.play-pause-btn {
+    font-size: 16px;
+    min-width: 45px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.play-pause-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.play-pause-btn.playing {
+    background-color: var(--bg-medium);
+    border-color: var(--primary-color);
+}
+
+.play-pause-btn.playing:hover:not(:disabled) {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
 }
 
 .time-display {
@@ -452,6 +493,25 @@ body {
     color: var(--text-secondary);
     margin-right: 10px;
     font-family: 'Courier New', monospace;
+    min-width: 70px;
+}
+
+/* Zoom reset button - highlight when at default zoom */
+#zoomResetBtn {
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+#zoomResetBtn.at-default {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+#zoomResetBtn.at-default:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
 }
 
 .timeline-container {
@@ -497,8 +557,21 @@ body {
     bottom: 0;
     width: 2px;
     background-color: var(--danger-color);
-    pointer-events: none;
+    pointer-events: auto;  /* Changed from 'none' to allow dragging */
     z-index: 100;
+    cursor: ew-resize;     /* Show horizontal resize cursor */
+    transition: width 0.1s ease, background-color 0.1s ease;
+}
+
+.timeline-playhead:hover {
+    width: 4px;            /* Wider on hover for easier grabbing */
+    background-color: #ff4444;
+}
+
+.timeline-playhead.dragging {
+    width: 4px;            /* Stay wider while dragging */
+    background-color: #ff6666;
+    cursor: ew-resize;
 }
 
 /* Right Panel - Asset Selection */
@@ -1051,6 +1124,19 @@ textarea {
     border: 2px solid #388E3C;
 }
 
+/* Green screen video with preview disabled - ghostly appearance */
+.timeline-element.video.preview-disabled {
+    opacity: 0.5;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--video-color),
+        var(--video-color) 10px,
+        rgba(56, 142, 60, 0.3) 10px,
+        rgba(56, 142, 60, 0.3) 20px
+    );
+    border: 2px dashed #388E3C;
+}
+
 .timeline-element.transition {
     background-color: var(--transition-color);
     border: 2px solid #F57C00;
@@ -1088,65 +1174,82 @@ textarea {
     text-overflow: ellipsis;
 }
 
-/* Time Markers - Dynamic Scaling System */
+/* Time Markers - Hierarchical Dynamic Scaling System */
 .time-marker {
     position: absolute;
     bottom: 0;
     width: 1px;
     background-color: var(--border-color);
+    pointer-events: none;
 }
 
-/* 30-second ticks (always visible, tallest) */
-.time-marker.tick-30s {
-    height: 20px;
-    background-color: var(--text-secondary);
+/* Major ticks (labeled, tallest, high contrast) */
+.time-marker.tick-major {
+    height: 22px;
+    background-color: rgba(255, 255, 255, 0.9);
     width: 2px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
-/* 10-second ticks (visible at zoom >= 1.0) */
-.time-marker.tick-10s {
-    height: 14px;
-    background-color: rgba(0, 255, 255, 0.8); /* Cyan for visibility */
+/* Minor ticks (unlabeled, medium height, semi-transparent) */
+.time-marker.tick-minor {
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.4);
     width: 1px;
 }
 
-/* 5-second ticks (visible at zoom >= 2.5) */
-.time-marker.tick-5s {
-    height: 10px;
-    background-color: rgba(255, 255, 0, 0.7); /* Yellow for visibility */
-    width: 1px;
-}
-
-/* 1-second ticks (visible at zoom >= 5.0) */
-.time-marker.tick-1s {
-    height: 6px;
-    background-color: rgba(255, 0, 255, 0.6); /* Magenta for visibility */
-    width: 1px;
-}
-
-/* Frame ticks (visible at zoom >= 10.0) */
+/* Frame ticks (visible at extreme zoom >= 10.0x, very subtle) */
 .time-marker.tick-frame {
-    height: 4px;
-    background-color: rgba(0, 255, 0, 0.5); /* Green for visibility */
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.15);
     width: 1px;
 }
 
+/* Time labels (positioned above major ticks) */
 .time-label {
     position: absolute;
     top: 2px;
     font-size: 10px;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
     transform: translateX(-50%);
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Legacy classes for backward compatibility */
 .time-marker.major {
-    height: 20px;
-    background-color: var(--text-secondary);
+    height: 22px;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 2px;
 }
 
 .time-marker.minor {
-    height: 10px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Old specific tick classes (deprecated but kept for compatibility) */
+.time-marker.tick-30s {
+    height: 22px;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 2px;
+}
+
+.time-marker.tick-10s {
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.time-marker.tick-5s {
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.time-marker.tick-1s {
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Scrollbar Styling */
@@ -1168,3 +1271,30 @@ textarea {
     background: var(--secondary-color);
 }
 
+/* Green Screen Context Menu */
+.greenscreen-context-menu {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 180px;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.2s;
+}
+
+.context-menu-item:hover {
+    background-color: var(--bg-light);
+}
+
+.context-menu-separator {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 4px 0;
+}

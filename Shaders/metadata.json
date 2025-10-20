@@ -56,7 +56,7 @@
   {
     "name": "Quasi-crystals_Fixed.glsl",
     "preview_image": "Quasi-crystals_Fixed.JPG",
-    "stars": 0,
+    "stars": 5,
     "buffer": null,
     "texture": null,
     "description": "Animated quasi-crystal with HSV coloring. This shader is static with no audio reactivity, showing plane wave interference in log-polar space.",
@@ -65,7 +65,7 @@
   {
     "name": "reflected structure by musk for TDF 2021_Optimized.glsl",
     "preview_image": "reflected structure by musk for TDF 2021_Optimized.JPG",
-    "stars": 0,
+    "stars": 5,
     "buffer": null,
     "texture": null,
     "description": "Audio-reactive reflected structure with wave patterns. Audio modulates color transitions, wave intensity, camera rotation, and overall brightness with reflections.",
@@ -78,6 +78,18 @@
     "buffer": null,
     "texture": null,
     "description": "Fractal crystals with gyroid sphere and reflections. This shader is static with no audio reactivity, featuring IFS fractals and multiple reflection passes.",
+    "audio_reactive": false
+  },
+  {
+    "name": "SIG15 EntryLevel.glsl",
+    "preview_image": "SIG15 EntryLevel.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "Abstract 1.jpg",
+      "iChannel2": "Uffizi Gallery Blurred.png"
+    },
+    "description": "Raymarched tunnel with fractal geometry, 3D texture mapping, and environment reflections. Features procedural domain repetition and dynamic camera movement through infinite tunnel.",
     "audio_reactive": false
   },
   {
@@ -110,7 +122,7 @@
   {
     "name": "the_fractal_Fixed.glsl",
     "preview_image": "the_fractal_Fixed.JPG",
-    "stars": 0,
+    "stars": 2,
     "buffer": null,
     "texture": null,
     "description": "Audio-reactive Menger sponge fractal tunnel. Audio controls movement speed, rotation, time modulation, and color intensity throughout the animated fractal journey.",
@@ -189,6 +201,15 @@
     "audio_reactive": true
   },
   {
+    "name": "Combine and Conquer.glsl",
+    "preview_image": "Combine and Conquer.JPG",
+    "stars": 2,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive kaleidoscopic pattern with 5-fold symmetry and pastel color palettes. Bass, mid, and treble frequencies drive turbulence, spirals, and hue rotation for mesmerizing geometric visuals.",
+    "audio_reactive": true
+  },
+  {
     "name": "Cosmic Energy Streams1.glsl",
     "preview_image": "Cosmic Energy Streams1.JPG",
     "stars": 4,
@@ -243,6 +264,15 @@
     "audio_reactive": true
   },
   {
+    "name": "late-night-colorful-2.glsl",
+    "preview_image": "late-night-colorful-2.JPG",
+    "stars": 2,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful wave patterns with kick detection. Bass frequencies create wave perturbations while kick hits trigger brightness flashes for vibrant, pulsing visuals.",
+    "audio_reactive": true
+  },
+  {
     "name": "Luminous Nebulae.glsl",
     "preview_image": "Luminous Nebulae.JPG",
     "stars": 4,
@@ -268,6 +298,15 @@
     "texture": null,
     "description": "Audio-reactive drifting Gaussian petals with gentle lighting. Multi-frequency analysis drives petal movement, color palette switching, and global rotation effects.",
     "audio_reactive": true
+  },
+  {
+    "name": "Perspex Web Lattice.glsl",
+    "preview_image": "Perspex Web Lattice.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": "London.jpg",
+    "description": "Raymarched 2nd-order Voronoi with perspex-like web lattice. Features tri-planar texture mapping, edge detection, environmental reflections, and dynamic camera rotation through crystalline structures.",
+    "audio_reactive": false
   },
   {
     "name": "sleeplessV4.glsl",
@@ -313,5 +352,88 @@
     "texture": null,
     "description": "Funky flight path visualization with smooth camera movement through 3D space. This shader is static with no audio reactivity, featuring dynamic flight trajectory and perspective effects.",
     "audio_reactive": false
+  },
+  {
+    "name": "Tie Dye zoom.glsl",
+    "preview_image": "Tie Dye zoom.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Original PAEz creation. Mesmerizing psychedelic tie-dye pattern with smooth zoom animation. Features layered kaleidoscopic shapes with rotating tiles, petal-shaped elements, and hypnotic color palette cycling. Non-audio-reactive with pure time-based animation for consistent visual flow.",
+    "audio_reactive": false
+  },
+  {
+    "name": "The Four Trumpets 2.glsl",
+    "preview_image": "The Four Trumpets 2.JPG",
+    "stars": 5,
+    "buffer": true,
+    "texture": null,
+    "description": "Audio-reactive quasi-crystal with feedback trails using log-polar coordinates. Bass controls pinch/zoom, mids boost brightness, highs affect rotation. Features temporal accumulation for trailing effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shader Lesson 8 - cube maps.glsl",
+    "preview_image": "Shader Lesson 8 - cube maps.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "skybox"
+      }
+    },
+    "description": "Raytraced reflective sphere with cubemap environment mapping. Features a rotating metallic sphere that reflects the surrounding skybox environment using real-time ray tracing and cubemap sampling.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Magical Orb.glsl",
+    "preview_image": "Magical Orb.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "symmetrical_garden"
+      }
+    },
+    "description": "Magical volumetric orb with dynamic color cycling and Fresnel reflections. Features glowing volumetric rendering constrained to a sphere with environment reflections from a symmetrical garden cubemap. Colors cycle through purple-yellow, cyan-magenta, and warm-cool palettes.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Audio Reactive Magical Orb.glsl",
+    "preview_image": "Audio Reactive Magical Orb.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Audio-reactive magical volumetric orb with dynamic color cycling and Fresnel reflections. The orb pulses and reacts to bass, mid, and high frequencies - internal energy, density, glow, and colors all respond to the music. Features environment reflections from a cobblestone street night cubemap. Colors cycle through purple-yellow, cyan-magenta, and warm-cool palettes.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Waveform3d.glsl",
+    "preview_image": "Waveform3d.JPG",
+    "stars": 4,
+    "buffer": true,
+    "texture": null,
+    "description": "3D audio waveform visualization with raymarching and reflections. Features vertical scrolling feedback buffer that creates trailing effects. The waveform data drives the surface displacement creating dynamic audio-reactive geometry.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio Reactive Magical Orb-2.glsl",
+    "preview_image": "Audio Reactive Magical Orb-2.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Enhanced audio-reactive magical orb with edge-detected rainbow waves and object-aware lighting. Features beat-triggered expanding rainbow rings that follow cubemap edges, surface-responsive spotlight effects, and rim lighting. The orb's colorful glow intelligently sticks to surfaces and objects in the environment. Bass hits trigger multi-frequency rainbow waves with enhanced color bands.",
+    "audio_reactive": true
   }
 ]

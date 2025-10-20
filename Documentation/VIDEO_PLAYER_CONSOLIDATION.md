@@ -299,6 +299,64 @@ seekToPosition(e) {
 
 ---
 
+## 🔧 Additional Container Boundary Fixes
+
+### **Problem: Video Still Breaking Container**
+After initial fixes, the video element was still breaking out of the `.viewer-container` boundaries when loaded.
+
+### **Root Cause**
+Flexbox containers can expand based on their content's intrinsic size. When a video loads, its natural dimensions can force the flex container to grow beyond intended bounds, even with `max-width` and `max-height` constraints on the video element itself.
+
+### **Solution: Strict Container Constraints**
+
+**Added to `.video-viewer`:**
+```css
+.video-viewer {
+    height: 40%;
+    min-height: 0;        /* NEW: Allow shrinking below content */
+    overflow: hidden;     /* NEW: Clip overflowing content */
+    /* ... existing styles ... */
+}
+```
+
+**Added to `.viewer-container`:**
+```css
+.viewer-container {
+    flex: 1;
+    overflow: hidden;     /* NEW: Prevent content breakout */
+    min-height: 0;        /* NEW: Allow shrinking below content */
+    /* ... existing styles ... */
+}
+```
+
+**Added to `#videoPreview`:**
+```css
+#videoPreview {
+    /* ... existing styles ... */
+    flex-shrink: 1;       /* NEW: Allow video to shrink */
+}
+```
+
+### **Why These Properties Matter**
+
+1. **`overflow: hidden`**: Clips any content that exceeds the container's bounds. This is the primary defense against boundary breaking.
+
+2. **`min-height: 0`**: By default, flex items have `min-height: auto`, which prevents them from shrinking below their content's size. Setting `min-height: 0` allows the container to respect its parent's size constraints rather than expanding to fit content.
+
+3. **`flex-shrink: 1`**: Allows the video element to shrink if the container is smaller than the video's natural size.
+
+### **The Flexbox Sizing Issue**
+In flexbox layouts, when you have:
+```
+.video-viewer (height: 40%)
+  └─ .viewer-container (flex: 1)
+      └─ #videoPreview (width: auto, height: auto)
+```
+
+Without `min-height: 0` and `overflow: hidden`, the video's intrinsic size can propagate up through the flex containers, causing them to expand beyond their intended 40% height allocation.
+
+---
+
 ## 🧪 Testing Checklist
 
 - [ ] Select audio file → audio plays in video element
@@ -322,10 +380,13 @@ seekToPosition(e) {
 The HTML5 `<video>` element can play audio files without visual content. This allows us to use a single element for both audio-only preview and video playback, simplifying the architecture.
 
 ### **Container Sizing Strategy**
-- `.viewer-container` uses `flex: 1` to fill available space
+- `.video-viewer` uses `height: 40%` with `overflow: hidden` and `min-height: 0`
+- `.viewer-container` uses `flex: 1` with `overflow: hidden` and `min-height: 0`
 - `#videoPreview` uses `max-width: 100%` and `max-height: 100%` to constrain
 - `width: auto` and `height: auto` allow natural sizing within constraints
 - `object-fit: contain` ensures aspect ratio is maintained
+- `overflow: hidden` on containers prevents video from breaking boundaries
+- `min-height: 0` allows flex items to shrink below content size
 
 ### **State Management**
 - `hasRenderedVideo` flag tracks whether we're in audio-only or video mode

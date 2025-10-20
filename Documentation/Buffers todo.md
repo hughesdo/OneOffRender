@@ -1,25 +1,53 @@
-# Multi-Pass Buffer Rendering - TODO
+# Shadertoy-Style Buffer Implementation TODO
 
 ## Overview
 
-This document outlines the plan to implement Shadertoy-style multi-pass rendering with buffer feedback loops in the OneOffRender system.
+This document outlines the plan to implement Shadertoy-style multi-pass rendering with buffer feedback loops in OneOffRender. This will enable shaders like "The Four Trumpets 2" that require ping-pong buffers for trail effects and other advanced rendering techniques.
 
-## Current System Status
+## Current Status
 
-### What Works Now
-- ✅ Single-pass shader rendering
-- ✅ Audio texture on `iChannel0` (512x256 FFT data)
-- ✅ Shader transitions between different shaders
-- ✅ Timeline-based shader sequencing
-- ✅ User-selected transitions from web interface
+### What Works Now ✅
+- Single-pass shader rendering
+- Audio texture on `iChannel0` (512x256 FFT data)
+- Shader transitions between different shaders
+- Timeline-based shader sequencing
+- User-selected transitions from web interface
+- Metadata field `"buffer": null` exists but is unused
 
-### What's Missing
-- ❌ Multi-pass rendering (buffers)
-- ❌ Buffer feedback loops (reading previous frame)
-- ❌ Multiple texture inputs beyond audio
-- ❌ Custom channel routing
+### What's Missing ❌
+- Multi-pass rendering (buffers)
+- Buffer feedback loops (reading previous frame)
+- Multiple texture inputs beyond audio
+- Custom channel routing
+- Buffer metadata parsing and usage
 
-## Proposed File Naming Convention
+## Why This Matters
+
+Many advanced Shadertoy shaders require buffers for:
+- **Feedback effects** - Reading previous frame for trails, motion blur, persistence
+- **Multi-stage processing** - Separate passes for different effects
+- **Temporal effects** - Accumulation over time
+- **Complex pipelines** - Raymarching in one buffer, post-processing in another
+
+**Example:** "The Four Trumpets 2" uses a ping-pong buffer to create trailing quasi-crystal patterns that accumulate and rotate over time.
+
+## Implementation Strategy: Hybrid Approach
+
+We'll use **both** metadata and file-based auto-discovery for maximum flexibility:
+
+### Primary: Metadata-Driven (Fast)
+Check `Shaders/metadata.json` `buffer` field first for explicit configuration
+
+### Fallback: Auto-Discovery (Compatible)
+Scan filesystem for `ShaderName.buffer.A.glsl` files if metadata is missing
+
+### Benefits:
+- ✅ Fast performance (no filesystem scans when metadata is complete)
+- ✅ Backward compatibility (works without metadata updates)
+- ✅ Future extensibility (can add advanced config later)
+- ✅ Better UX (web editor knows about buffers immediately)
+
+## File Naming Convention
 
 Following Shadertoy conventions:
 
@@ -31,38 +59,76 @@ Waveform.buffer.C.glsl     ← Buffer C (optional third buffer)
 Waveform.buffer.D.glsl     ← Buffer D (optional fourth buffer)
 ```
 
-### Example Use Case
+## Metadata Schema Evolution
 
-**Waveform Shader with Buffer A:**
+### Phase 1: Simple Boolean (Immediate Implementation)
 
-**Main Image (`Waveform.glsl`):**
-```glsl
-void mainImage(out vec4 O, vec2 I)
+```json
 {
-    vec2 r = iResolution.xy;
-    // Read from Buffer A (iChannel1) and audio (iChannel0)
-    O = (I.y-=r.y/6e2)>1.?texture(iChannel1,I/r):texture(iChannel0,I/r);
+  "name": "The Four Trumpets 2.glsl",
+  "preview_image": "The Four Trumpets 2.JPG",
+  "stars": 5,
+  "buffer": true,
+  "texture": null,
+  "description": "Audio-reactive quasi-crystal with feedback trails",
+  "audio_reactive": true
 }
 ```
 
-**Buffer A (`Waveform.buffer.A.glsl`):**
-```glsl
-void mainImage(out vec4 O, vec2 I)
+**Behavior:** Renderer auto-discovers buffer files using naming convention.
+
+### Phase 2: File List (Medium Term)
+
+```json
 {
-    // Raymarch with audio reactivity
-    // Uses iChannel0 for audio, iChannel1 for previous frame feedback
-    float i, d, z, r;
-    for(O*= i; i++<9e1; O += (cos(z*.5+iTime+vec4(0,2,4,3))+1.3)/d/z)
-    {
-        vec3 R = iResolution.xyy,
-         p = z * normalize(vec3(I+I,0) - R);
-        r = max(-++p, 0.).y;
-        p.y += r+r-4.*texture(iChannel0, vec2((p.x+6.5)/15.,(-p.z-3.)*5e1/R.y)).r;
-        z += d = .1*(.1*r+abs(p.y)/(1.+r+r+r*r) + max(d=p.z+3.,-d*.1));
+  "name": "Waveform.glsl",
+  "buffer": {
+    "enabled": true,
+    "files": ["Waveform.buffer.A.glsl"]
+  },
+  "texture": null
+}
+```
+
+**Behavior:** Explicitly lists which buffer files to load, skips auto-discovery.
+
+### Phase 3: Full Configuration (Advanced)
+
+```json
+{
+  "name": "ComplexShader.glsl",
+  "buffer": {
+    "enabled": true,
+    "buffers": [
+      {
+        "id": "A",
+        "file": "ComplexShader.buffer.A.glsl",
+        "resolution": 1.0,
+        "channels": {
+          "iChannel0": {"type": "audio"},
+          "iChannel1": {"type": "self", "filter": "linear", "wrap": "clamp"}
+        }
+      },
+      {
+        "id": "B",
+        "file": "ComplexShader.buffer.B.glsl",
+        "resolution": 0.5,
+        "channels": {
+          "iChannel0": {"type": "audio"},
+          "iChannel1": {"type": "buffer", "id": "A"}
+        }
+      }
+    ],
+    "main_channels": {
+      "iChannel0": {"type": "audio"},
+      "iChannel1": {"type": "buffer", "id": "A"},
+      "iChannel2": {"type": "buffer", "id": "B"}
     }
-    O = tanh(O/9e2);
+  }
 }
 ```
+
+**Behavior:** Complete control over buffer resolution, channel routing, and texture parameters.
 
 ## Channel Allocation Strategy
 
@@ -79,22 +145,53 @@ void mainImage(out vec4 O, vec2 I)
 - `iChannel0` = Audio texture
 - `iChannel1` = Own previous frame (Buffer A reads Buffer A from previous frame)
 - `iChannel2` = Other buffer outputs (optional)
-- etc.
 
 ## Implementation Plan
 
-### Phase 1: Auto-Discovery System
+### Phase 1: Metadata Detection & Auto-Discovery ⏳
 
-**Goal:** Automatically detect and load buffer files by naming convention
+**Goal:** Detect buffers from metadata and filesystem
 
-**Changes Required:**
+**Files to Modify:**
+- `render_shader.py` - Add `detect_shader_buffers()` method
+- `render_timeline.py` - Add buffer detection to `precompile_shaders()`
+- `web_editor/app.py` - Parse and expose buffer info in shader list API
 
-1. **`precompile_shaders()` in `render_timeline.py`:**
-   - Detect if `ShaderName.buffer.A.glsl` exists alongside `ShaderName.glsl`
-   - Load and compile all buffer shaders
-   - Store buffer programs with main shader
+**New Functions:**
+```python
+def detect_shader_buffers(shader_path, metadata=None):
+    """
+    Detect buffer files for a shader using hybrid approach.
+    
+    Args:
+        shader_path: Path to main shader file
+        metadata: Optional metadata dict for this shader
+        
+    Returns:
+        List of buffer IDs ['A', 'B', ...] or empty list
+    """
+    # 1. Check metadata first
+    if metadata and metadata.get('buffer'):
+        buffer_config = metadata['buffer']
+        if isinstance(buffer_config, bool) and buffer_config:
+            # Phase 1: Boolean, auto-discover files
+            pass
+        elif isinstance(buffer_config, dict):
+            # Phase 2/3: Explicit configuration
+            return buffer_config.get('files', [])
+    
+    # 2. Fallback: Auto-discover by file naming
+    base_name = shader_path.stem
+    found_buffers = []
+    for buffer_id in ['A', 'B', 'C', 'D']:
+        buffer_file = shader_path.parent / f"{base_name}.buffer.{buffer_id}.glsl"
+        if buffer_file.exists():
+            found_buffers.append(buffer_id)
+    
+    return found_buffers
+```
 
-2. **Data Structure:**
+**Data Structure:**
 ```python
 compiled_shaders[element_id] = {
     'main': {
@@ -105,20 +202,20 @@ compiled_shaders[element_id] = {
     'buffers': {
         'A': {
             'program': buffer_a_program,
-            'texture_current': None,  # Current frame output
-            'texture_previous': None, # Previous frame (for feedback)
+            'path': buffer_a_path,
+            'texture_current': None,
+            'texture_previous': None,
             'fbo_current': None,
             'fbo_previous': None
         },
-        'B': { ... },
-        # etc.
+        # B, C, D...
     }
 }
 ```
 
-### Phase 2: Buffer Rendering Pipeline
+### Phase 2: Buffer Rendering Pipeline ⏳
 
-**Goal:** Render buffers before main image, with feedback loops
+**Goal:** Render buffers before main image with feedback loops
 
 **Rendering Order Per Frame:**
 1. Render Buffer A → writes to `texture_current`
@@ -126,126 +223,90 @@ compiled_shaders[element_id] = {
 3. Render Buffer C → writes to `texture_current`
 4. Render Buffer D → writes to `texture_current`
 5. Render Main Image → reads from all buffer `texture_current`
-6. Swap buffers: `texture_current` → `texture_previous` for next frame
+6. Swap buffers: `texture_current` ↔ `texture_previous` for next frame
 
-**Changes Required:**
-
-1. **New method: `render_shader_frame_with_buffers()`**
-   - Replace current `render_shader_frame()` for multi-pass shaders
-   - Implement buffer rendering loop
-   - Handle texture binding for each pass
-
-2. **Ping-Pong Buffer Management:**
-   - Create two textures per buffer (current + previous)
-   - Swap after each frame
-   - Or use `texture.copy()` to save previous frame
-
-### Phase 3: Texture Binding Logic
-
-**Goal:** Correctly bind textures to shader channels
-
-**For Buffer Shaders:**
+**New Methods:**
 ```python
-def render_buffer_pass(buffer_id, buffer_data, audio_texture):
-    buffer_data['fbo_current'].use()
+def render_shader_frame_with_buffers(shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file):
+    """Render a frame with multi-pass buffer support."""
+    
+    # 1. Render all buffer passes
+    for buffer_id in ['A', 'B', 'C', 'D']:
+        if buffer_id in shader_data['buffers']:
+            render_buffer_pass(shader_data['buffers'][buffer_id], audio_data, frame_idx, frame_rate)
+    
+    # 2. Render main image using buffer outputs
+    render_main_image(shader_data['main'], shader_data['buffers'], audio_data, frame_idx, frame_rate, fbo, raw_file)
+    
+    # 3. Swap ping-pong buffers for next frame
+    for buffer_id, buffer_data in shader_data['buffers'].items():
+        swap_buffer_textures(buffer_data)
 
+def render_buffer_pass(buffer_data, audio_data, frame_idx, frame_rate):
+    """Render a single buffer pass."""
+    buffer_data['fbo_current'].use()
+    
     # Bind audio to iChannel0
     audio_texture.use(location=0)
-    if 'iChannel0' in buffer_data['program']:
-        buffer_data['program']['iChannel0'].value = 0
-
+    buffer_data['program']['iChannel0'].value = 0
+    
     # Bind previous frame to iChannel1 (feedback)
     if buffer_data['texture_previous']:
         buffer_data['texture_previous'].use(location=1)
-        if 'iChannel1' in buffer_data['program']:
-            buffer_data['program']['iChannel1'].value = 1
-
+        buffer_data['program']['iChannel1'].value = 1
+    
     # Set uniforms
-    buffer_data['program']['iTime'].value = time_seconds
+    buffer_data['program']['iTime'].value = frame_idx / frame_rate
     buffer_data['program']['iResolution'].value = (width, height)
-
+    
     # Render
     buffer_vao.render()
+
+def swap_buffer_textures(buffer_data):
+    """Swap current and previous textures for ping-pong rendering."""
+    buffer_data['texture_current'], buffer_data['texture_previous'] = \
+        buffer_data['texture_previous'], buffer_data['texture_current']
+    buffer_data['fbo_current'], buffer_data['fbo_previous'] = \
+        buffer_data['fbo_previous'], buffer_data['fbo_current']
 ```
 
-**For Main Image:**
+### Phase 3: Web Interface Integration ⏳
+
+**Goal:** Display buffer information in web editor
+
+**Changes to `web_editor/app.py`:**
 ```python
-def render_main_image(shader_data, audio_texture):
-    fbo.use()
-
-    # Bind audio to iChannel0
-    audio_texture.use(location=0)
-    shader_data['main']['program']['iChannel0'].value = 0
-
-    # Bind buffer outputs to iChannel1, iChannel2, etc.
-    channel = 1
-    for buffer_id in ['A', 'B', 'C', 'D']:
-        if buffer_id in shader_data['buffers']:
-            buffer_data['buffers'][buffer_id]['texture_current'].use(location=channel)
-            shader_data['main']['program'][f'iChannel{channel}'].value = channel
-            channel += 1
-
-    # Set uniforms and render
-    main_vao.render()
+@app.route('/api/shaders/list')
+def list_shaders():
+    # ... existing code ...
+    
+    for shader in shaders:
+        shader['preview_path'] = f"/api/shaders/preview/{shader['preview_image']}"
+        
+        # Add buffer information
+        if shader.get('buffer'):
+            shader['has_buffers'] = True
+            shader['buffer_count'] = len(detect_shader_buffers(shader['name'], shader))
+        else:
+            shader['has_buffers'] = False
+            shader['buffer_count'] = 0
 ```
 
-### Phase 4: Transition Support
+**Changes to `web_editor/static/js/editor.js`:**
+- Add badge to shader thumbnails showing "Multi-Pass" or "Buffers: A, B"
+- Show warning tooltip about increased render time
+- Add filter option to show/hide multi-pass shaders
+
+### Phase 4: Transition Support ⏳
 
 **Goal:** Handle transitions between multi-pass shaders
-
-**Challenges:**
-- Transition shader needs outputs from both "from" and "to" shader buffers
-- May need to render both shader pipelines during transition
 
 **Approach:**
 1. Render "from" shader with all its buffers → output to temp texture
 2. Render "to" shader with all its buffers → output to temp texture
 3. Apply transition shader blending the two outputs
 
-### Phase 5: JSON Metadata (Optional)
-
-**Goal:** Support advanced configurations beyond auto-discovery
-
-**Use Cases:**
-- Custom channel routing
-- External texture files (images, videos)
-- Buffer resolution overrides
-- Filter/wrap mode settings
-
-**Example Metadata:**
-```json
-{
-  "Waveform.glsl": {
-    "name": "Waveform",
-    "description": "Audio-reactive waveform with feedback",
-    "buffers": [
-      {
-        "id": "A",
-        "file": "Waveform.buffer.A.glsl",
-        "resolution": "full",
-        "inputs": [
-          {"channel": 0, "type": "audio"},
-          {"channel": 1, "type": "buffer", "id": "A", "filter": "linear", "wrap": "clamp"}
-        ]
-      }
-    ],
-    "main_inputs": [
-      {"channel": 0, "type": "audio"},
-      {"channel": 1, "type": "buffer", "id": "A"}
-    ]
-  }
-}
-```
-
-### Phase 6: Web Interface Support
-
-**Goal:** Allow users to upload and manage multi-pass shaders
-
-**Features:**
-- Upload multiple files as a "shader package"
-- Visual indicator for multi-pass shaders
-- Preview showing buffer outputs
-- Drag-and-drop for shader packages
+**Challenge:** Buffer states need to persist during transitions for smooth visual continuity.
 
 ## Performance Considerations
 
@@ -263,8 +324,8 @@ def render_main_image(shader_data, audio_texture):
 - **4 buffers at 1440p:** 8 textures = ~88MB GPU memory
 
 ### Optimization Strategies
-1. **Buffer resolution scaling:** Allow buffers to render at lower resolution
-2. **Lazy buffer creation:** Only create buffers when shader uses them
+1. **Lazy buffer creation:** Only create buffers when shader uses them
+2. **Buffer resolution scaling:** Allow buffers to render at lower resolution (Phase 3)
 3. **Buffer pooling:** Reuse textures across different shaders
 4. **Conditional rendering:** Skip buffer passes if not needed
 
@@ -274,19 +335,11 @@ def render_main_image(shader_data, audio_texture):
 - ✅ All current single-pass shaders continue to work unchanged
 - ✅ No changes required to existing shader files
 - ✅ System automatically detects if buffers exist
+- ✅ Shaders with `"buffer": null` use fast single-pass path
 
 ### Detection Logic
 ```python
-def has_buffers(shader_path):
-    base_name = shader_path.stem
-    for buffer_id in ['A', 'B', 'C', 'D']:
-        buffer_file = shader_path.parent / f"{base_name}.buffer.{buffer_id}.glsl"
-        if buffer_file.exists():
-            return True
-    return False
-
-# Use appropriate rendering path
-if has_buffers(shader_path):
+if shader_data.get('buffers'):
     render_shader_frame_with_buffers(...)
 else:
     render_shader_frame(...)  # Current implementation
@@ -323,95 +376,74 @@ else:
 
 ## Files to Modify
 
-### Core Rendering (`render_timeline.py`)
-- `precompile_shaders()` - Add buffer detection and compilation
-- `render_shader_frame()` - Add multi-pass support or create new method
-- Add `render_buffer_pass()` method
-- Add `swap_buffer_textures()` method
-- Add buffer texture/FBO creation in initialization
+### Core Rendering
+- `render_shader.py` - Add buffer detection, compilation, and rendering
+- `render_timeline.py` - Add buffer support to timeline rendering
 
-### Shader Loader (`render_shader.py`)
-- Similar changes for standalone shader rendering
-- Ensure consistency with timeline rendering
+### Web Interface
+- `web_editor/app.py` - Parse and expose buffer metadata
+- `web_editor/static/js/editor.js` - Display buffer badges and warnings
+- `web_editor/templates/index.html` - UI elements for buffer info
 
-### Web Interface (`web_editor/app.py`)
-- Add support for uploading shader packages
-- Detect multi-pass shaders in shader list
-- Display buffer information in UI
+### Documentation
+- `Documentation/README - New Shader Addition.md` - Add buffer shader instructions
+- `Shaders/metadata.json` - Update entries with buffer information
 
-### Web Interface Frontend (`web_editor/static/js/editor.js`)
-- Visual indicator for multi-pass shaders
-- Handle shader package uploads
-- Show buffer preview (optional)
+## Migration Path for Existing Shaders
 
-## Future Extensions
+### For "The Four Trumpets 2.glsl"
 
-### Texture Inputs
-- Support external image files: `ShaderName.texture.0.png`
-- Support video files: `ShaderName.texture.1.mp4`
-- Naming convention: `ShaderName.texture.{channel}.{ext}`
+**Step 1:** Update metadata.json
+```json
+{
+  "name": "The Four Trumpets 2.glsl",
+  "preview_image": "The Four Trumpets 2.JPG",
+  "stars": 5,
+  "buffer": true,
+  "texture": null,
+  "description": "Audio-reactive quasi-crystal with feedback trails",
+  "audio_reactive": true
+}
+```
 
-### Cubemap Support
-- Support cubemap textures for environment mapping
-- Naming: `ShaderName.cubemap.0.{face}.png`
+**Step 2:** Split shader into files
+- `The Four Trumpets 2.glsl` - Main image (display final result)
+- `The Four Trumpets 2.buffer.A.glsl` - Quasi-crystal with feedback
 
-### 3D Textures
-- Support volumetric textures
-- Naming: `ShaderName.texture3d.0.raw`
+**Step 3:** Update uniforms
+- Change `uniform sampler2D feedbackTex;` → Use `iChannel1` in buffer shader
+- Change `uniform sampler2D audioTex;` → Use `iChannel0`
+- Change `uniform vec2 resolution;` → Use `iResolution`
+- Change `uniform float time;` → Use `iTime`
+- Change `out vec4 FragColor;` → Use `out vec4 fragColor;`
 
-### Buffer Resolution Control
-- Allow buffers to render at different resolutions
-- Useful for performance optimization
-- Example: Half-res buffer for blur effects
+## Priority & Timeline
+
+**Status:** Planning phase - not yet implemented  
+**Priority:** High - enables advanced Shadertoy shaders  
+**Complexity:** High - requires significant rendering pipeline changes  
+**Estimated Effort:** 2-3 weeks of development + testing
+
+### Milestones
+
+- [ ] **Week 1:** Phase 1 - Metadata detection and auto-discovery
+- [ ] **Week 2:** Phase 2 - Buffer rendering pipeline
+- [ ] **Week 3:** Phase 3 - Web interface integration + testing
+- [ ] **Future:** Phase 4 - Transition support for multi-pass shaders
 
 ## References
 
-### Shadertoy Documentation
-- [Shadertoy Buffers](https://www.shadertoy.com/howto)
-- Multi-pass rendering examples
-- Channel binding conventions
-
-### Current System
-- `render_timeline.py` - Main timeline rendering
-- `render_shader.py` - Single shader rendering
-- `Transitions/` - Transition shader examples
-- `Shaders/` - Current single-pass shaders
-
-## Notes
-
-- This is a significant architectural change
-- Requires careful testing to avoid breaking existing functionality
-- Performance impact should be documented and communicated to users
-- Consider adding a "complexity indicator" in web UI (single-pass vs multi-pass)
-- May want to add render time estimates based on buffer count
-
-## Questions to Resolve
-
-1. **Buffer persistence across shader switches:**
-   - Should buffers reset when switching shaders in timeline?
-   - Or maintain state for smooth transitions?
-
-2. **Transition handling:**
-   - How to handle buffer states during transitions?
-   - Render both shader pipelines simultaneously?
-
-3. **Memory management:**
-   - When to release buffer textures?
-   - Pool textures across shaders?
-
-4. **Error handling:**
-   - What if buffer shader fails to compile?
-   - Fallback to single-pass rendering?
-
-5. **Web interface:**
-   - How to upload multi-file shader packages?
-   - ZIP file upload?
-   - Multiple file selection?
+- [Shadertoy Buffers Documentation](https://www.shadertoy.com/howto)
+- `Documentation/Buffers todo.md` - Original detailed planning document
+- `Shaders/metadata.json` - Current metadata structure
+- `render_shader.py` - Current single-pass rendering implementation
 
 ---
 
-**Status:** Planning phase - not yet implemented
-**Priority:** Medium - nice to have for advanced shaders
-**Complexity:** High - requires significant rendering pipeline changes
-**Estimated Effort:** 2-3 weeks of development + testing
+**Next Steps:**
+1. Review and approve this implementation plan
+2. Create feature branch: `feature/buffer-support`
+3. Implement Phase 1: Metadata detection
+4. Test with "The Four Trumpets 2" shader
+5. Iterate and expand to full buffer support
 
