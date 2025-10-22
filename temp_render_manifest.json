@@ -1,77 +1,77 @@
 {
   "version": "1.0",
-  "project_name": "RAVE-BANNGER1_30",
+  "project_name": "Untitled",
   "audio": {
-    "path": "Input_Audio/RAVE-BANNGER1_30.wav",
-    "duration": 30
+    "path": "Input_Audio/Untitled.wav",
+    "duration": 29.879979166666665
   },
   "resolution": {
-    "width": 854,
-    "height": 480
+    "width": 2560,
+    "height": 1440
   },
   "frame_rate": 30,
   "timeline": {
-    "duration": 30,
+    "duration": 29.879979166666665,
     "elements": [
       {
-        "id": "element_1760816003517_8fm0ryajl",
+        "id": "element_1761101032500_gessrfmf2",
         "type": "shader",
-        "name": "sleeplessV4.glsl",
+        "name": "neural_image_shader2.glsl",
         "startTime": 0,
-        "endTime": 9.545,
-        "duration": 9.545,
+        "endTime": 10,
+        "duration": 10,
         "layer": 1,
-        "path": "Shaders/sleeplessV4.glsl"
+        "path": "Shaders/neural_image_shader2.glsl"
       },
       {
-        "id": "element_1760816077787_ozvdrdtf3",
+        "id": "element_1761101039685_056jdufb2",
         "type": "transition",
-        "name": "Displacement",
-        "startTime": 9.545,
-        "endTime": 11.145,
+        "name": "Dreamy",
+        "startTime": 10,
+        "endTime": 11.6,
         "duration": 1.6,
         "layer": 1,
-        "path": "Transitions/Displacement.glsl"
+        "path": "Transitions/Dreamy.glsl"
       },
       {
-        "id": "element_1760816125482_3vj4o5drh",
+        "id": "element_1761101055981_x2w2ol5g3",
         "type": "shader",
         "name": "Audio Reactive Magical Orb-2.glsl",
-        "startTime": 11.145,
-        "endTime": 21.145,
+        "startTime": 11.6,
+        "endTime": 21.6,
         "duration": 10,
         "layer": 1,
         "path": "Shaders/Audio Reactive Magical Orb-2.glsl"
       },
       {
-        "id": "element_1760816139144_g32om9pkm",
+        "id": "element_1761101066897_030nsmqxn",
         "type": "transition",
-        "name": "CannabisLeaf",
-        "startTime": 21.145,
-        "endTime": 22.745,
+        "name": "Displacement",
+        "startTime": 21.6,
+        "endTime": 23.200000000000003,
         "duration": 1.6,
         "layer": 1,
-        "path": "Transitions/CannabisLeaf.glsl"
+        "path": "Transitions/Displacement.glsl"
       },
       {
-        "id": "element_1760816154811_3jpgyml8d",
+        "id": "element_1761101095886_x8pa25c07",
         "type": "shader",
-        "name": "Volumetric Glow2.glsl",
-        "startTime": 22.745,
-        "endTime": 30,
-        "duration": 7.254999999999999,
+        "name": "The Four Trumpets 2.glsl",
+        "startTime": 23.200000000000003,
+        "endTime": 29.879979166666665,
+        "duration": 6.679979166666662,
         "layer": 1,
-        "path": "Shaders/Volumetric Glow2.glsl"
+        "path": "Shaders/The Four Trumpets 2.glsl"
       },
       {
-        "id": "element_1760816179997_cf5cg6ktp",
+        "id": "element_1761101101357_b2vkryo9f",
         "type": "video",
-        "name": "Redhead_Rave_Green.mp4",
-        "startTime": 11.207857142857144,
-        "endTime": 21.207857142857144,
-        "duration": 10,
+        "name": "Baby playing a xylopho.mp4",
+        "startTime": 24.004979166666665,
+        "endTime": 29.879979166666665,
+        "duration": 5.875,
         "layer": 0,
-        "path": "Input_Video/Redhead_Rave_Green.mp4"
+        "path": "Input_Video/Baby playing a xylopho.mp4"
       }
     ]
   }

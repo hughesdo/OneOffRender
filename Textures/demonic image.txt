@@ -1,0 +1,72 @@
+submit image and the shader called "neural_image_shader.glsl"
+
+ask:  there are point in this shader that I need to relate to the image I've upload,  marking around eyes and mouth, hair,  outer image.   
+       previously this was for another image. I've now changed the image.  can you alter the code to fix this image and return full code
+
+
+
+
+# Reusable Prompt for Shader Modification with Image
+
+## Overview
+This document contains a detailed, reusable prompt template you can use next time you want Grok to modify a GLSL shader code based on a new uploaded image. The process involves analyzing the image, identifying key features (e.g., eyes, mouth, hair, teeth, cross, necklace, neck), adding targeted effects like glow/marking, implementing differential morphing (less on facial features, more on outer areas responsive to audio/music), and enhancing overall audio reactivity to make the shader "rock" to the music. 
+
+Copy the template below, replace placeholders with your new image and code, and paste it into a new conversation with Grok.
+
+## Step-by-Step Breakdown of the Process
+Here's what Grok does when processing your request (based on the conversation history):
+
+1. **Image Analysis**: Grok views and describes the uploaded image to identify key features. For example, in your case: a demonic woman with red hair, glowing red eyes, fanged smile with blood, leather jacket, black cross necklace, choker on neck, dark background with colorful auras.
+
+2. **Code Review**: Grok examines the provided GLSL shader code (e.g., neural_image_shader.glsl), which applies a neural network-inspired distortion (Blackle Mori/Quasimondo style), audio reactivity via FFT, displacement/morphing, and blending.
+
+3. **Feature Targeting**: 
+   - Add glow/marking to specified areas:
+     - Red areas (eyes, mouth, hair, blood): Enhance existing red glow with audio pulsing.
+     - Teeth: Detect high luminance (white/bright) and add warm glow.
+     - Cross, necklace, neck: Detect low luminance (dark areas) and add contrasting glow (e.g., purple).
+   - Ensure existing markers (e.g., around eyes/mouth) are preserved and extended.
+
+4. **Differential Morphing**:
+   - Create a mask based on distance from center (face area vs. outer).
+   - Apply less morphing to facial features (e.g., factor 0.6).
+   - Apply more morphing to outer areas (e.g., factor 1.8), amplified by audio (bass for strong pulses).
+
+5. **Audio Enhancement**:
+   - Separate bass and mid frequencies from FFT.
+   - Boost overall reactivity (higher AUDIO_BOOST, BASS_MORPH_POWER).
+   - Make outer morph, glow pulses, and blending "rock" more intensely to music (faster time, stronger boosts).
+   - Ensure the shader responds dynamically to audio input (e.g., iChannel0 FFT).
+
+6. **Code Modifications**:
+   - Tweak defines (e.g., MORPH_STRENGTH, GLOW_INTENSITY) for intensity.
+   - Add new variables (e.g., bass, mid) in mainImage.
+   - Implement masks and conditions for glow (red_intensity, luminance).
+   - Output the full updated code.
+
+7. **Output**: Grok returns the complete modified GLSL code as a code block.
+
+## Reusable Prompt Template
+Use this exact template next time. Upload your new image first, then attach the code as a <DOCUMENT> block, and paste this prompt.
+
+---
+
+[Upload your new image here]
+
+<DOCUMENT filename="your_shader_filename.glsl">
+[Paste your full GLSL shader code here]
+</DOCUMENT>
+
+There are points in this shader that I need to relate to the image I've uploaded, marking around eyes and mouth, hair, more facial features and more outer image. There are already some markers that already work; I want more. Her teeth, her cross, her necklace. The outer marking should really morph to the music, the facial features a little less. I really want this shader to rock to the music and morph a bit with audio input.
+
+---
+
+## Tips for Next Time
+- Replace "Her teeth, her cross, her necklace" with specifics for the new image (e.g., "His hat, his sword, the background mountains").
+- If the image has different colors/themes, mention them (e.g., "Glow on blue areas instead of red").
+- Save this markdown file (prompt_document.md) and open it when needed to copy the template.
+- If the shader is very long/truncated, ensure the full code is pasted in the <DOCUMENT> block.
+
+This setup allows Grok to replicate the process exactly for any new image and shader.
+
+
