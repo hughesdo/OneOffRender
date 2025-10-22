@@ -95,6 +95,47 @@ python verify_ffmpeg.py
 
 ---
 
+## 🔄 Keeping OneOffRender Updated
+
+### Automatic Updates from GitHub
+
+Stay up-to-date with the latest shaders, features, and improvements using the built-in update system:
+
+**One-Click Update:**
+```bash
+# Double-click to update from GitHub
+refresh.bat
+```
+
+**What the update does:**
+- ✅ **Pulls latest code** - New features, bug fixes, and improvements
+- ✅ **Downloads new shaders** - Fresh audio-reactive effects and visuals
+- ✅ **Updates transitions** - New transition effects between shaders
+- ✅ **Refreshes metadata** - Updated shader descriptions and ratings
+- ✅ **Preserves your files** - Your audio, videos, and settings stay safe
+- ✅ **Clears cache** - Ensures fresh compilation of updated code
+
+**Safe Update Process:**
+- 🔒 **Stashes local changes** - Your customizations are preserved
+- 🔒 **Non-destructive** - Virtual environment and user files untouched
+- 🔒 **Rollback support** - Can restore your changes with `git stash pop`
+- 🔒 **Smart detection** - Only updates when new changes are available
+
+### Manual Update (Alternative)
+```bash
+# If you prefer manual Git commands
+git pull origin main
+CacheClear.bat
+python update_audio_metadata.py
+```
+
+### After Updating
+- **Web Editor users**: Press `Ctrl+Shift+R` in browser to refresh
+- **Batch users**: Next render automatically uses updated code
+- **Check Documentation/**: New features and improvements documented
+
+---
+
 ## 🎨 Web Editor (Primary Workflow - RECOMMENDED)
 
 The **Web Editor** is the most comprehensive and user-friendly way to create videos. It provides a professional, visual editing experience with complete control over every aspect of your video.
