@@ -435,5 +435,27 @@
     },
     "description": "Enhanced audio-reactive magical orb with edge-detected rainbow waves and object-aware lighting. Features beat-triggered expanding rainbow rings that follow cubemap edges, surface-responsive spotlight effects, and rim lighting. The orb's colorful glow intelligently sticks to surfaces and objects in the environment. Bass hits trigger multi-frequency rainbow waves with enhanced color bands.",
     "audio_reactive": true
+  },
+  {
+    "name": "neural_image_shader.glsl",
+    "preview_image": "neural_image_shader.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "CrepyMe.jpg"
+    },
+    "description": "Neural network effect applied to input image texture. Creates organic displacement and distortion effects that respond to audio. The neural network layers generate complex patterns that warp and blend with the source image.",
+    "audio_reactive": true
+  },
+  {
+    "name": "neural_image_shader2.glsl",
+    "preview_image": "neural_image_shader2.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "CrepyMe.jpg"
+    },
+    "description": "Enhanced neural network shader with sophisticated edge detection, HSV color manipulation, and advanced audio-reactive morphing. Features multi-band audio analysis, luminance-based displacement scaling, and edge-reactive effects for professional-quality image distortion.",
+    "audio_reactive": true
   }
 ]
