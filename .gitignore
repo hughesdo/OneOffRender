@@ -71,10 +71,10 @@ Output_Video/*
 # Input_Video/*.mov
 # Input_Video/*.avi
 
-# Large video files (excluded from git to reduce repo size)
-Input_Video/*.mp4
-Input_Video/*.mov
-Input_Video/*.avi
+# Large video files (excluded from git to reduce repo size) - COMMENTED OUT TO ALLOW INPUT_VIDEO PUSH
+# Input_Video/*.mp4
+# Input_Video/*.mov
+# Input_Video/*.avi
 
 # FFmpeg temporary files
 *.ffmpeg_temp*
