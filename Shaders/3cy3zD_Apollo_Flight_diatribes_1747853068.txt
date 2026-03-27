@@ -1,0 +1,130 @@
+// ID: 3cy3zD
+// Name: Apollo Flight
+// User: diatribes
+// Date: 1747853068
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Fractal that I tried to make look nice with AO and tex3D
+    from Shane shaders.
+    Then distorted with a bendy path and z coord fiddling :)
+*/
+
+#define T (iTime * 1.)
+#define P(z) (vec3(tanh(cos((z) * .7) * .15) * 8., \
+                   tanh(cos((z) * .6) * .2) * 12., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+
+bool orbHit = false;
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+float orb(vec3 p) {
+    float t = T*.3;
+    return length(p - vec3(
+            P(p.z).x+tanh(sin(p.z+t) * .2),
+            P(p.z).y+sin(sin(p.z*1.5)+t*1.75) *.2,
+           .7+T+tan(cos(t*.5)*.9)*.2));
+}
+
+vec4 fog(vec4 rgb, float d) {
+    float fogDistance = 2.35 + sin(iTime * 0.2) * 0.5;
+    float fogAmount = 0.6 + sin(iTime * 0.1) * 0.1;
+    float fogColor = 0.84 + sin(iTime * 0.3) * 0.7;
+
+    if(fogDistance != 0.0) {
+        float f = d - fogDistance;
+        if(f > 0.0) {
+            f = min(1.0,f * fogAmount);
+            rgb.rgb = mix(rgb.rgb, vec3(0.2 + f * fogColor),f);
+        }
+    }
+    return rgb;
+}
+
+float fractal(vec3 p) {
+    float i,s,w = 3.5, l;
+    
+    p *= 4.;
+    
+    p.xy -= 1.5;
+    
+    for (; i++ < 8.;
+        p  = (sin(p)),
+        l = 2.75/dot(p,p),
+        p *= l,
+        w *= l );
+    return length(p)/w; 
+}
+
+float map(vec3 p) {
+    float n, s, f;
+    vec3 q = p;
+    p.xy -= P(p.z).xy;
+    
+    vec3 fractalPos = p;
+    p.z += length(q.xy - p.xy);
+    s = fractal(p);
+    for (n = .3; n < 4.;
+        p += abs(dot(sin(p * n * 32.), vec3(.008))) / n,
+        n += n);
+    f  = 1.-p.y;
+    s = min(s,max(.5 - abs(p.x), .3 - abs(p.y)));
+    
+    s = min(s, orb(q) - .05);
+    s = min(s, f);
+    orbHit = s == orb(q)-.05;
+
+    return s;
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution,
+          e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.4)*.6)*(u-r.xy/2.)/r.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    while(i++ < 200. && s > (.001 * i * .02))
+        p = ro + D * d,
+        d += (s = map(p)*.6);
+        
+    r =  N(map(p) - vec3(map(p-e.xyy)-map(p+e.xyy), 
+                         map(p-e.yxy)-map(p+e.yxy), 
+                         map(p-e.yyx)-map(p+e.yyx)));
+    if (orbHit)
+        o.rgb = pow(tex3D(iChannel0, p, r), vec3(1.2)),
+        o.rgb *= 2.;
+    else
+        o.rgb = pow(tex3D(iChannel1, p*2.5, r), vec3(2.2)),
+        o.rgb /= pow(orb(p), 2.5);
+    
+    
+    o.rgb *= max(dot(r, normalize(ro-p)), .05);
+    o.rgb *= AO(p, r)*4.;
+    o = tanh(pow(fog(o,d)*exp(-d/4.), vec4(.45)));
+}

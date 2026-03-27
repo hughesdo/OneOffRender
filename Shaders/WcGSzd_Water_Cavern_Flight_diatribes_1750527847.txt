@@ -1,0 +1,37 @@
+// ID: WcGSzd
+// Name: Water Cavern Flight
+// User: diatribes
+// Date: 1750527847
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(cos(vec2(.02,.03)*(z))*16.,z)          
+#define A(x,r) abs(dot(sin(x*p*n), r +p-p )) / n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float i,r,s,n,t=iTime*8.,
+          d = 3.*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    vec3  q = iResolution;
+    u = (u-q.xy/2.)/q.y;
+    vec3  p = P(t),ro = p,
+          Z = normalize(P(t+1.)- p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1)  * mat3(-X, cross(X, Z), Z);
+    for (o*=i;i++<90.;
+         d += s = .06 + abs(min(s,r))*.4,
+         o += (1.+cos(.1*p.z+vec4(3,1,0,0))) / s)
+        for(p = ro + D * d,
+            q = P(p.z),
+            r = 16.-p.y,
+            s  = 12.  - min(length((p-q).xy),
+                        min(length(p.xy - q.y) ,
+                            length(p.xy - q.x))),
+            n = .2;
+            n < 2.22;
+            n *= 1.4)
+            r += A(.4*t+p.z + 4., .02),
+            s -= A(.65,.35);
+    o = tanh(o/3e2);
+}
+

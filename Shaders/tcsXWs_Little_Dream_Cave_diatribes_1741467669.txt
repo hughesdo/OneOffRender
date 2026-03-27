@@ -1,0 +1,48 @@
+// ID: tcsXWs
+// Name: Little Dream Cave
+// User: diatribes
+// Date: 1741467669
+
+
+// ===== PASS 0: Image =====
+
+// I'm playing around with golfing using the techniques I see in
+// the golf @FabriceNeyret2 did here https://www.shadertoy.com/view/3fsXWM
+
+#define P(z) (vec3(tanh(cos((z) * .32) * .25) * 16., \
+                   tanh(cos((z) * .41) * .24) * 18., (z)))
+#define N normalize
+
+float M(vec3 p) {
+    float s,w = 1., l;
+    s = 6. - length(p.xy - P(p.z).xy);    
+    p.xy -= P(p.z).xy - s*.5;
+    p.x -= 3.;
+    p.y += 2.5;
+    for (l = .2; l < 8.;
+        s -=  abs(dot(sin(p * l * 8.), vec3(.4))) / l,
+        l += l);
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return min(s, s*length(p)/w - .001); 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime*1., d, i, s=.02;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3((u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    for( ; i++ < 1e2 && s > .001 ; )
+        p += s*D,
+        d += s = M(p);
+    o.rgb = mix(abs(p / dot(sin(p*3.),vec3(sin(T*6.)*1.+4.))),
+                vec3(.75, 2., .75), .1);
+    o.rgb *=exp(-d/3.);
+    o = vec4(pow(o.rgb, vec3(.45)), 1);
+}
+

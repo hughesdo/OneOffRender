@@ -1,0 +1,81 @@
+// ID: 3fcyD2
+// Name: Dark Falls
+// User: diatribes
+// Date: 1764103538
+
+
+// ===== PASS 0: Image =====
+
+float mist(vec3 p) {
+    
+    float i,d,s,t = iTime;
+    vec4 o = vec4(0);
+    mat2 r = mat2(cos(1.2+vec4(0,33,11,0)));
+    
+    // step back
+    p.z -= 4e1;
+    
+    // rot little less than 90*
+    p.yz *= r;
+    
+    // move the water/mist
+    p.z += t*2e1;
+
+    // noise
+    for(s = .03; s < 4.; s += s )
+        p.yz -= abs(dot(sin(.5*t+.32*p / s ), vec3(s)));
+
+    // stretch
+    p *= vec3(.2, .6, 1),
+    
+    // distance to tunnel
+    d += s = .1+.2*abs(2. - length(p.xy));
+    return s;
+    
+}
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float w,d,a,i,s,t = iTime*.5;
+    vec3  p = iResolution;    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    // cinema bars
+    if (abs(u.x) > 1.25) { o *= 0.; return; }
+ 
+    for(o*=i; i++<1e2;
+    
+
+        // accumulate distance
+        d += s = min(w, .1+.3*abs(s)),
+        
+        // grayscale color
+        o += mix(5e3/(s), 1e1/w, .98))
+        
+        // noise loop start, march
+        for(p = vec3(u*d,d), // p = ro + rd *d
+            w = mist(p),
+            
+            // mirrored planes 20 units apart
+            s = 2e1 - abs(p.x),
+            
+            // noise starts at .03 up to 1.,
+            // grow by a+=a
+            a = .03; a < 1.; a += a)
+            
+            // apply noise
+            s += abs(dot(sin(.05*p.z+.2*p / a ), a+a+p-p));
+    
+    // tanh tonemap, brightness
+    o = tanh(o*o/4e9+.1);
+}
+
+
+
+
+
+
+
+
+

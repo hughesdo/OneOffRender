@@ -1,0 +1,36 @@
+// ID: tft3R2
+// Name: Happy Cloud [386]
+// User: diatribes
+// Date: 1747289623
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float od,i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        p = vec3(u * d, d);
+        od = length(p - vec3(sin(sin(t)+sin(t*.1))*d/2.,
+                            sin(sin(t*1.7) +
+                            sin(t*.1))*d/4.,
+                            sin(t*.5)*5.+7.)) - .8;
+        s = min(od, 4. - abs(p.y));
+        for (a = .1; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(p * a * 8.), vec3( .05))) / a;
+        d += s = .02 + abs(s)*.1;
+        o += vec4(4,3,2,0) / s;
+    }
+    o = tanh(o / 2e3 / abs(od));
+}
+
+/*
+    big brother: https://www.shadertoy.com/view/tfXGWs
+    
+    See here for how to do a tiny raymarch loop and translucency:
+        https://www.shadertoy.com/view/wXjSRt
+        https://www.shadertoy.com/view/wXSXzV
+*/
+    

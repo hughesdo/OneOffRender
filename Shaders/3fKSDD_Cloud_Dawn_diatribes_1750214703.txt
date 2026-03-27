@@ -1,0 +1,28 @@
+// ID: 3fKSDD
+// Name: Cloud Dawn
+// User: diatribes
+// Date: 1750214703
+
+
+// ===== PASS 0: Image =====
+
+// The sky in @Xor's "Runner" made me want to make a nice
+// sun sky :)
+// https://www.shadertoy.com/view/wfGXDh
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        d += s = .06 + abs(s)*.5,
+        o += (vec4(5,2,1,0) - cos(p.y))*s/(1.+d))
+        for (p = vec3(u * d, d + t*4.),
+            s = 5.+p.y,
+            a = .05; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(.5*t+p * a * 6.), vec3( .06))) / a;
+    u.y -= .1;
+    o = tanh(o / 5e1 / length(u));
+}
+

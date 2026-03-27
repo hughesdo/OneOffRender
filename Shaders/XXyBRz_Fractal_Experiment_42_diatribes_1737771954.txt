@@ -1,0 +1,35 @@
+// ID: XXyBRz
+// Name: Fractal Experiment 42
+// User: diatribes
+// Date: 1737771954
+
+
+// ===== PASS 0: Image =====
+
+
+// modified https://www.shadertoy.com/view/4XdfW4
+float fractal(vec3 p, out vec3 rgb, int iterations){
+  float m = 1.;
+  for (int i = 0; i < iterations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.325,1.35)-1.85;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-2. * m)*5.;
+  rgb=vec3(p.xy,1.0) * m;
+  return length(rgb);
+}
+
+void mainImage(out vec4 fragColor,in vec2 fragCoord){
+   vec2 uv = fragCoord/iResolution.xy-.5;
+   uv *= .75;
+
+  vec3 a,b,c,d;
+  fractal(vec3(uv,sin(iTime*.030)), a, 6);
+  fractal(vec3(uv,sin(iTime*.015)), b, 5);
+  fractal(vec3(uv,sin(iTime*.020)), c, 4);
+    
+  vec3 color = mix(c,mix(a,b,.5),.5);
+  color *= vec3(pow(color, vec3(1.0/2.2)));
+  fragColor = vec4(color,1.);
+}

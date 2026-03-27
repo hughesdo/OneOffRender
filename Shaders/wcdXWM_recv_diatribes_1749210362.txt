@@ -1,0 +1,26 @@
+// ID: wcdXWM
+// Name: recv
+// User: diatribes
+// Date: 1749210362
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, s1, s2, n, t=iTime*.2;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<60.; ) {
+        p = vec3(u * d, d + t*32.);
+        s1 = 4.-length(p.x);
+        p.xy -= cos(t+vec2(.05,.09)*p.z)*8.;
+        s2 = 7.-(tanh(cos(t)*2.)*2.)*.6-length(p.xy);
+        for (n = 1.5; n < 16.; n += n )
+            s1 -= abs(dot(step(.1, sin(t+p*n )), vec3(1))) / n,
+            s2 -= abs(dot(step(.6, sin(5.*t+p*n*16. )), vec3(1))) / n;
+        d += s = .01 + abs(max(s1,s2))*.2;
+        o += 1. / s;
+    }
+    o = tanh(vec4(1,2,s1 > s2?4:8,1)*o*o  / 2e6);
+}
+

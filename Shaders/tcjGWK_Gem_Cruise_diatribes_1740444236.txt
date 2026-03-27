@@ -1,0 +1,47 @@
+// ID: tcjGWK
+// Name: Gem Cruise
+// User: diatribes
+// Date: 1740444236
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 3.5)
+#define P1(z) (vec3(tanh(cos((z) * .04) * .6) * 24.1, \
+                    tanh(cos((z) * .05) * .6) * 26.5, (z)))
+
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+float length2(vec2 p){
+    p = pow(abs(p), vec2(10.));
+    return pow(p.x + p.y, 1./10.);
+}
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.x;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+5.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.05))*u, 1.) * mat3(-lax, lay, laz) * .75,
+         rgb;
+    float d = 0.,s, i;
+    do{
+        p = ro + rd * d;
+        s = 1.5 - min(length(p.xy - P1(p.z).x+1.),
+                  min(length2(p.xy - P1(p.z).xy),
+                      length(p.xy - P1(p.z).y+1.)));
+
+        for(i = 0.; i < 4.; i++) {
+            s += i * .25 * dot(sin(p), vec3(.3));
+        }
+        d += s;
+    } while (d < 150. && s > .01);
+    p = sin(ro + rd * d)*.1;
+    for (float i = 0.; i < 4.; i++) {
+        float n = abs(p.x*p.y*p.z);
+        p  = abs(p)/clamp(n,.1,.4)-1.35;
+    } 
+    o =vec4(pow(vec3(p/d*.9),vec3(.45)), 1.);
+}

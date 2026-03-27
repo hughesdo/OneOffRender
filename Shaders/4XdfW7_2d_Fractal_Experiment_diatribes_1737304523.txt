@@ -1,0 +1,66 @@
+// ID: 4XdfW7
+// Name: 2d Fractal Experiment
+// User: diatribes
+// Date: 1737304523
+
+
+// ===== PASS 0: Image =====
+
+// https://www.shadertoy.com/view/4XdfW4
+// original fractal()
+/*
+vec3 fractal(vec3 p)
+{
+    float z = p.z * 2.;
+    p.z = abs(.5 - fract(z));
+    float m = 100.;
+    for (int i = 0; i < 4; i++)
+    {
+        p = abs(p)/clamp(abs(p.x*p.y*p.z),.2,1.) - 2.;
+        m = min(m, min(abs(p.z),min(abs(p.x),abs(p.y))));
+    }
+    m = exp(-10. * m)*2.;
+    vec3 col=vec3(p.xz, 1.) * m;
+    return col;
+}
+*/
+
+// modified from above
+float fractal(vec3 p, out vec3 rgb){
+  float m = 1.;
+  for (int i = 0; i < 4; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.2,1.)-1.75;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-2. * m)*2.;
+  rgb=vec3(2.0, p.xy) * m;
+  return length(rgb);
+}
+
+float scene(vec3 p, out vec3 rgb) {
+  return fractal(p, rgb);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+  vec2 uv = fragCoord.xy/iResolution.xy-.5;
+  uv.x *= iResolution.x / iResolution.y;
+  uv *= 2.25;
+
+  float z = 1.0+iTime*.001;
+  vec3 ro = vec3(0.0, 0., z);
+  vec3 rd = normalize(vec3(uv*1.5, -1.0));
+  float s = sin(iTime*.15);
+  float c = cos(iTime*.15);
+  mat2 m = mat2(c, s, -s, c);
+  rd.xy *= m;
+  
+  vec3 rgb;
+  float d = scene(ro + rd, rgb);
+  vec3 color = vec3(0.0);
+  color = rgb;
+  fragColor = vec4(color, 1.0);
+  
+}
+

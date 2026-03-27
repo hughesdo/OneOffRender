@@ -1,0 +1,211 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Chill Fluffy Orbs
+// Created by diatribes
+// Shadertoy ID: 3ffGDr
+// https://www.shadertoy.com/view/3ffGDr
+
+// Added fluffies, as inspired by
+// https://www.shadertoy.com/view/Xf3yR8
+
+#define R 2.25
+#define S 2.5
+
+vec3 path1(float z) {
+    return vec3(
+        tanh(cos(z * .27)*1.) * 4.,
+        tanh(cos(z * .1)*1.) * 5.,
+        z
+    );
+}
+
+vec3 path2(float z) {
+    return vec3(
+        tanh(cos(z * .2)*1.) * 3.,
+        tanh(cos(z * .1)*1.) * 3.,
+        z
+    );
+}
+
+vec3 path3(float z) {
+    return vec3(
+        sin(z * .05) * 3.,
+        sin(z * .08) * 4.,
+        z
+    );
+}
+
+vec3 path4(float z) {
+    return vec3(
+        tanh(cos(z * .05)*2.) * 5.,
+        tanh(cos(z * .09)*2.) * 5.,
+        z
+    );
+}
+
+vec3 path5(float z) {
+    return vec3(
+        tanh(cos(z * .12)*3.) * 4.,
+        tanh(cos(z * .05)*5.) * 3.,
+        z
+    );
+}
+
+vec3 lightPosition(vec3 p, int i) {
+    switch(i) {
+    case 0:
+        p.xy-=path1(p.z).xy;
+        return p-vec3(
+                tanh(cos(iTime*3.)*2.)*1.25,
+                tanh(cos(iTime*2.)*2.)*1.25,
+                12.+iTime*S+tanh(cos(iTime*.4)*8.)*8.
+            );
+        break;
+    case 1:
+        p.xy-=path2(p.z).xy;
+        return p-vec3(
+                tanh(cos(iTime*2.)*3.)*1.15,
+                tanh(cos(iTime*2.6)*2.)*1.15,
+                13.+iTime*S+tanh(cos(iTime*.33)*8.)*9.
+            );
+        break;
+    case 2:
+        p.xy-=path3(p.z).xy;
+        return p-vec3(
+                tanh(cos(iTime*1.3)*3.)*.75,
+                tanh(cos(iTime*3.4)*1.)*.75,
+                13.+iTime*S+tanh(cos(iTime*.33)*8.)*9.
+            );
+        break;
+    case 3:
+        p.xy-=path4(p.z).xy;
+        return p-vec3(
+                tanh(cos(iTime*1.3)*3.)*.45,
+                tanh(cos(iTime*3.4)*1.)*.65,
+                13.+iTime*S+tanh(cos(iTime*.33)*8.)*9.
+            );
+        break;
+    case 4:
+        p.xy-=path5(p.z).xy;
+        return p-vec3(
+                tanh(cos(iTime*1.3)*3.)*.45,
+                tanh(cos(iTime*3.4)*1.)*.65,
+                13.+iTime*S+tanh(cos(iTime*.23)*7.)*8.
+            );
+        break;
+    }
+}
+
+vec3 gyroid(vec3 p) {
+  float g = (cos(p.x) * sin(p.y) + cos(p.y) * sin(p.z) + cos(p.z) * sin(p.x));
+  return vec3(g);
+}
+
+float scene(vec3 p, out vec3 rgb) {
+    float g1 = length(gyroid(sin(p*2.))*.025);
+    
+    float g2 = length(gyroid(sin(p*4.))*.125);
+    
+    float p1 = g2+g1+length(p.xy - path1(p.z).xy);
+    float p2 = g2+g1+length((p.xy - path2(p.z).xy));
+    float p3 = g2+g1+length((p.xy - path3(p.z).xy));
+    float p4 = g2+g1+length((p.xy - path4(p.z).xy));
+    float p5 = g2+g1+length((p.xy - path5(p.z).xy));
+    float o1 = length(lightPosition(p,0))-.3;
+    float o2 = length(lightPosition(p,1))-.3;
+    float o3 = length(lightPosition(p,2))-.3;
+    float o4 = length(lightPosition(p,3))-.3;
+    float o5 = length(lightPosition(p,4))-.3;
+    
+    float hit = min(o1,min(o2,min(o3,min(o4,o5))));
+    hit = min(hit,R-min(p1,min(p2,min(p3,min(p4,p5)))));
+    rgb = vec3(1.);
+    
+    float n=0.;
+    for(float a=.4;a < 64.;
+        n-=abs(dot(sin(p*a*4.),
+        vec3(1.)))/a*.06,a+=a);   
+ 
+    return hit+n;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+   float d = 0.;
+   for(float i = 0.; i < 200.; i++) {
+        float step = scene(ro + rd *d, rgb);
+        d += step;
+        if(d > 100. || step < .001) {
+            break;
+        }
+    }
+    return d;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+    vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+    vec3 ww = normalize(target - origin);
+    vec3 uu = normalize(cross(ww, rr));
+    vec3 vv = normalize(cross(uu, ww));
+    return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.01, 0);
+    vec3 rgb;
+    vec3 n = scene(p,rgb) - vec3(
+         scene(p-e.xyy,rgb),
+         scene(p-e.yxy,rgb),
+         scene(p-e.yyx,rgb));
+    return normalize(n);
+}
+
+void main() {
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    vec3 rgb = vec3(1.);
+    vec2 uv = -1.0 + 2.0*(u.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = path1(iTime*S);
+	vec3 rd = normalize(vec3(uv,1.)
+            * lookAt(ro,
+                     path1(iTime*S+1.),
+                     0.));
+
+	float d = raymarch(ro, rd, rgb);
+    vec3 p = ro + rd * d;
+
+    if (d < 100.) {
+
+        float o1 = length(lightPosition(p,0));
+        float o2 = length(lightPosition(p,1));
+        float o3 = length(lightPosition(p,2));
+        float o4 = length(lightPosition(p,3));
+        float o5 = length(lightPosition(p,4));
+
+        vec3 oc1 = vec3(0.,1.,0.)/o1;
+        vec3 oc2 = vec3(vec3(0.,0.,1.))/o2;
+        vec3 oc3 = vec3(1.,0.,0.)/o3;
+        vec3 oc4 = vec3(1.,0.,1.)/o4;
+        vec3 oc5 = vec3(0.,1.,1.)/o5;
+
+        vec3 oc = oc1+oc2+oc3+oc4+oc5;
+        d = o1+o2+o3+o4+o5;
+        rgb *= 1.5/(pow(d,d*.02));
+        rgb = mix(rgb,oc,.5);
+    } else {
+        vec3 red = vec3(.3, 0.00, 0.125);
+        vec3 blue = vec3(0.0, 0.125, 0.25);
+        rgb = mix(red.xyz, blue.xyz, uv.y);
+    }
+
+    o = vec4(pow(rgb, vec3(.45)), 1.0);
+
+    fragColor = o;
+}
+

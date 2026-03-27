@@ -1,0 +1,37 @@
+// ID: tfKGzG
+// Name: Polar Orb
+// User: diatribes
+// Date: 1762736208
+
+
+// ===== PASS 0: Image =====
+
+// 🤷
+
+#define A(x,r) abs(dot(sin(x*p*a), r +p-p )) / a
+void mainImage(out vec4 o, vec2 u) 
+{
+    float i,e,r,d,s,a,t=iTime*5e1,et=iTime;
+    vec3  p = iResolution; 
+    u = (u-p.xy/2.)/p.y-.1;
+    for (o*=i;i++<80.; 
+         d += s = min(e*.2, .02 + abs(min(s*.3,r*.8))),
+         o += 1. / s * d
+           + 1e4*vec4(1,2,6,0)/e
+           + 4e1*vec4(6,2,1,0)/ length(u-.25))
+        for(p = vec3(u * d, d + t+t),
+            e = abs(length(p - vec3(
+                sin(sin(et*.5)+et*4.) * 24.,
+                sin(sin(et*2.)+et*2.) *32. - 16.,
+                3e2+t+t+cos(et*2.)*1e2))-.5),
+            r = mix(e,6e1 + p.y, smoothstep(0.,6e1, e)),
+            s = r + 5e1 - abs(p.x += sin(p.z*.1)*4.),
+            a = .01;
+            a < 1.;
+            r += A(.13 * p.z -.07 * t + 8., .0125),
+            s += A(.8,.2),
+            a += a);
+
+    o = tanh(o / 1e5 );
+}
+

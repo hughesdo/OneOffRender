@@ -1,0 +1,85 @@
+// ID: WfdyD7
+// Name: Neural Port 23978
+// User: diatribes
+// Date: 1763688154
+
+
+// ===== PASS 0: Image =====
+
+/*
+    if you're on an integrated or older gpu,
+    how does this run for you?
+    
+    Time does speed up and slow down in this one,
+    so watch out for that :D
+
+*/
+
+#define T (iTime*6.+2.*sin(.6*iTime))
+
+#define P(z) vec3(cos((z) *  .03) * 16., \
+                 cos((z) *  .1) * 2., (z))
+
+float lights;
+
+float light(vec3 p) {
+    return length(p - vec3(
+            p.x+(sin(p.z*.3) * .2),
+            p.y,
+            2.+T));
+}
+
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(vec3 q){
+    vec3 p;
+    
+    // *** Play with scale (s)
+    // 2 - 8 works'ish
+    float s = 4., d = 9e9;
+    MENGERLAYER(1., min, 4.);
+    MENGERLAYER(4., max, 3.5);
+    
+    return d;
+}
+
+float map(vec3 p) {
+    float s, l;
+    l = light(p) - .01;
+    s = max(1. - abs(p.x),1. - abs(p.y));
+    s = min(s, fractal(p));
+    lights += .1/max(l,.001);
+    return s;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+   
+    float s,d,i;
+
+    vec3  c,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+ 
+     // cinema bars
+    if (abs(u.y) > .375) { o = vec4(0); return;}
+    
+    // camera movement
+    u += vec2(cos(T*.2)*.1, cos(T*.1)*.05);
+ 
+    vec3  ro = P(T),
+          p,D = vec3(u, 1);
+          
+    for(;i++ < 24. && d < 2e1;
+        c += vec3(2,1e1,4)/s
+          + 6e1*vec3(2,1,8)*lights / d
+    )
+        p = ro + D * d,
+        p.xy -= P(p.z).xy,
+        d += s = .03+abs(map(p));
+        
+    o.rgb = tanh(c*c/2e7);
+
+}

@@ -1,0 +1,73 @@
+// ID: tcGyDW
+// Name: Multi Light Canal Cruise
+// User: diatribes
+// Date: 1764725269
+
+
+// ===== PASS 0: Image =====
+
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( t*c*24. ) * 16.,        \
+                    sin( t*c*18. ) * 12. + 12.,  \
+                    t*2.+Z+cos(t*.5)*32. )  ) - c )
+
+// This is a line normally found within the sine noise loop
+// I use all the time. It's the line that generates the sine
+// wave that is summed in the loop
+#define A(x,r) abs(dot(sin(x*p/n), r +p-p )) * n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float r,i,s,e,n,t=iTime,d;
+    vec3  p = iResolution,
+    // color variable, for golf stuff, sometimes o is better,
+    // sometimes a separate vec3 is (thanks @bug)
+    c; 
+    
+    // this is the camera movement
+    u = (u+u-p.xy)/p.y+cos(t*.3)*vec2(.2,.1);
+
+    // 50 iterations
+    for (;i++<50.;
+    
+         // accumulate distance to cave or water
+         d += s = min(e, min(.003+.3*abs(s),.01+.6*abs(r))),
+         
+         // accumulate color for cave and water, and light
+         c += (r<s?vec3(1,2,3):vec3(1))/s
+           +  vec3(3,1,5)/length(u-.7)/sin(t*.3)
+           +  1e3/e
+           +  1e1*vec3(1,2,5)/length(vec2(u.x+1.2, u.y - .7)))
+           
+        // start noise loop, march
+        for(p = vec3(u * d, d + t*2.),
+
+            // flying lights
+            e = max( .8* min( O( 3., .03),
+                         min( O( 4., .06),
+                         min( O( 5., .09),
+                         min( O( 6., .12),
+                              O( 7., .15) )))), .01 ),
+
+
+            // get river distance
+            r = 3.+p.y,
+            
+            // get cave (tunnel) distance
+            // max(river - 6. to chop the top
+            s = max(r-6., 12. - length(p.xy )),
+            
+            // noise params, grows by n *= 1.7
+            n = .04;n < 2.;n *= 1.7)
+                // apply noise to river
+                r += A(t-.1*p.z + .6*t + 1., .2)
+                  + sin(.6*t+p.z*.4+n*1e1)*.05,
+                  + cos(.2*t+p.z*.3+n*6.)*.1,
+                // apply noise to cave
+                s += A(.06*p.z +.5,.35);
+    
+    // stretch and move u to become our light
+    u += u.yx*1.4-vec2(-1.,.1);
+    
+    // tanh tonemap and light
+    o.rgb = tanh(c / 1e4 / length(u));
+}

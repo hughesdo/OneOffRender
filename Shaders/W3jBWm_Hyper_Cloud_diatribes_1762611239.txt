@@ -1,0 +1,65 @@
+// ID: W3jBWm
+// Name: Hyper Cloud
+// User: diatribes
+// Date: 1762611239
+
+
+// ===== PASS 0: Image =====
+
+/*
+    I wanted to do more with this, make the clouds look
+    nicer and add a VHS effect, but the more I tinker with
+    it the worse it looks so I'm letting it go :D
+
+    If anybody has a suggestion for post-processing or a vhs
+    effect, let me know :D
+
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime;
+    vec3  p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    // cinema bars
+    if (abs(u.x) > 1.35) { o *= 0.; return; }
+ 
+    vec2 v = u.yx*.7 + vec2(1.2,.1);
+    float l1 = length(u + v),
+          l2 =length(u - v);
+ 
+    for(o*=0.; i++<64.;
+    
+        // entity (orb)
+        e = length(p - vec3(
+            sin(sin(t*3.)+t*2.) * 16.,
+            sin(sin(t)+t*3.) *16.,
+            32.+t*1e1+cos(t)*24.)),
+        
+        // accumulate distance
+        d += s = min(.007+.3*abs(s),e),
+        
+        // color
+        o += 1e2*vec4(1,2,6,0)/(s+.4*e)
+          + vec4(9,2,1,0)/l1 + vec4(1,2,9,0)/l2
+          + (.6+tanh(sin(t+cos(t))*.1))*vec4(4,1,2,0)/abs(u.x) )
+        
+        // noise loop start, march
+        for (p = vec3(u*d,d+t*1e1), // p = ro + rd *d, p.z + t;
+            
+            // mix cloud with flying light
+            s = mix(e*.02,16. - abs(p.x), smoothstep(0., 16., e)),
+            // noise starts at .01 up to 3.,
+            // grow by a+=a
+            a = .01; a < 2.; a += a)
+            
+            // apply noise
+            s -= abs(dot(sin(t+t+.4*p / a ), 1.+p-p)) * a;
+
+    // tanh tonemap, brightness, light off-screen
+    o = tanh(o/2.5e3);
+}
+
+

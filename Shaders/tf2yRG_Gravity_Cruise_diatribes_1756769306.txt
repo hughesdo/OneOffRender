@@ -1,0 +1,34 @@
+// ID: tf2yRG
+// Name: Gravity Cruise
+// User: diatribes
+// Date: 1756769306
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime;
+    vec3  ep, p = iResolution;    
+    
+    u = (u+u-p.xy)/p.y+vec2(cos(t*.4)*.3, cos(t*.8)*.1-.2);
+    
+    for(o*=i; i++<1e2;
+
+        d += s = .03+abs(min(s,e)),
+        o += 1. / s)
+        for (p = vec3(u*d,d),
+    
+            ep = p - vec3(
+                sin(sin(t)+t*1.4) * 8. + sin(t*1.0)*5.,
+                sin(sin(t)+t*.7) *2.-2. + cos(t*1.0)*5.,
+                24.+cos(t*.4)*16.),
+            e = length(ep) - .5,
+             
+            p.x *= .2,
+            p.xz *= mat2(cos(t*2.+vec4(0,33,11,0))),
+            s = mix(exp(-e/16.),3.+p.y, smoothstep(0., 32., length(ep))),
+            a = 4.; a <32.; a += a)
+            s -= abs(dot(step(.99, cos(p * a )), .1+p-p)) / a;
+    
+    o = tanh(vec4(2,1,12,0)*o/1e3);
+}

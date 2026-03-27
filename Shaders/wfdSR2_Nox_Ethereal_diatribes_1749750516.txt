@@ -1,0 +1,25 @@
+// ID: wfdSR2
+// Name: Nox Ethereal
+// User: diatribes
+// Date: 1749750516
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) 
+{
+    float i,d,s,n,t=iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<40.;
+        d += s = .03 + abs(s)*.13,
+        o += 1. / s)
+        for (p = vec3(u * d, d),
+            s = p.x+2.,
+            n = .6; n < 24.;
+            n += n)
+            s -= abs(dot(sin(p.z+t+p*n), vec3(.7))) / n;
+    u.y += .5;
+    o = tanh(vec4(3,1,9,1)*o / d / 2e3 / length(sin(t*.3)*u));
+}
+

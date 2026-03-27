@@ -1,0 +1,38 @@
+// ID: w3SSzW
+// Name: Little Dark Wavez [225]
+// User: diatribes
+// Date: 1745893789
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d,t=iTime;
+    for(O *= i;i++ < 79.;O += max(sin(z), .1) / d / 6e2) 
+        p = z * normalize(vec3(I+I,I.y) - iResolution.xyy),
+        p += cos(p.yzx*(sin(t*.5)*6.+9.)),
+        z += d = .03 + abs(dot(cos(p.yzx*.2),cos(t+p*.2)));
+}    
+
+
+/*
+    inspired by Xor's little raymarch shaders with comments:
+    https://www.shadertoy.com/view/tXlXDX
+
+
+    some other stuff:
+
+//Little Dark Shift [186]
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d;
+    for(O *= i;i++ < 99.;O += max(sin(z), .1) / d / 7e2) 
+        p = z * normalize( vec3(I+I,I.y) - iResolution.xyy ),
+        z += d = .04 + abs(dot(cos(p.yzx),cos(iTime+p)*.5));
+}
+
+*/
+
+

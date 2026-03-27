@@ -1,0 +1,23 @@
+// ID: wcXBzN
+// Name: Light Trip
+// User: diatribes
+// Date: 1757377151
+
+
+// ===== PASS 0: Image =====
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float i,s,d,t=iTime;
+    vec3  p,r = iResolution;
+    for (o *= i; i++ < 128.;
+         o += vec4(1,2,5,0)/s
+           + (1.+cos(d+vec4(3,1,0,0)))/s)
+        p = vec3((u+u-r.xy)/r.y * d, 2e2 + d),
+        p.xy *= R(.1*-t+.1*p.y),
+        p.yz *= R(.1*-t+.1*p.y),
+        p.z += cos(t*.1)*1e2, 
+        d += s = max(cos(p.y*.1),
+                     dot(abs(p-floor(p)-.5), vec3(.065)));
+    o = tanh(o*o/3e8);
+}

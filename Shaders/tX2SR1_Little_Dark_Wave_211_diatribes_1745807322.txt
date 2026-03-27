@@ -1,0 +1,44 @@
+// ID: tX2SR1
+// Name: Little Dark Wave [211]
+// User: diatribes
+// Date: 1745807322
+
+
+// ===== PASS 0: Image =====
+
+/*
+    inspired by Xor's little raymarch shaders with comments:
+    https://www.shadertoy.com/view/tXlXDX
+
+    Golfed from 211 to 198 by FabriceNeyret2 :D
+*/
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d;
+    for( O *= i; 
+         i++ < 99.;
+         O += max(sin(z), .1) / d / 2e3
+       ) 
+        p = z * normalize( vec3(I+I,0) - iResolution.xzy ),
+        p += cos(iTime+p.yzx),
+        z += d = .02 + abs(4.*dot(tanh(2./p),cos(p)));
+}
+
+
+/*
+
+Original:
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime,i,z,d;
+    for(O *= i; i++ < 99.;
+        O += max(vec4(sin(z)), .1) / d)
+        p = z * normalize(vec3(I+I,0)-iResolution.xzy),
+        p += cos(t+p.yzx),
+        z += d = .02 + abs(dot(tanh(2./p)*4.,cos(p)));
+    O /= 2e3;
+}
+
+*/

@@ -1,0 +1,38 @@
+// ID: 3cBXDD
+// Name: Thursday Turbo Tunnel
+// User: diatribes
+// Date: 1741883558
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .2) * .5) * 16., \
+                  tanh(cos((z) * .3) * .6) * 12., (z))
+#define T iTime*2.5
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.02,l,w=1.;
+    vec3  r = iResolution,
+          p = P(T),q,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.4)*.9)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;;
+    for(int i = 0; i++ < 150 && s > .001;) {
+        q = p;
+        q.xy -= P(q.z).xy;
+        q.x -= 6.;
+        q.xy *= 2.;
+        w = 1.;
+        q = clamp(q, -2.0, 2.0) * 2.0 - q;
+        for (int j; j++ < 8; q *= l, w *= l )
+            q  = abs(sin(q)) - 1.,
+            l = 1.65/dot(q,q);
+        p += (s = length(q)/w)*D;
+        o.rgb += (abs(sin(p*.5))*.01+.001);
+    }
+    o.rgb = mix(o.rgb,abs(sin(p) / dot(sin(p*5.),vec3(1.))), .09);
+}
+

@@ -1,0 +1,82 @@
+// ID: WftGzH
+// Name: Ethereal Tunnel Flight
+// User: diatribes
+// Date: 1746818131
+
+
+// ===== PASS 0: Image =====
+
+/*
+
+    Distorted tunnel you can see through. Just playing around.
+
+    Thanks @Xor for publishing commented tiny shaders:
+    
+        https://www.shadertoy.com/view/wXjSRt
+        https://www.shadertoy.com/view/W3BSzy
+
+    Thanks @chronos for sharing the ray jitter trick.
+    It gets rid of ugly bands/ripples.
+    It's described in the comments here:
+
+        https://www.shadertoy.com/view/w3SSWd
+
+*/
+
+#define T (iTime*5.)
+
+
+#define P(z) (vec3(tanh(cos((z) * .15) * 1.) * 8., \
+                   tanh(cos((z) * .12) * 1.) * 8., (z)))
+                       
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,d,i, l;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+
+    vec3  p = P(T),ro=p,q,
+          Z = normalize( P(T+1.)  - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(tanh(sin(p.z*.03)*8.)*3.)*u, 1)* mat3(-X, cross(X, Z), Z);
+    o -= o;
+    d = .1*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    for(; i++<80. && s > .001; ) {
+    
+        // March
+        p = ro + D * d;
+        
+        // Stars
+        q = p - T*.001 + cos(p.yzx+D);
+        l = dot(abs(mod(q, 2.)-1.), vec3(.5));
+        
+        // Noise
+        for (s = .5; s < 2.;
+            p -= dot(cos(T+p * s*4.), vec3(.008)) / s,
+            p += sin(T+p.zxy*3.)*.07,
+            s *= 1.4142);
+            
+        // tunnels
+        // p.xy - q.xy is the tunnel we fly through
+        // the other two are just there for looks
+        q = P(p.z);
+        p.x += tanh(cos(T*.1)*6.)*6.-6.;
+        s  = 3.  - min(length(p.xy - q.xy ),
+                   min(length(p.xy - q.y) ,
+                       length(p.xy - q.x)));
+        d += s = (-l - 1. > s) ? l : .02 + abs(s) * .2;
+
+        // color
+        o += (1.+cos(d+vec4(6,4,1,0))) / s / d;
+    }
+ 
+    // darken, white vignette
+    o *= o / 6e5 - dot(-u,u)*.002;
+    
+    // tonemap
+    o = (o / (o + 0.155) * 1.019);
+
+}

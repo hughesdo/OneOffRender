@@ -1,6 +1,16 @@
+#version 330 core
+
 // Vectors by Xor
 // https://x.com/XorDev/status/1972423422711111894
 // Made reactive by PAEz
+// Converted to OneOffRender format
+
+// OneOffRender uniforms
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0;  // Audio texture
+
+out vec4 fragColor;
 
 // FFT bands
 #define LOW_START   0
@@ -64,7 +74,10 @@
 #define BLUE_WEIGHT 1.0
 #define ALPHA_WEIGHT 1.0
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+void main() {
+    // Get fragment coordinates with Y-flip for OneOffRender
+    vec2 fragCoord = gl_FragCoord.xy;
+    fragCoord.y = iResolution.y - fragCoord.y;
     // Band averages via three tight loops (skip unused bins)
     float low = 0.0;
     for (int i = LOW_START; i < LOW_END; ++i) {

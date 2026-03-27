@@ -1,0 +1,42 @@
+// ID: tctyWn
+// Name: Water Again [264]
+// User: diatribes
+// Date: 1763511484
+
+
+// ===== PASS 0: Image =====
+
+// g0lf m3h plz
+
+/*
+
+    -5 chars from @yonatan
+    
+    -1 chars by @bug
+    
+    -7 chars by @FabriceNeyret2
+       ... and nice formatting :D
+    
+    ty!!   :D
+    
+    
+*/
+
+void mainImage( out vec4 o, vec2 u ) {
+    float s,i,n;
+    vec3 r = iResolution, p;
+    
+    for(o*=i, u = ( u - r.xy/2. ) / r.y - .3; 
+         i++ < 32.;
+         o += s/.1/length(.1*u+s) + 1./length(u+vec2(.03,-.07))
+       )
+        for ( p += vec3(u*s,s),
+              s = .8 + p.y,
+              n =.01
+            ; n < 1.
+            ; n += n
+            )
+            s += abs(dot(sin(p.z+iTime +p/n),  r/r)) * n*.1;
+            
+    o = tanh(o/7e2);
+}

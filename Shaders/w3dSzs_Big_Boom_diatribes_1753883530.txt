@@ -1,0 +1,82 @@
+// ID: w3dSzs
+// Name: Big Boom
+// User: diatribes
+// Date: 1753883530
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,a,d,s,t=iTime*8.;
+    
+    vec3  p = iResolution;
+    
+    u = (u+u-p.xy)/p.y;
+    if(iTime < 1. || abs(u.y)>.8){ o = vec4(0); return; }
+    u += vec2(cos(t*t)*.01);
+    
+    for(o*=i; i++<64.;
+        d += s = .05 + abs(s)*.2,
+        o += 1./max(s*d, .005))
+        for (p = vec3(u * d, d), p.y -= 7.,
+             s = 9.+8.*cos(.2*t+p.z*.1) - length(p.xy * sin(p.y*.7)),
+             a = 1.; a < 24.; a += a)
+             s -= abs(dot(sin(.5*t+.1*p.z+p * a), 2.+p-p)) / a;
+    
+    o = tanh(vec4(9.-cos(.2*t)*3.,2.5-cos(.2*t)*.5,1,0)*o / 42.);
+}
+
+
+/*
+
+//  I probably made some tweaks but below should be mostly the same,
+//  but with comments added
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, // raymarch iterator
+          a, // noise iterator
+          d, // total distance
+          s, // signed distance
+          t=iTime*8.;
+    
+    // temporarily resolution, then raymarch position
+    vec3  p = iResolution; 
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    // black if before first 1sec or within .8 of top or bottom
+    if(iTime < 1. || abs(u.y)>.8){ o = vec4(0); return; }
+    
+    // screen shake, should be better timed to the boom
+    u += vec2(cos(t*t)*.01);
+    
+    // clear o, 64 steps
+    for(o*=i; i++<64.;
+        // accumulate distance
+        d += s = .05 + abs(s)*.2,
+        // accumulate brightness
+        o += 1./max(s*d, .005))
+        // begin noise for-loop:
+        for (
+            // but first we, march :)
+            // then move to a good spot (p.y -= 7.)
+            p = vec3(u * d, d ), p.y -= 7.,
+            // create a warped tunnel to distort with noise
+            // modulate opening by z coord and time (.2*t)
+            s = 9.+8.*cos(.2*t+p.z*.1) - length(p.xy * sin(p.y*.7)),
+            // noise from 1 until 24
+            a = 1.; a < 24.; a += a)
+            // body of noise for-loop:
+            // apply noise, pass in time for movement, p.z so
+            // that it's less repetative looking
+            // 2.+p-p is just golfy vec3(2)
+            s -= abs(dot(sin(.5*t+.1*p.z+p * a), 2.+p-p)) / a;
+    // tone map, vary the red and green at a freq of .2*t,
+    // to match the tunnel modulation
+    o = tanh(vec4(8.-cos(.2*t)*3.,2.5-cos(.2*t)*.5,1,0)*o / 1e2);
+}
+*/
+

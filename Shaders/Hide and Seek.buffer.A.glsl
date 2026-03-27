@@ -1,0 +1,97 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform sampler2D iChannel0; // BufferA feedback (self)
+uniform sampler2D iChannel1; // Audio FFT
+
+out vec4 fragColor;
+
+/*
+    BUFFER A - Audio Analysis & History
+    ====================================
+
+    Channel Setup for Buffer A (OneOffRender convention):
+    - iChannel0: BufferA itself (feedback for history)
+    - iChannel1: Audio input (FFT texture)
+
+    This buffer processes audio and stores:
+    - Row 0: Current frame audio spectrum (bass, mid, treble, overall)
+    - Row 1: Smoothed/accumulated values for smooth reactions
+    - Row 2-10: Audio history for trailing effects
+*/
+
+void main() {
+    // No Y-flip - texelFetch in main shader uses bottom-left origin
+    vec2 fragCoord = gl_FragCoord.xy;
+    vec2 uv = fragCoord / iResolution.xy;
+
+    // Only process first few pixels for data storage
+    if (fragCoord.x > 32.0 || fragCoord.y > 32.0) {
+        fragColor = vec4(0.0);
+        return;
+    }
+
+    int x = int(fragCoord.x);
+    int y = int(fragCoord.y);
+
+    // Row 0: Raw audio analysis
+    if (y == 0) {
+        // Sample different frequency ranges from AUDIO (iChannel1)
+        float bass = 0.0;
+        float mid = 0.0;
+        float treble = 0.0;
+
+        // Bass: 0-0.1 of spectrum
+        // OneOffRender: FFT is at row 0 (y=0.0), not row 64 (y=0.25)
+        for (int i = 0; i < 8; i++) {
+            bass += texture(iChannel1, vec2(float(i) / 512.0, 0.0)).x;
+        }
+        bass /= 8.0;
+
+        // Mids: 0.1-0.4
+        for (int i = 20; i < 80; i++) {
+            mid += texture(iChannel1, vec2(float(i) / 512.0, 0.0)).x;
+        }
+        mid /= 60.0;
+
+        // Treble: 0.4-0.8
+        for (int i = 100; i < 200; i++) {
+            treble += texture(iChannel1, vec2(float(i) / 512.0, 0.0)).x;
+        }
+        treble /= 100.0;
+
+        // Store based on x position
+        if (x == 0) fragColor = vec4(bass, mid, treble, bass + mid + treble);
+        else if (x == 1) {
+            // Waveform sample
+            float wave = texture(iChannel1, vec2(uv.x, 0.75)).x;
+            fragColor = vec4(wave, wave * wave, abs(wave - 0.5), 1.0);
+        }
+        else fragColor = vec4(0.0);
+    }
+    // Row 1: Smoothed values with decay
+    else if (y == 1) {
+        vec4 prev = texture(iChannel0, vec2(fragCoord.x, 1.0) / iResolution.xy);
+        vec4 curr = texture(iChannel0, vec2(fragCoord.x, 0.0) / iResolution.xy);
+
+        // Smooth attack, slow decay - adjusted for breathing effect
+        float attack = 0.1;  // Slower attack for smoother rise
+        float decay = 0.98;  // Slower decay for longer sustain
+
+        vec4 smoothed;
+        smoothed.x = curr.x > prev.x ? mix(prev.x, curr.x, attack) : prev.x * decay;
+        smoothed.y = curr.y > prev.y ? mix(prev.y, curr.y, attack) : prev.y * decay;
+        smoothed.z = curr.z > prev.z ? mix(prev.z, curr.z, attack) : prev.z * decay;
+        smoothed.w = curr.w > prev.w ? mix(prev.w, curr.w, attack) : prev.w * decay;
+
+        fragColor = smoothed;
+    }
+    // Rows 2-10: History buffer (shift down each frame)
+    else if (y >= 2 && y <= 10) {
+        fragColor = texture(iChannel0, vec2(fragCoord.x, fragCoord.y - 1.0) / iResolution.xy);
+    }
+    else {
+        fragColor = vec4(0.0);
+    }
+}

@@ -1,0 +1,132 @@
+// ID: WcdyR2
+// Name: Crystal Orb Cathedral - diatribe
+// User: OneHung
+// Date: 1763833782
+
+
+// ===== PASS 0: Image =====
+
+//
+
+// Crystal Orb Cathedral - diatribes-style with colorful audio orbs
+// Audio reactivity ONLY affects orb colors and their glow
+// Hook up iChannel0 to audio in Shadertoy!
+//
+// please follow https://www.shadertoy.com/user/diatribes
+//
+// see me on x as @OneHung and ask questions.  I share what little I know (mostly AI related) 
+//
+// Hey folks, I'm mostly a .NET tools guy who mixes shaders into my AI videos.
+// Not really a graphics dev, just building stuff that helps a different crowd.
+// Been learning how MCP context can help vibe coders get better results fast.
+// Hope I didn’t miss any credits—tap me if I did. Happy to share my methods
+// anytime if anyone’s curious.
+
+
+#define T (iTime)
+
+// Three moving orbs with different trajectories
+float orb1(vec3 p) {
+    float t = T * 3.;
+    return length(p - vec3(
+        sin(t*.3) * 8.,
+        2. + cos(t*.4) * 3.,
+        10. + T + sin(t*.2) * 5.
+    ));
+}
+
+float orb2(vec3 p) {
+    float t = T * 2.5;
+    return length(p - vec3(
+        cos(t*.4) * 6.,
+        -1. + sin(t*.3) * 2.,
+        15. + T + cos(t*.25) * 4.
+    ));
+}
+
+float orb3(vec3 p) {
+    float t = T * 4.;
+    return length(p - vec3(
+        sin(t*.2) * 7.,
+        sin(t*.5) * 4.,
+        8. + T + sin(t*.35) * 6.
+    ));
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e1,e2,e3,i,s,t = T;
+    vec3  p = iResolution;
+    
+    // Get audio frequencies (if connected)
+    float bass = texture(iChannel0, vec2(0.0, 0.25)).x;
+    float mid = texture(iChannel0, vec2(0.2, 0.25)).x;
+    float high = texture(iChannel0, vec2(0.5, 0.25)).x;
+    
+    // Fallback if no audio (creates gentle pulsing)
+    bass = bass > 0.01 ? bass : 0.3 + 0.1 * sin(t * 1.5);
+    mid = mid > 0.01 ? mid : 0.2 + 0.1 * sin(t * 2.3);
+    high = high > 0.01 ? high : 0.15 + 0.1 * sin(t * 3.7);
+    
+    // Scale coords diatribes-style
+    u = (u+u-p.xy)/p.y;
+    
+    // Camera sway
+    u += vec2(cos(t*.15)*.2, sin(t*.2)*.15);
+    
+    // Audio-reactive orb colors (ONLY place audio affects visuals)
+    vec3 orb1Color = vec3(
+        1.0 + bass * 3.0,      // Red pulses with bass
+        0.2 + mid * 0.5,       // Touch of green
+        0.3 + high * 0.3       // Slight blue
+    );
+    
+    vec3 orb2Color = vec3(
+        0.2 + high * 0.5,      // Slight red
+        0.3 + bass * 0.5,      // Green shimmer
+        1.0 + mid * 3.0        // Blue pulses with mids
+    );
+    
+    vec3 orb3Color = vec3(
+        0.8 + mid * 2.0,       // Yellow-orange
+        1.0 + high * 3.0,      // Green flashes with highs
+        0.1 + bass * 0.3       // Touch of blue
+    );
+    
+    for(o*=i; i++<100.;
+        
+        // Accumulate distance (diatribes-style)
+        d += s = min(.02+.3*abs(s), min(min(e1,e2),e3)*.8),
+        
+        // Surface glow (white) + colored orb lights
+        o += 1./(s+.001) 
+            + 1e3 * vec4(orb1Color,0) / (e1*e1 + 1.)
+            + 1e3 * vec4(orb2Color,0) / (e2*e2 + 1.) 
+            + 1e3 * vec4(orb3Color,0) / (e3*e3 + 1.))
+        
+        // Inner noise loop (diatribes pattern)
+        for (p = vec3(u*d, d+t), // march
+            
+            // Three orb entities
+            e1 = orb1(p) - .5,
+            e2 = orb2(p) - .4,
+            e3 = orb3(p) - .6,
+            
+            // Rotation by time and depth
+            p.xy *= mat2(cos(.1*t + p.z/10. + vec4(0,33,11,0))),
+            
+            // Crystal planes
+            s = 5. - abs(p.y) + 3. - abs(p.x),
+            
+            // Noise accumulator starts at .8
+            a = .8; a < 16.; a += a)
+            
+            // Apply turbulence (diatribes signature)
+            p += cos(.7*t + p.yzx) * .15,
+            
+            // Apply noise (diatribes formula)
+            s -= abs(dot(sin(.1*t + p * a), .6 + p-p)) / a;
+    
+    // tanh tonemap with brightness adjustment
+    o = tanh(o / 8e3);
+}
+

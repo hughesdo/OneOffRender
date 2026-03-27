@@ -55,9 +55,10 @@ class VideoEditor {
         this.transitionList = document.getElementById('transitionList');
         
         // Header buttons
+        this.loadProjectBtn = document.getElementById('loadProjectBtn');
         this.saveProjectBtn = document.getElementById('saveProjectBtn');
         this.renderBtn = document.getElementById('renderBtn');
-        
+
         // Timeline controls
         this.zoomInBtn = document.getElementById('zoomInBtn');
         this.zoomOutBtn = document.getElementById('zoomOutBtn');
@@ -65,7 +66,7 @@ class VideoEditor {
         this.zoomDisplay = document.getElementById('zoomDisplay');
         this.undoBtn = document.getElementById('undoBtn');
         this.redoBtn = document.getElementById('redoBtn');
-        
+
         // Overlay
         this.disabledOverlay = document.getElementById('disabledOverlay');
 
@@ -80,6 +81,15 @@ class VideoEditor {
         // Green screen preview state
         this.currentGreenScreen = null; // Currently active green screen element
         this.greenScreenVideoPath = null; // Path to green screen video file
+
+        // Save/Load modal elements
+        this.saveProjectModal = document.getElementById('saveProjectModal');
+        this.loadProjectModal = document.getElementById('loadProjectModal');
+        this.projectNameInput = document.getElementById('projectNameInput');
+        this.projectList = document.getElementById('projectList');
+
+        // Current project name (for re-save)
+        this.currentProjectName = '';
 
         this.setupEventListeners();
     }
@@ -128,8 +138,30 @@ class VideoEditor {
         });
         
         // Header buttons
-        this.saveProjectBtn.addEventListener('click', () => this.saveProject());
+        this.loadProjectBtn.addEventListener('click', () => this.showLoadProjectModal());
+        this.saveProjectBtn.addEventListener('click', () => this.showSaveProjectModal());
         this.renderBtn.addEventListener('click', () => this.renderProject());
+
+        // Save project modal buttons
+        document.getElementById('closeSaveModal').addEventListener('click', () => this.hideSaveProjectModal());
+        document.getElementById('cancelSaveBtn').addEventListener('click', () => this.hideSaveProjectModal());
+        document.getElementById('confirmSaveBtn').addEventListener('click', () => this.confirmSaveProject());
+        this.projectNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') this.confirmSaveProject();
+            if (e.key === 'Escape') this.hideSaveProjectModal();
+        });
+
+        // Load project modal buttons
+        document.getElementById('closeLoadModal').addEventListener('click', () => this.hideLoadProjectModal());
+        document.getElementById('cancelLoadBtn').addEventListener('click', () => this.hideLoadProjectModal());
+
+        // Close modals on overlay click
+        this.saveProjectModal.addEventListener('click', (e) => {
+            if (e.target === this.saveProjectModal) this.hideSaveProjectModal();
+        });
+        this.loadProjectModal.addEventListener('click', (e) => {
+            if (e.target === this.loadProjectModal) this.hideLoadProjectModal();
+        });
 
         // Settings controls
         this.resolutionSelect.addEventListener('change', () => this.onResolutionChange());
@@ -169,8 +201,8 @@ class VideoEditor {
         try {
             // Load audio files with loading indicator
             this.audioFileList.innerHTML = '<p class="loading-message">Loading audio files...</p>';
-            const audioFiles = await API.getAudioFiles();
-            this.renderAudioList(audioFiles);
+            this.audioFiles = await API.getAudioFiles();
+            this.renderAudioList(this.audioFiles);
 
             // Load shaders
             this.shaders = await API.getShaders();
@@ -603,6 +635,8 @@ class VideoEditor {
 
     /**
      * Check if element type is valid for target layer
+     * NOTE: With strict enforcement, items will auto-correct to proper layer
+     * This validation is mainly for user feedback
      */
     isValidDropForLayer(elementType, targetLayer) {
         // Layer 0 is dedicated to green screen videos only (top visual layer)
@@ -613,8 +647,19 @@ class VideoEditor {
         if (targetLayer === 1) {
             return elementType === 'shader' || elementType === 'transition';
         }
-        // All other layers accept any type
-        return true;
+        // Layers 2+ are not currently used - redirect to proper layer
+        return false;
+    }
+
+    /**
+     * Calculate drop time from mouse X position on timeline
+     */
+    calculateDropTime(e) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const timelineWidth = this.timeline.container.offsetWidth;
+        const dropTime = (x / timelineWidth) * this.timeline.duration;
+        return Math.max(0, Math.min(dropTime, this.timeline.duration));
     }
 
     /**
@@ -629,20 +674,28 @@ class VideoEditor {
         try {
             const data = JSON.parse(e.dataTransfer.getData('application/json'));
             const targetLayer = this.calculateTargetLayer(e);
+            const dropTime = this.calculateDropTime(e);
 
-            // Validate drop for specialized layers
+            // Determine the correct layer for this element type
+            const correctLayer = (data.type === 'video') ? 0 : 1;
+
+            // Validate drop and provide feedback if dropped on wrong layer
             if (!this.isValidDropForLayer(data.type, targetLayer)) {
-                if (targetLayer === 0) {
-                    alert(`Layer 0 (Green Screen Videos) only accepts videos.\nPlease drop shaders and transitions on Layer 1.`);
-                } else if (targetLayer === 1) {
-                    alert(`Layer 1 (Shaders & Transitions) only accepts shaders and transitions.\nPlease drop videos on Layer 0.`);
+                if (targetLayer === 0 && data.type !== 'video') {
+                    // Dropped shader/transition on video layer - auto-correct with notification
+                    console.log(`Auto-correcting: Shaders and transitions belong on Layer 1`);
+                } else if (targetLayer === 1 && data.type === 'video') {
+                    // Dropped video on shader layer - auto-correct with notification
+                    console.log(`Auto-correcting: Videos belong on Layer 0`);
+                } else if (targetLayer >= 2) {
+                    // Dropped on unused layer - auto-correct
+                    console.log(`Auto-correcting to proper layer: ${data.type === 'video' ? 'Layer 0' : 'Layer 1'}`);
                 }
-                return;
             }
 
-            // Add element to timeline with auto-concatenation
-            // The targetLayer is just a hint - the system will find the best placement
-            this.timeline.addElement(data.type, data.data, targetLayer);
+            // Add element to timeline - it will automatically go to the correct layer
+            // The timeline.addElement() now enforces strict layer assignment
+            this.timeline.addElement(data.type, data.data, correctLayer, dropTime);
         } catch (error) {
             console.error('Error handling drop:', error);
         }
@@ -1007,19 +1060,214 @@ class VideoEditor {
     }
 
     /**
-     * Save project
+     * Show save project modal
      */
-    async saveProject() {
+    showSaveProjectModal() {
+        // Pre-fill with current project name if re-saving
+        this.projectNameInput.value = this.currentProjectName;
+        this.saveProjectModal.style.display = 'flex';
+        this.projectNameInput.focus();
+        this.projectNameInput.select();
+    }
+
+    /**
+     * Hide save project modal
+     */
+    hideSaveProjectModal() {
+        this.saveProjectModal.style.display = 'none';
+        this.projectNameInput.value = '';
+    }
+
+    /**
+     * Confirm and save project
+     */
+    async confirmSaveProject() {
+        const projectName = this.projectNameInput.value.trim();
+        if (!projectName) {
+            alert('Please enter a project name');
+            this.projectNameInput.focus();
+            return;
+        }
+
         try {
+            // Gather project data
             const projectData = {
                 audio: this.selectedAudio,
+                settings: {
+                    resolution: this.resolutionSelect.value,
+                    frameRate: parseInt(this.frameRateInput.value)
+                },
                 timeline: this.timeline.getTimelineData()
             };
-            
-            await API.saveProject(projectData);
+
+            // Save via API
+            await API.saveProject(projectName, projectData);
+
+            // Update current project name
+            this.currentProjectName = projectName;
+
+            // Close modal and show success
+            this.hideSaveProjectModal();
             alert('Project saved successfully!');
         } catch (error) {
             alert('Failed to save project: ' + error.message);
+        }
+    }
+
+    /**
+     * Show load project modal
+     */
+    async showLoadProjectModal() {
+        this.loadProjectModal.style.display = 'flex';
+        await this.loadProjectList();
+    }
+
+    /**
+     * Hide load project modal
+     */
+    hideLoadProjectModal() {
+        this.loadProjectModal.style.display = 'none';
+    }
+
+    /**
+     * Load and display project list
+     */
+    async loadProjectList() {
+        try {
+            this.projectList.innerHTML = '<p class="loading-message">Loading projects...</p>';
+            const projects = await API.listProjects();
+
+            if (projects.length === 0) {
+                this.projectList.innerHTML = `
+                    <div class="no-projects-message">
+                        <p>No saved projects found</p>
+                        <p class="help-text">Save your current project to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render project list
+            this.projectList.innerHTML = '';
+            projects.forEach(project => {
+                const item = this.createProjectListItem(project);
+                this.projectList.appendChild(item);
+            });
+        } catch (error) {
+            this.projectList.innerHTML = `
+                <div class="no-projects-message">
+                    <p>Failed to load projects</p>
+                    <p class="help-text">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Create project list item element
+     */
+    createProjectListItem(project) {
+        const item = document.createElement('div');
+        item.className = 'project-item';
+
+        const modifiedDate = project.modified ? new Date(project.modified).toLocaleString() : 'Unknown';
+
+        item.innerHTML = `
+            <div class="project-info">
+                <div class="project-name">${project.name}</div>
+                <div class="project-meta">
+                    Audio: ${project.audio} • Modified: ${modifiedDate}
+                </div>
+            </div>
+            <div class="project-actions">
+                <button class="btn btn-primary btn-sm load-btn">Load</button>
+                <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+            </div>
+        `;
+
+        // Load button handler
+        item.querySelector('.load-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.loadProjectFromFile(project.filename, project.name);
+        });
+
+        // Delete button handler
+        item.querySelector('.delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deleteProjectFile(project.filename);
+        });
+
+        return item;
+    }
+
+    /**
+     * Load project from file
+     */
+    async loadProjectFromFile(filename, projectName) {
+        try {
+            const projectData = await API.loadProject(filename);
+
+            // Find matching audio file from stored audioFiles
+            if (projectData.audio && projectData.audio.name) {
+                const audioFile = this.audioFiles.find(a => a.name === projectData.audio.name);
+
+                if (audioFile) {
+                    // Find the corresponding DOM element
+                    const audioItems = this.audioFileList.querySelectorAll('.audio-file-item');
+                    const audioItem = Array.from(audioItems).find(item => item.dataset.path === audioFile.path);
+
+                    if (audioItem) {
+                        this.selectAudio(audioFile, audioItem);
+                    }
+                } else {
+                    console.warn(`Audio file not found: ${projectData.audio.name}`);
+                    alert(`Warning: Audio file "${projectData.audio.name}" was not found. Timeline may be empty.`);
+                }
+            }
+
+            // Restore settings
+            if (projectData.settings) {
+                if (projectData.settings.resolution) {
+                    this.resolutionSelect.value = projectData.settings.resolution;
+                }
+                if (projectData.settings.frameRate) {
+                    this.frameRateInput.value = projectData.settings.frameRate;
+                }
+            }
+
+            // Restore timeline after a short delay (to allow audio selection to complete)
+            setTimeout(() => {
+                if (projectData.timeline && projectData.timeline.layers) {
+                    this.timeline.layers = projectData.timeline.layers;
+                    this.timeline.render();
+                }
+            }, 100);
+
+            // Update current project name
+            this.currentProjectName = projectName;
+
+            // Close modal
+            this.hideLoadProjectModal();
+
+            console.log(`Project "${projectName}" loaded successfully`);
+        } catch (error) {
+            alert('Failed to load project: ' + error.message);
+        }
+    }
+
+    /**
+     * Delete project file
+     */
+    async deleteProjectFile(filename) {
+        if (!confirm('Are you sure you want to delete this project?')) {
+            return;
+        }
+
+        try {
+            await API.deleteProject(filename);
+            await this.loadProjectList(); // Refresh list
+        } catch (error) {
+            alert('Failed to delete project: ' + error.message);
         }
     }
 

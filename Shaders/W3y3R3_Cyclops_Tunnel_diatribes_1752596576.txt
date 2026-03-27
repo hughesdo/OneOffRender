@@ -1,0 +1,63 @@
+// ID: W3y3R3
+// Name: Cyclops Tunnel
+// User: diatribes
+// Date: 1752596576
+
+
+// ===== PASS 0: Image =====
+
+// apollonian
+float fractal(vec3 p) {
+    // weight
+    float w = 1.5;
+    p-=1.5;
+    // 6 - 8 iterations is usually the sweet spot
+    for (float l, i; i++ < 5.; p *= l, w *= l )
+        // sin(p), abs(sin(p))-1., also work,
+        // but need to adjust weight(w) and scale(l=2.)
+        p  = sin(p),
+        // low scale for this fractal type, so we just get snowflake-like shape
+        // adjust 2. for scaling
+        l = 3.1/dot(p,p);
+    return length(p)/w; 
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    bool hit;// fractal hit
+    float i, // iterator
+          f, //fractal dist
+          
+          // init total dist to a good random value (blue noise)
+          // to hide some of the noise flickering
+          d = .2*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          s, // signed distance
+          n, // noise iterator
+          t = iTime;
+    // p is temporarily resolution,
+    // then raymarch position
+    vec3 p = iResolution;
+    
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    u += vec2(cos(t*.3)*.2, sin(t*.2)*.15);
+
+    // clear o, up to 100, accumulate distance, grayscale color
+    for(o*=i; i++<1e2;d += n = .001+abs(min(f = fractal(p), s))*.8,
+        hit = f<=s,
+        o += 1./n)
+        
+        // march, equivalent to p = ro + rd * d, p.z += d+t+t
+        for (p = vec3(u * d, d+t),
+             // spin by t, twist by p.z, equivalent to p.xy *= rot(.05*t+p.z*.2)
+             p.xy *= mat2(cos(.02*t+p.z*.2+vec4(0,33,11,0))),
+             // dist to our spiral'ish thing that will be distorted by noise
+             // max(tunnel, spiral)
+             s = max(1.5 - length(p.xy), sin(p.x+p.y)),
+             // start noise at 6., until 32, grow by n*=1.41
+             n = 16.; n < 64.; n *= 1.41 )
+                 // subtract noise from s
+                 s += abs(dot(cos(p*n), vec3(1))) / n;
+    // divide down brightness and make a light in the center
+    o = tanh(o/2e5/pow((.5+.1*cos(t))*dot(u,u), .6));
+}
+

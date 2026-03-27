@@ -1,0 +1,51 @@
+// ID: wffXDl
+// Name: Detailed Fractal Tunnel
+// User: diatribes
+// Date: 1741436168
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime*1.5)
+#define P(z) (vec3(tanh(cos((z) * .3) * .15) * 18., \
+                     tanh(cos((z) * .21) * .24) * 12., (z)))
+#define N normalize
+
+float M(vec3 p) {
+    float s,w = 1., l;
+    s = 2.5 - length(p.xy - P(p.z).xy);    
+    p.xy -= P(p.z).xy ;
+    p.x += 1.25;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return min(s, length(p)/w); 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy, 
+         e = vec2(.0001, 0);
+         u = (u - r.xy / 2.) / r.x;
+    vec3 p,
+         ro = P(T),
+         la = P(T+2.);
+    vec3 laz = N(la - ro),
+         lax = N(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(u, 1.) * mat3(-lax, lay, laz);
+
+    float d = 0.,s = .1;
+    for(int i = 0; i++ < 200 && s > .001;
+        p = ro + rd * d,
+        d += s = M(p)); 
+    vec3 n = M(p) - vec3(
+        M(p-e.xyy),
+        M(p-e.yxy),
+        M(p-e.yyx));
+    o.rgb = texture(iChannel0, p.xz*.3).xyz;
+    o.rgb *= 3.;
+    o.rgb *= pow(vec3(0.) + max(dot(N(n), N(ro-p)), .0) * 
+            exp(-d/2.), vec3(.45));
+}
+

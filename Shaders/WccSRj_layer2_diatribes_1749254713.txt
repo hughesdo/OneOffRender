@@ -1,0 +1,27 @@
+// ID: WccSRj
+// Name: layer2
+// User: diatribes
+// Date: 1749254713
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, s1, s2, n, t=iTime*.5;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<90.; ) {
+        p = vec3(u * d, d + t*14.);
+        p.xy -= cos(t+vec2(.15,.19)*p.z)*8.;
+        s2 = 3. - length(p.xy);
+        s1 = 1. - cos(p.z);
+        for (n = 1.5; n < 16.; n += n )
+            s1 -= abs(dot(step(.1, sin(4.*t+p*n )), vec3(1))) / n,
+            s2 -= abs(dot(step(.6, sin(3.*t+p*n*16. )), vec3(.1))) / n;
+        d += s = .01 + abs(min(s1,s2))*.12;
+        o += 1. / s;
+    }
+
+    o = tanh(vec4(1,2,s1 > s2?4:8,1)*o*o  / 5e6);
+}
+

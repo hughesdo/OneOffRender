@@ -1,0 +1,74 @@
+// ID: wfSczV
+// Name: Gravity Orb
+// User: diatribes
+// Date: 1757547650
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Golf by @FabriceNeyret2
+   → 444 chars ( from 515)
+        
+    thanks!!   :D
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+    vec3  p = iResolution;  
+    u = ( u+u - p.xy ) / p.y;
+    float d,a,e,i,s,t = iTime,
+          S = length(u-vec2(-1.3, .65)); // sun
+    
+    for( o*=d
+       ; i++ < 1e2
+       ; d += s = .8*min(.01+abs(s), e=max(.2*e, .001)),
+         o += 12./(s+e*1e2) + vec4(5,2,1,0)*.001/S
+       )
+        
+        for( p = vec3(u*d,d),
+             e = length( 
+                   p - vec3(
+                     sin(sin(t+t)+t) * 24.,
+                     sin(sin(t*1.5)+cos(t*1.3)*2.) *16.,
+                     74.+cos(t)*64.
+                       )   ),
+             s = mix( e/5e1, 4.+p.y, smoothstep(0., 64., e)),
+             p.x -= t*8.,
+             a = .1
+           ; a < 4.
+           ; a += a 
+           )
+               s += a * abs(dot(sin( .1*p.z + t+t+ p/a ), .2+p-p));
+    
+    o = tanh(o/2.);
+}
+
+
+/* original 
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime;
+    vec3  ep, p = iResolution;    
+    
+    u = (u+u-p.xy)/p.y;
+    float sun = max(length(u-vec2(-1.3, .65)), .001);
+    for(o=vec4(0); i++<1e2;
+        d += s = .8*min(.01+abs(s), e=max(.2*e, .001)),
+        o += 2.*vec4(3,3,3,0)*2./(s+e*1e2), o += vec4(5,2,1,0)*.001/sun)
+        
+        for (p = vec3(u*d,d),
+            s = 4.+p.y,
+            ep = p - vec3(
+                sin(sin(t*2.)+t) * 24.,
+                sin(sin(t*1.5)+cos(t*1.3)*2.) *16.,
+                74.+cos(t)*64.),
+            p.x -= t*8.,
+            e = length(ep)-.1,
+            s = mix(e/5e1,s, smoothstep(0., 64., length(ep))),
+            a = .1; a < 4.; a += a)
+                s += abs(dot(sin(.1*p.z+2.*t+p / a), .2+p-p)) * a;
+    
+    o = tanh(o/2.);
+}
+*/

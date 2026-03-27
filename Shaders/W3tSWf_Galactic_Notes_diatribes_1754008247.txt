@@ -1,0 +1,55 @@
+// ID: W3tSWf
+// Name: Galactic Notes
+// User: diatribes
+// Date: 1754008247
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+
+    float i, // raymarch iterator
+          d, // total distance marched
+          s, // signed distance
+          n, // noise iterator
+          t = iTime;
+    
+    // p is resolution, then raymarch position
+    vec3 p = iResolution;
+    
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    
+    // move camera left-right and up-down
+    u += vec2(cos(t*.3)*.2, sin(t*.2)*.15);
+    
+    // clear o, iterate 80 times, accumulate distance (d) and brightness (o)
+    for(o*=i; i++<80.;d += s = .001+abs(s)*.7, o += 1./s)
+        // this for-loop is the noise loop, before entering the loop body,
+        // we march. the below is equivalent to p = ro + rd * d, p.z += t;
+        for (p = vec3(u * d, d+t),
+             // twist by p.z and spin by time
+             p.xy *= mat2(cos(.1*t-p.z*.14+vec4(0,33,11,0))),
+             // it's just a mirrored plane with tanh wrapped around it to make it interesting
+             // why tanh? i was using cos for repetition and was curious, so i tried
+             // tanh, liked it, and kept it :)
+             s = tanh(1.-abs(p.x)),
+             // start noise at 2, while < 16, grow by approx square root of 2
+             // n += n works, n *= 1.x works, but keep in mind the number of iterations
+             // the loop will need
+             n = 2.; n < 16.; n *= 1.42 )
+                 // apply the noise with a scale of .5
+                 // add time to p to make it move,
+                 // add p.z to make it less repetitive looking
+                 // round the cos() passed to dot() to make square shapes,
+                 // as opposed to the usual noise. remove the round() to see 
+                 // what it looks like
+                 s += abs(dot(round(cos(t+p.z+p*n)), vec3(.5))) / n;
+                 
+    // tanh tonemap, vec4 divides color by d (red and blue) for depth,
+    // divide down brightness (o / 1e8),
+    // add a light in the center (dot(u,u),
+    o = tanh(abs(vec4(1e1/d,.2, d/3e1,0)) * o / 8e4
+                / max(dot(u,u), .0001));
+}
+

@@ -1,0 +1,133 @@
+// ID: w3fSWN
+// Name: Menger Morph
+// User: diatribes
+// Date: 1745108885
+
+
+// ===== PASS 0: Image =====
+
+
+#define T (iTime * .9)
+#define P(z) (vec3((cos((z) * .3) * .4) * 8., \
+                   (cos((z) * .25) * .4) * 8., (z)))
+
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define inf 9e9
+
+bool orbHit = false;
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+float orb(vec3 p) {
+    float t = T*1.;
+    return length(p - vec3(
+            P(p.z).x+tanh(sin(p.z+t) * .15),
+            P(p.z).y+sin(sin(p.z*1.5)+t*1.75) *.1,
+           1.75+T+tan(cos(t*.5)*.9)*.4));
+}
+
+
+// Modified from Shane's Menger function
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(in vec3 q){
+    vec3 p;
+    float d=inf, s = 2.;
+    // maybe mod is better for this
+    // left over from moving it smoothly
+    // but too much noise
+    float f1 = floor(tanh(cos(T*.6)*1.3)*1.1)*3.;
+    float f2 = floor(tanh(cos(T*.75)*3.3)*1.1)*2.;
+    
+    // base geometry
+    MENGERLAYER(1., min, 3.);
+    MENGERLAYER(3., max, 3.5);
+    
+    // dynamic stuff
+    MENGERLAYER(2.+f2*.35, max, 3.5);
+    MENGERLAYER(6.+f2, max, 3.5);
+    MENGERLAYER(4.+f1, max, 3.);
+    return d;
+}
+
+float map(vec3 p) {
+    float n, s;
+    vec3 q = p;
+    p.xy -= P(p.z).xy;
+    s = fractal(p);
+    s = min(s, orb(q) - .05);
+    orbHit = s == orb(q)-.05;
+    return s;
+}
+
+
+// Ambient occlusion, for that self shadowed look.
+// XT95 came up with this particular version. Very nice.
+//
+// Hemispherical SDF AO - https://www.shadertoy.com/view/4sdGWN
+// Alien Cocoons - https://www.shadertoy.com/view/MsdGz2
+float calculateAO(in vec3 p, in vec3 n){
+    
+	float ao = 0.0, l;
+	const float nbIte = 6.0;
+	const float falloff = 1.;
+    
+    const float maxDist = 1.;
+    for(float i=1.; i<nbIte+.5; i++){
+    
+        l = nbIte*maxDist;
+        ao += (l - map( p + n*l ))/ pow(1. + l, falloff);
+    }
+	
+    return clamp( 1.-ao/nbIte, 0., 1.);
+}
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(-rot(tanh(sin(p.z*.15)*3.)*3.5)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    a = .4;
+    while(i++ < 200. && s > .001)
+        p = ro + D * d,
+        d += s = map(p)*.6,
+        o.rgb += sin(p)*.005+.119;
+ 
+     r =  N(map(p) - vec3(map(p-e.xyy)-map(p+e.xyy), 
+                          map(p-e.yxy)-map(p+e.yxy), 
+                          map(p-e.yyx)-map(p+e.yyx)));
+
+    if (orbHit)
+        o.rgb *= pow(tex3D(iChannel0, p, r), vec3(1.2)),
+        o *= .001,
+        o.rb *= 2.5;
+    else if (mod(p.z, 10.) > 5.) // do smoothstep+mix instead
+        o.rgb *= pow(tex3D(iChannel1, p*2.5, r), vec3(2.2));
+    else
+        o.rgb *= pow(tex3D(iChannel0, p*1.5, r), vec3(2.2));
+        o *= 2.,
+        o.rg *= 1.5;
+
+    o *= max(dot(r, normalize(ro-p)), .01);
+    o *= calculateAO(p, r)*4.;
+
+    o.rgb /= pow(orb(p), 2.5);
+    o = vec4(pow(tanh(o.rgb*exp(-d/1.)), vec3(.45)), 1.);
+}

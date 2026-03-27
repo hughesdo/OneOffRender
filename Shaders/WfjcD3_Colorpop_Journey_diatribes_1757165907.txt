@@ -1,0 +1,74 @@
+// ID: WfjcD3
+// Name: Colorpop Journey
+// User: diatribes
+// Date: 1757165907
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -6 chars from @FabriceNeyret2 (485 to 479)
+    
+    Thanks!!    :D
+    
+*/
+
+#define P(z) vec3( cos( vec2(.15,.2)*(z) ) *5. , z )   //
+#define R(a) mat2( cos( a +vec4(0,33,11,0)))
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,n, t = iTime*2.;
+    vec3  R = iResolution,
+          p = P(t),
+          Z = normalize( P(t+1.) - p ),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3( R( tanh(2.*sin(p.z*.1)) ) *(u-R.xy/2.)/R.y , 1 ) 
+                   * mat3(-X, cross(X, Z), Z );
+    for( o*=i ; i++<1e2 ; ) {
+        p += D * s;
+        s  = tanh(length((p-P(p.z)).xy));
+        for( n = .3; n < 16.;
+             s -= abs( dot( sin( .05*t + p*n ) , p-p+.2 ) ) / n,
+             n += n 
+           );
+        d += s = .001 + .8 * abs(s);
+        o += ( 1. + cos(.3*p.z +vec4(5,3,1,0)) ) / s;
+    }
+    o = tanh(o / 2e4 );
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Original:
+
+// just cruising through some colorful noise 😎
+
+#define P(z) vec3(cos(vec2(.15,.2)*(z))*5.,z)  
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,n,t=iTime*2.;
+    vec3  q = iResolution,
+          p = P(t),
+          Z = normalize( P(t+1.)- p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(R(tanh(sin(p.z*.1)*2.)*1.)*(u-q.xy/2.)/q.y, 1)  * mat3(-X, cross(X, Z), Z);
+    for(o*=i; i++<1e2;) {
+        p += D * s;
+        s  = tanh(-length((p-P(p.z)).xy));
+        for (n = .3; n < 16.;
+            s += abs(dot(sin(.05*t+p * n), p-p+.2)) / n,
+            n *= 2.);
+        d += s = .001 + .8 * abs(s);
+        o += (1.+cos(.3*p.z+vec4(5,3,1,0)))/s;
+    }
+    o = tanh(o / 2e4);
+}
+*/

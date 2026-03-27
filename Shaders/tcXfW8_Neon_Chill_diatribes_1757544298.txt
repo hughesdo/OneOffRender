@@ -1,0 +1,19 @@
+// ID: tcXfW8
+// Name: Neon Chill
+// User: diatribes
+// Date: 1757544298
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float t=iTime * .2;
+    vec3  p = iResolution;
+    u =(u+u-p.xy)/p.y;
+    u *= mat2(cos(length(u*3.5)+vec4(0,33,11,0)));
+    o  = tanh((vec4(.5,.1,2,0)/(.001*length(u.x+sin(8. *t-u.y*1.)*.1))
+            +  vec4( 1,.1,0,0)/(.002*length(u.x+sin(4. *t-u.y*2.)*.2))
+            +  vec4( 1,.6,0,0)/(.003*length(u.x+sin(3. *t-u.y*4.)*.3))
+            +  vec4( 1, 2,0,0)/(.004*length(u.x+sin(2. *t-u.y*8.)*.4)))
+            /2e4);
+}

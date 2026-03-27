@@ -1,0 +1,53 @@
+// ID: tcsyDj
+// Name: Spacefloat
+// User: diatribes
+// Date: 1756090646
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime * .1;
+    vec3  p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+ 
+    // sun
+    float sun = max(length(u-vec2(1.2, .6)), .001);
+    
+    // clear o, march 140 steps
+    for(o*=i; i++<140.;
+        
+        // accumulate distance
+        d += s = min(.08+.5*abs(s), e=max(.5*e, .001)),
+        
+        // little light + big light
+        o += 1./(mix(s,e,.1)) + vec4(5,6,7,0)*.001/sun)
+        
+        // noise loop start, march
+        for (p = vec3(u*d,d + t * 32.), // p = ro + rd *d;
+            
+            // entity (orb), len(p - vec3(wigglez)) - radius
+            // p.y is mirrored
+            e = length(p
+                     - vec3(tanh(cos(t*.6)*3.) * 128. - 128.,
+                       sin(sin(t)+t*2.) * 64. + 128.,
+                       256.+t * 32.+cos(t*.7)*24.))-.01,
+            
+            // plane
+            s = 4. + p.y + p.x * .3,
+            
+            // noise starts at .2 up to 4., grow by a+=a
+            a = .2; a < 4.; a += a)
+            
+            // apply turbulence
+            p += cos(2.*t*a+p.yzx*.4),
+            
+            // apply noise
+            s += abs(dot(sin(3.*t + p * a), vec3(.2))) / a;
+
+
+    // tanh tonemap, brightness
+    o = tanh(o/1e1);
+}

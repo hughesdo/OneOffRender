@@ -1,0 +1,27 @@
+// ID: 3XKGWh
+// Name: strace
+// User: diatribes
+// Date: 1752284158
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, s1, s2, n, t=iTime*.3;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    if(abs(u.y)>.4){ o = vec4(0); return; }
+    for(o*=i; i++<64.;d += s = .01 + abs(max(s1,s2))*.7,o += 1./s)
+        for (p = vec3(u * d, d+t*4.),
+             p.xy *= mat2(cos(.5*t+.02*p.z+vec4(0,33,11,0))),
+             p.y += t*4.,
+             p.x += sin(t)*32.,
+             s1 =16.-abs(p.x),
+             s2 = cos(p.x+p.y+s1),
+             n = .5; n < 4.; n += n )
+                s1 -= abs(dot(floor(sin(t+p*n )), vec3(.15))) / n,
+                s2 -= abs(dot(round(sin(8.*t+p*n*2. )), vec3(.2))) / n;
+    u += cos(4.*t+u.yx)*.3;
+    o = tanh(vec4(2,6,1,1)*o/6e3/length(u));
+}
+

@@ -1,0 +1,26 @@
+// ID: Wcfczl
+// Name: Bright Spiral 😎
+// User: diatribes
+// Date: 1755921343
+
+
+// ===== PASS 0: Image =====
+
+// 😎
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,n,t = iTime;
+    vec3 p = iResolution;
+    
+    u = (u-p.xy/2.)/p.y;
+    
+    for(o*=i; i++<160.;d += s = .002+abs(s)*.6, o += vec4(16,2,s,0)/s/d)
+        for (p = vec3(u * d, d+t+t),
+             p.xy *= mat2(cos(p.z*.23+vec4(0,33,11,0))),
+             s = 1.+sin(p.y-p.x),
+             n = 8.; n < 32.; n += n )
+                 s -=  abs(dot(cos(p*s*n), sin(p*2.))) / n;
+                 
+    o = tanh(mix(o, o.yzxw, i=length(u))/2e4/i);
+}
+

@@ -1,0 +1,21 @@
+// ID: wfGSz3
+// Name: Funky Gyroid Color Field
+// User: diatribes
+// Date: 1750433494
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) 
+{
+    float i,r,s,t=iTime,
+     d = .5*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    vec3  p = iResolution; 
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<7e1; 
+         p = vec3(u * d, d + t+t) + cos(t+.3*p.zzx)*.5,
+         p.xy *= mat2(cos(.3*t+vec4(0,33,11,0))),
+         d += s = .006+.6*abs(dot(tanh(cos(.1*t+p*.5)*2.), cos(p+sin(t+p.zxy*4.)/8.))),
+         o += (1.+cos(.3*p.z+vec4(3,1,0,0))) / s);
+    o = tanh(o / 5e3  * exp(d/24.));
+}

@@ -18,9 +18,6 @@ uniform sampler2D iChannel1;   // Audio FFT texture
 
 void mainImage(out vec4 O, vec2 I)
 {
-    // Y-flip to match Shadertoy coordinate system
-    I.y = iResolution.y - I.y;
-
     //Raymarch iterator, step distance, depth and reflection
     float i, d, z, r;
     //Clear fragcolor and raymarch 90 steps

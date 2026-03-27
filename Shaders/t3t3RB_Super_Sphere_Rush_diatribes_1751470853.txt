@@ -1,0 +1,75 @@
+// ID: t3t3RB
+// Name: Super Sphere Rush
+// User: diatribes
+// Date: 1751470853
+
+
+// ===== PASS 0: Image =====
+
+/*
+    I was playing with super sphere geometry seen in recent @mrange
+    shaders, they're fun and easy to get on the screen, see here
+    for an example that I used as a reference:
+        https://www.shadertoy.com/view/3cGXDh
+
+    More super sphere doodling
+    
+*/
+
+#define P(z) vec3(cos(vec2(.03,.04)*(z))*32.,z) 
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// power length
+// makes our tunnel square instead of circle
+float length2(vec2 p){
+    float k = 20.;
+    p = pow(abs(p), vec2(k));
+    return pow(p.x + p.y, 1./k);
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    // init
+    float i,a,s,t=iTime * 16.,d;
+    vec3  q,p = iResolution;
+   
+    // scale coords
+    // rotate a little left, right, left, right...
+    // .03 is the freq, 3. is the amount
+    u = (u-p.xy/2.)/p.y * rot(sin(t*.02)*3.);
+    
+    // ro and p are on our path at position 't' (time)
+    vec3 ro = p = P(t);
+    
+    // this is our look-at matrix,
+    // we want to look ahead by t+2., or so...
+    // try other values, many will work, you'll just look
+    // down the path soon or later
+    vec3 Z = normalize( P(t+6.)- p),
+         X = normalize(vec3(Z.z,0,-Z)),
+         // typical ray dir vector of vec3(u, 1) * lookAt
+         D = vec3(u, 1)  * mat3(-X, cross(X, Z), Z);
+
+    // clear o, 100 steps, accumulate color
+    for(o*=i; i++<1e2;o.rgb += 1./s) {
+        // march
+        p = ro + D * d,
+        // subtract path xy from p.xy, save as q.
+        // we need q for tunnel dist later
+        q = p - P(p.z),
+        // repeat p
+        p = mod(p, 1.5) - .75,
+        // super sphere power
+        p = p*p*p*p,
+        // max(max(plane, tunnel), super sphere)
+        s = .005+abs(max(max(4. - length2(q.xy - q.x),
+                        8. - length2(q.xy)), abs(dot(p,p))));
+        // accumulate distance
+        d += s * .7;
+    }
+        
+    // tanh to tone map, index into cos of our color palette
+    o = tanh((1.+cos(.3*t+.1*d+vec4(3,1,0,1)))*vec4(d/s/2e2)/d);
+    
+}
+
+

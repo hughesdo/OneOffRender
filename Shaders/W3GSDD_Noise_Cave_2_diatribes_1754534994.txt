@@ -1,0 +1,120 @@
+// ID: W3GSDD
+// Name: Noise Cave 2
+// User: diatribes
+// Date: 1754534994
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Added a gyroid...
+
+    Experimenting... not great but getting better maybe :D
+    More surface texture stuff, just noise this time.
+    Few layers of basic noise applied unrolled.
+*/
+
+#define T (iTime*3.)
+#define P(z) vec3(cos(vec2(.03,.04)*(z))*16.,z) 
+#define noise(f, i, s) abs(dot(sin(f*p*s), i +p-p )) / s
+#define N normalize
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// map()
+float M(vec3 p) {
+
+    float s, // tunnel
+          g; // gyroid
+          
+          
+    g = 1.+dot(tanh(p), cos(p+sin(p.zxy)));
+          
+    // path
+    vec3 q = P(p.z);
+
+
+    // tunnel with modulating radius
+    s = cos(p.z*.1)*1.+3. - 
+        min(length(p.xy - q.y- 4.),
+        min(length(p.xy - q.xy),
+            length(p.x - q.y - 12.))),
+
+    // bring tha noize
+    s -= noise(.1*p.z+2., .13, .5);
+    s += noise(.6*p.z+2., .12, 2.);
+    s += tanh(g);
+    s *= .4; // clean up surface texture
+    
+    // subtract path xy
+    p.xy -= q.xy;
+    
+    
+    return min(s, 2.-p.y+noise(.2*p.z+1., .05, 2.));
+}
+
+// @Shane
+vec3 tex3D(sampler2D tex, vec3 p, vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+// @Shane, @iq
+float AO(in vec3 p, in vec3 n){
+
+	float sca = 2., occ = 0.;
+    for( int i = 0; i<5; i++ ){
+    
+        float hr = float(i + 1)*.15/5.;        
+        float d = M(p + n*hr);
+        occ += (hr - d)*sca;
+        sca *= .75;
+    }
+    
+    return clamp(1. - occ, 0., 1.);  
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+
+    float i,d,s=.002;
+    
+    vec3  q = iResolution,
+          e = vec3(.01,0,0),
+          
+          // position, origin
+          p = P(T),ro=p,
+          
+          // Look-at
+          Z = normalize( P(T+4.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          // raydir
+          D = vec3((u-q.xy/2.)/q.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    for(o *= i; i++<120.;o+=(s+cos(p.z)))
+        // march
+        p = ro + D * d,
+        s = M(p),
+        d += s;
+
+    // normal
+    q =  N(M(p) - vec3(M(p-e.xyy)-M(p+e.xyy), 
+                       M(p-e.yxy)-M(p+e.yxy), 
+                       M(p-e.yyx)-M(p+e.yyx)));
+
+    // texture
+    o.rgb = pow(tex3D(iChannel0, p*.4, q), vec3(2.2))*16.;
+
+    // red-blue moar
+    o.rb *= 1.3;
+    
+    // diffuse
+    o.rgb *= max(dot(q, normalize(ro-p)), .1);
+
+    // ao
+    o.rgb *= max(AO(p, q), .05);
+    
+    // tonemap
+    o = tanh(pow(o*o/max(d,1.)*exp(-d/16.), vec4(.4545)));
+}

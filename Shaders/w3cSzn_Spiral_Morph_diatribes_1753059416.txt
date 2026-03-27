@@ -1,0 +1,53 @@
+// ID: w3cSzn
+// Name: Spiral Morph
+// User: diatribes
+// Date: 1753059416
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    // iterator, total distance, signed distance, time
+    float i,d,s,t=iTime;
+    
+    // we don't pre-calc 'u', will need the resolution
+    vec3  p,r = iResolution;
+    
+    // clear o
+    for(o*=i;
+        
+        // up to 64
+        i++<64.;
+        
+        // accumulate color, divide by s, minimum of .01
+        // colorize by p.z, reduce frequency (*.3)
+        // so there aren't so many colors at once
+        o += (1.+cos(.3*p.z+vec4(6,2,3,1)))/max(s,.01))
+        
+        // accumulate distance, abs(s) + .005 is translucency,
+        // pops the backwards forwards :D
+        // .5 * is just understepping to avoid wibbly-wobbly artifacts
+        d += s = .5 * abs(s) + .005,
+        
+        // this is just p = ro + rd * d, p++,
+        p = vec3((u+u-r.xy)/r.y * d, d + t)+1.,
+        
+        // spin by .3*t and twist by p.z *.2
+        // comment this line to see the underlying geometry
+        p.xy *= mat2(cos(.3*t+p.z*.2+vec4(0,33,11,0))),
+       
+        // tanh() - a bunch of mirrored stuff,
+        // i use tanh here to morph-pause-morph
+        p = tanh(sin(t*.3)*4.)*2.3+11. - abs(8. - abs( 2. - abs(p))),
+        
+        // sample our geometry by cos(p.x + p.y) + noise
+        // remove the + abs() stuff to see it without
+        s = cos(p.x+p.y)+abs(dot(sin(p * 16.), .1+p-p));
+        
+    // tanh is the tone map superhero imho
+    // divide down brightness
+    o = tanh(o / 3e3);
+}
+

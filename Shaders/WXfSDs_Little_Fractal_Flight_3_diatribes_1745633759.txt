@@ -1,0 +1,33 @@
+// ID: WXfSDs
+// Name: Little Fractal Flight 3
+// User: diatribes
+// Date: 1745633759
+
+
+// ===== PASS 0: Image =====
+
+/*
+    This uses the raymarcher Xor provided in his example shaders
+    e.g, https://www.shadertoy.com/view/t3XXWj
+*/
+
+void mainImage(out vec4 O, vec2 I) {
+    float t = iTime,i,j,z,d,s,w,l;
+    for (O *= i; i++ < 90.;) {
+        vec3 p = z * normalize(vec3(I+I,0)-iResolution.xxy);
+        p.z -= t/2.;
+        p.xy *=  mat2(cos(sin(t*.3)*2. + vec4(0, 33, 11, 0)));
+        p.y -= 1.5;
+        p.y += cos(t)*.25;
+        p.x += cos(t*3.)*.1;
+        p += cos(p.yzx * 1.5 + t)*.3;
+        w = 1.25;
+        for (j = 0.; j++ < 6.; p *= l, w *= l )
+            p  = abs(sin(p)) - 1.,
+            l = 1.5/dot(p,p);
+        z += (d = length(p)/w);
+        O += max(sin(z*z + t*2. + vec4(6, 2, 4, 0)) + .7, .2) / d;
+    }
+    O /= 1e6;
+    O = (O / (O + 0.155) * 1.019);
+}

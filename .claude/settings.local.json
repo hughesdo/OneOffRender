@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(python convert_shaders.py:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(ffprobe:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(grep:*)",
+      "Bash(python -c \":*)"
+    ]
+  }
+}

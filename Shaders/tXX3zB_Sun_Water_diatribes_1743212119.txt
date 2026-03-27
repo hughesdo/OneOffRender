@@ -1,0 +1,47 @@
+// ID: tXX3zB
+// Name: Sun & Water
+// User: diatribes
+// Date: 1743212119
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .2) * .3) * 6., \
+                  tanh(cos((z) * .5) * .5) * .25, (z))
+void mainImage( out vec4 o, vec2 u )
+{
+    float T=iTime,s=.002,d=0.,i;
+    vec3 r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    vec3 p = P(T),ro = p,
+         Z = normalize( P(T+3.) - p),
+         X = normalize(vec3(Z.z,0,-Z)),
+         D = vec3(u, 1) * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    for(i = 0.; i++ < 60. && s > .001;) {
+        p = ro + D * d;
+        p.xy -= P(p.z).xy+sin(T)*.3;
+        p.y += (.1*(sin(p.x+T*2.5)+
+                    sin(p.z+T*1.5)+
+                    sin(p.z+T*2.8)));
+        s = 1. - p.y;
+        for (float a = .075; a < 1.;
+            s += abs(dot(sin(iTime+iTime+p * a * 24.)*.08, vec3(1.))) / a * .07,
+            a *= 1.4142);
+        o.rgb += s *.05+.05;
+        d += s;
+    }
+    o.rgb *= vec3(.65,.25,.25) ;
+    
+    float f = tanh(sin(T*.5)*6.);
+
+    vec3 c1 = vec3(.85, .6, .7)/length(vec2(u.x,.2+u.y-f*.45))*2.;
+    vec3 c2 = o.rgb*(f*.25+.35);
+    c1 = mix(c1, texture(iChannel0, vec2(u.x+T*.16,.25*T+u.y)*.02).xyz, .75);
+    if (d > 80.) {
+        o.rgb = c1;
+    } else {
+        o.rgb = c2;
+    }
+    o.rgb = pow(o.rgb*.5,vec3(.45));
+}

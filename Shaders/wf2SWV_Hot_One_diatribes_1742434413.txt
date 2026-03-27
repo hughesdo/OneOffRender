@@ -1,0 +1,42 @@
+// ID: wf2SWV
+// Name: Hot One
+// User: diatribes
+// Date: 1742434413
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .3) * .5) * 22., \
+                  tanh(cos((z) * .4) * .2) * 22., (z))
+#define T iTime*1.5
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,l,w=1.,d=0.;
+    vec3  r = iResolution,
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.1)*3.3)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    for(int i = 0; i++ < 100 && s > .001;) {
+        p = ro + D * d;
+        p.xy -=  P(p.z).xy;
+        p.x -= 8.;
+        p.y *= (sin(T*.3+p.z*1.5)+sin(T+p.z*5.))*1.;
+        p.z = mod(p.z,5.) - 2.5;
+        p = clamp(p, -8.0, 8.0) * 2.0 - p;
+        w = .8;
+        for (int j; j++ < 8; p *= l, w *= l )
+            p = clamp(p, -2.0, 2.0) * 2.0 - p,
+            p  = abs(sin(p)) - 1.,
+            l = 1.6/dot(p,p);
+        o.rgb += sin(p)*.01+.025;
+        s = length(p)/w-.003;
+        d += s;
+    }
+    o.rgb *= vec3(5,.4,.05)*exp(-d/2.);
+    o.rgb = pow(o.rgb, vec3(.45));
+}

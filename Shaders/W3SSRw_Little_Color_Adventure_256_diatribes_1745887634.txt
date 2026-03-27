@@ -1,0 +1,59 @@
+// ID: W3SSRw
+// Name: Little Color Adventure  [256]
+// User: diatribes
+// Date: 1745887634
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d,t = iTime;
+    for(O *= i;i++ < 99.;O.rgb += max(sin(z+p), .1) / d / 1e3) 
+        p = z * normalize( vec3(I+I,tanh(sin(t*.5)*9.)*I.x) - iResolution.xyy),
+        p.x += tanh(sin(t))*9.,
+        p.z -= t*4.,
+        z += d = .02 + abs(dot(cos(t+p.yzx)*.4,cos(p)));
+    O = tanh(O);
+}
+
+
+
+/*
+    inspired by Xor's little raymarch shaders with comments:
+    https://www.shadertoy.com/view/tXlXDX
+
+    Some other stuff:
+
+// Little Color Sponge  [238]
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d,t = iTime;
+    for(O *= i;i++ < 99.;O.rgb += max(sin(d+z+p), .1) / d / 1e3) 
+        p = z * normalize( vec3(I+I,tanh(sin(t*.4)*1.5)*I.x) - iResolution.xyy ),
+        p.z -= t*4.,
+        z += d = .02 + abs(dot(cos(t+p.yzx)*.5,cos(p)));
+    O = tanh(O);
+}
+
+
+// Little Colors [201]
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float i,z,d;
+    for(O *= i;i++ < 99.;O.rgb += max(sin(z+p), .1) / d / 7e2) 
+        p = z * normalize(vec3(I+I,I.y) - iResolution.xyy ),
+        z += d = .04 + abs(dot(tanh(cos(p.yzx)*3.)*.3,cos(iTime+p)));
+}
+
+// Little Lights [199]
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime,i,z,d;
+    for(O *= i; i++ < 99.;
+        O += vec4(p,1) / d / 2e4)
+        p = z * normalize(vec3(I,-I.x)+iResolution.zyy),
+        p += cos(t+p.yzx)*.4,
+        z += d = dot(abs(p-floor(p)-.5), vec3(.2));
+}
+*/

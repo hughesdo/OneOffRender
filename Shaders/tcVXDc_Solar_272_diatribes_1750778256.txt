@@ -1,0 +1,22 @@
+// ID: tcVXDc
+// Name: Solar [272]
+// User: diatribes
+// Date: 1750778256
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        d += s = .04 + abs(s)*.3,
+        o += 1./s)
+        for (p = vec3(u * d, d + t+t),
+            s = 1.+cos(p.z*.5),
+            a = .05; a < 2.; a += a)
+            s -= abs(dot(sin(.1*t+p * a * 6.), .05+p-p)) / a;
+    o = tanh(vec4(6,2,1,1)*o*o / 1e7 / dot(u,u));
+}
+

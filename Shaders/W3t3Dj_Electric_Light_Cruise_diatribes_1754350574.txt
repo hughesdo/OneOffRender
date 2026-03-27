@@ -1,0 +1,33 @@
+// ID: W3t3Dj
+// Name: Electric Light Cruise
+// User: diatribes
+// Date: 1754350574
+
+
+// ===== PASS 0: Image =====
+
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+void mainImage( out vec4 o, in vec2 u )
+{
+    float i,n,s=.02,d, t = iTime;
+    vec3  w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<1e2 && s > .01; 
+         d += s = min(s,.01+.7*abs(3.+w.y)),
+         o += 2./d)
+        for(p = w = vec3(u * d, d + t*4.),
+            n = 1.,
+            w.z += t,
+            w.y += cos(t+w.z*.2)*.2+cos(t+w.z*.3)*.3,
+            s = 24. - length(p.xy);
+            n < 4.;
+            w += N(2.*t+w, .14),
+            s += N(p, .1),
+            n *= 1.4);
+    o *= vec4(5,2,1,0);
+    o = mix(o, o.yzxw, smoothstep(0., 1., length(u)));
+    o = tanh(o / pow( abs(w.y+sin(t)*N(.4*t+p, 16.)), .7) * 
+             d / 8. / (8. * cos(.6*t) + 6e1) );
+}
+
+

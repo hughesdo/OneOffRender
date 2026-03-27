@@ -1,0 +1,30 @@
+// ID: w32fRw
+// Name: Fire Imp
+// User: diatribes
+// Date: 1762316247
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec3  p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    float e, i, d=1., s, n, T = iTime;
+    for(o=vec4(0); i++<64.; ) {
+        p = vec3(u * d, d);
+        e = length(p - vec3(
+            sin(sin(T*4.)+T*.4)*2.,
+            sin(sin(T*3.)+T*.2)+1.,
+            6.+3.*sin(sin(T*3.)+T*.6)))-.01,
+        p += cos(p.z+T+p.yzx*.5)*.6;
+        s = p.y-.75;
+        p.yz *= mat2(cos(.3*T+vec4(0,33,11,0)));
+        for (n = .01; n < .17; n += n )
+            s += abs(dot(sin( 4.*T + .3*p/n ), vec3(8.))) * n;
+        d += s = .01 + abs(min(s,e))*.1;
+        o += 1. / s + vec4(1,2,3e1,0) / max(e, .1);
+    }
+    o *= vec4(7,2,1,1);
+    o = mix(o, o.zyxw, smoothstep(.2, 1., abs(u.y*.6+.6)));
+    o = tanh( o / d / 1e3);
+}

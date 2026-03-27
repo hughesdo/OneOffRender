@@ -1,0 +1,20 @@
+// ID: 33l3zj
+// Name: Noise42
+// User: diatribes
+// Date: 1743207068
+
+
+// ===== PASS 0: Image =====
+
+void mainImage( out vec4 o, vec2 u )
+{
+    float T=iTime*.08,d=0.,a = .5, f = tanh(sin(T*20.)*.2);
+    vec3 r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    o -= o;
+    for (; a < 2.5;
+        d += abs(dot(sin(vec3(u+sin(T), T) * a * (24.+sin(a)*16.)),
+        vec3(.025))) / a, a *= 1.4142, o.rgb+=d);
+    o.rgb *= 1.25 - length(vec2(sin(T*4.)*.5+u.x-f*.3,u.y-f*.7))*1.75;
+    o.rgb *= vec3(.8,0,0);
+}

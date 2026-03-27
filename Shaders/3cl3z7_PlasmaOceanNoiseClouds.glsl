@@ -1,0 +1,142 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Plasma Ocean, Noise Clouds
+// Created by diatribes
+// Shadertoy ID: 3cl3z7
+// https://www.shadertoy.com/view/3cl3z7
+
+#define S 1.5
+
+/* 
+ texturize() modified from the below by @Elsio
+ https://www.shadertoy.com/view/M3yBWK
+ https://www.shadertoy.com/view/WcXGRM
+*/
+float texturize(vec3 p, float t) {
+
+    float d = 0., a = .4;
+    vec3 f;
+    while(a < 64.)
+
+        // Multiplies input position by current frequency a.
+        // Scale factor of 2 determines base detail level.
+        f = p * a * 4.,
+
+        // Creates vertical movement over time.
+        // Factor of 1.4 controls animation speed.
+        f.y -= t * 1.4,
+
+        // Uses sine waves for base noise pattern.
+        // Dot product with normalized input adds complexity.
+        d -= abs(dot(tanh(cos(f)*.2)*3., vec3(1.))) / a,
+
+        // Doubles frequency for next iteration.
+        // Creates smooth transition between detail levels.
+        a += a;
+
+    return d;
+}
+
+vec3 plasma(vec2 uv) {
+    float t = iTime*.1;
+    uv *= 10.;
+    float r = distance(uv, vec2(sin(t), sin(t)));
+    float g = distance(uv, vec2(0, 3.));
+    float b = distance(uv, vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(uv.x+t) + cos(uv.y+t));
+    return vec3(r,g,b)/value*.1;
+}
+
+float scene(vec3 p, out vec3 rgb) {
+    float e = texturize(sin(vec3(p.x+iTime*.5,p.y,p.z)), iTime)*.05;
+
+    float w1 = sin(iTime+p.x*.3+p.z*1.1)*.22;
+    float w2 = tanh(cos(iTime+p.x*.75+p.z*.3)*.20)*1.1;
+    float w3 = tanh(cos(iTime+p.x*.6+p.z*1.7)*.26)*1.;
+    float river = 1.5+p.y+w1+w2+w3;
+    
+    float w4 = sin(iTime+p.x*.3+p.z*.15)*.20;
+    float w5 = tanh(cos(iTime+p.x*.75+p.z*1.3)*.23)*1.1;
+    float w6 = cos(iTime+p.x*.6+p.z*2.3)*.21;
+    float sky = 7.-p.y+w1+w2+w3+w4+w5+w6+e;
+    
+    float hit = min(sky,river);
+    
+    if (river == hit) {
+        rgb = plasma(sin(p.xz))*vec3(0.0, 0.5, 0.8);
+    } else if (sky == hit) {
+        rgb = vec3(1.);
+        rgb *= sin(.75+vec3(cos(p.z*2.8)*.2));
+        rgb *= vec3(1.5, 1.7, 2.);
+    } else {
+        //
+    }
+    return hit;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+  float dist = 0.0;
+  for(float i = 0.; i < 200.; i++) {
+    vec3 p = ro + rd * dist;
+    float step = scene(p, rgb);
+    dist += step;
+    if(dist > 100. || step < .001) {
+        break;
+    }
+  }
+  return dist;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+  vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+  vec3 ww = normalize(target - origin);
+  vec3 uu = normalize(cross(ww, rr));
+  vec3 vv = normalize(cross(uu, ww));
+  return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 rgb;
+
+  vec3 n = scene(p,rgb) - vec3(
+    scene(p-e.xyy,rgb),
+    scene(p-e.yxy,rgb),
+    scene(p-e.yyx,rgb));
+
+  return normalize(n);
+}
+
+void main() {
+    vec2 u = gl_FragCoord.xy;
+    vec3 rgb = vec3(1.);
+	
+    vec2 uv = -1.0 + 2.0*(u.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = vec3(0., 0., iTime*S);
+	vec3 la = ro + vec3(0., 0., 1.);
+
+	vec3 rd = normalize(vec3(uv,1.)*lookAt(ro,la,0.));
+	float d = raymarch(ro, rd, rgb);
+    vec3 p = ro + rd * d;
+
+    float diffuse = max(dot(normal(p), normalize(ro-p)), .3);
+    rgb *= diffuse;
+   
+    float fog = exp(-pow(200./d,.3));
+    rgb += vec3(fog);
+ 
+    if (d < 100.) {
+        
+    } else {
+        rgb = vec3(.9,.95,.99);
+    }
+    fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+}
+

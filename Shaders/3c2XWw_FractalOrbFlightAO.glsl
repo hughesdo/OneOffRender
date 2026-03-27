@@ -1,0 +1,87 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Fractal Orb Flight AO
+// Created by diatribes
+// Shadertoy ID: 3c2XWw
+// https://www.shadertoy.com/view/3c2XWw
+
+#define P(z) vec3(tanh(cos((z) * .4) * .4) * 1., \
+                  tanh(cos((z) * .5) * .3) * 7., (z))
+#define T iTime*.75
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float orb(vec3 p) {
+    float t = T*1.3;
+    return length(p - vec3(
+            P(p.z).x+tanh(sin(p.z*.1+t) * .75)*.6,
+            P(p.z).y+sin(sin(p.z*.5)+t*2.5) *.125,
+           2.+T+tan(cos(t*.5)*.6)*2.));
+}
+
+float M(vec3 p, out vec3 rgb) {
+    float l,w=1.,s;
+    s = orb(p) - .1;
+    p.xy -= P(p.z).xy;
+    s = min(s, 2.75 - length(p.xy));
+    p.x -= 1.5;
+    w = .8;
+    for (int j; j++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.6/dot(p,p);
+    rgb = sin(p)*.12+.12;
+    return min(s, length(p)/w-.001);
+}
+
+// Taken from Shane's "Fractal Flythrough"
+// https://www.shadertoy.com/view/4s3SRN
+float AO(in vec3 pos, in vec3 nor)
+{
+	float sca = 2.0, occ = 0.0;
+    vec3 unused;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = M(nor * hr + pos, unused);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+
+void main()
+{
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    float s=.002,l,w=1.,d=0.;
+    vec3  r,
+          e = vec3(.005,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.05)*2.)*(u-iResolution.xy/2.)/iResolution.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;;
+    for(int i = 0; i++ < 200 && s > .001;) {
+        p += (s = M(p,r))*D;
+        d += s;
+        o.rgb += r;
+    }
+    r =  N(M(p,Z) - vec3(M(p-e.xyy, Z), 
+                         M(p-e.yxy, Z), 
+                         M(p-e.yyx, Z)));
+    o.rgb *= vec3(1)*max(dot(r, normalize(ro-p)), .05);
+    o.rgb /= orb(p);
+    o.rgb *= AO(p, r)*2.;
+    o.rgb *= exp(-d/1.);
+    o.rgb = pow(o.rgb, vec3(.45));
+    
+    fragColor = o;
+}
+

@@ -1,0 +1,47 @@
+// ID: W3ySRK
+// Name: Saturated
+// User: diatribes
+// Date: 1754754317
+
+
+// ===== PASS 0: Image =====
+
+// playing with the geomoetry in @Shane's "Steel Lattice"
+// https://www.shadertoy.com/view/4tlSWl
+
+#define T iTime*2.
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+#define P(z) vec3(cos((z) *.12) * 8., \
+                  cos((z) * .1) * 8., z )
+
+float map(vec3 p)
+{
+    float s;
+    p.y += .1 * (sin(p.x+T*1.)+
+                 sin(p.z+T*3.)+
+                 sin(p.z+T*2.)),
+    p.xy -= P(p.z).xy,
+    p.xy *= R(p.z*.1),
+    p = mod(p, 4.)-2.,
+    s = min(length(p.xy),min(length(p.yz),length(p.xz)))-0.55, 
+    p = abs(mod(p, 1.)-0.5),
+    s = max(s, min(max(p.x, p.y),min(max(p.y, p.z),max(p.x, p.z)))-0.15);
+    return s;
+}
+
+void mainImage(out vec4 o, vec2 u)
+{
+    float i,j,d,s;
+    vec3  r = iResolution,
+          p = P(T), q=p,
+          Z = normalize( P(T+1.5) - p ),
+          X = normalize(vec3( Z.z, 0, -Z )),
+          D = vec3( ( u - r.xy/2. ) / r.y, 1 ) 
+             * mat3(-X, cross(X, Z), Z);
+    for(o*=i; i++ < 1e2;o +=(1.+cos(p.z+vec4(3,1,0,0)))/s)
+        p = q + D * d * .5,
+        d += s = max(map(p), .001);
+ 
+    o = tanh(d*o*o / max(d, 16.) / 4e9);
+}
+

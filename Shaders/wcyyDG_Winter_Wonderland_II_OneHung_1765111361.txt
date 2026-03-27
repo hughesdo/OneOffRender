@@ -1,0 +1,1598 @@
+// ID: wcyyDG
+// Name: Winter Wonderland II
+// User: OneHung
+// Date: 1765111361
+
+
+// ===== PASS 0: Image =====
+
+// Winter Wonderland - Enhanced Snow Visibility
+// Original: https://www.shadertoy.com/view/W3fBR7
+// Created by praveen in 2025-11-17
+// Winter transformation and snow/sky adjustments by AI Assistant
+//
+// Snow is now slightly gray-blue for better contrast
+// Sky is more blue, less gray to make falling snow visible
+
+// This was an Augmented Code AI experiment using the original shader from Praveen:
+// https://www.shadertoy.com/view/W3fBR7
+// I used the Augmented Code add-in for VS Code to see how far AI could transform
+// the scene into something new. Augmented uses ChatGPT and Claude under the hood
+// with vector database and RAG enhancements for coding support. I am not affiliated
+// with any of these tools; just exploring how well AI can assist creative shader
+// development.
+//
+// Original Prompt:
+// The current scene includes a mushroom, a rainbow, a castle, a bunny, a princess,
+// a flower, and green land. Without changing the camera motion or layout, reinterpret
+// the environment as a winter scene: a snowman, an ice castle, snow-covered ground,
+// a young boy, a semi-transparent glassy ice bridge, Christmas trees, and a poinsettia.
+// Add any other winter or holiday aesthetics like falling snow, icy textures,
+// frosted details, and festive lights.
+
+// Base:
+//         Green Field Diorama by Gallo
+//         https://www.shadertoy.com/view/7dSGW1
+// Portal mechanics:
+//         TARDIS by efelo
+//         https://www.shadertoy.com/view/7dKSRG
+// Glow effect:
+//         3D GLOW TUTORIAL by alro
+//         https://www.shadertoy.com/view/7stGWj
+
+// SDF, Maths and CG techniques:
+//         IQ's articles and shaders:
+//         https://iquilezles.org/articles/
+//         Raymarching - Primitives: https://www.shadertoy.com/view/Xds3zN
+//         Rainforest by IQ: https://www.shadertoy.com/view/4ttSWf
+//         Box Mapping: https://www.shadertoy.com/view/MtsGWH
+//         Box Function: https://iquilezles.org/articles/boxfunctions
+//         Extrusion and Revolution SDF: https://www.shadertoy.com/view/4lyfzw
+//         Elongation SDF: https://www.shadertoy.com/view/Ml3fWj
+//         Many more..!!: https://www.shadertoy.com/user/iq
+
+// Utility functions:
+//         Hash without Sine by Dave_Hoskins: 
+//         https://www.shadertoy.com/view/4djSRW
+//
+//         Shortest rotation dot! by FabriceNeyret2
+//         https://www.shadertoy.com/view/XlsyWX
+//
+//         hg_sdf:
+//         https://mercury.sexy/hg_sdf/
+
+// Inspiration and endless knowledge:
+//         Shadertoy Community – thank you for everything you share
+
+// Winter theme transformation by AI Assistant
+
+//---------------------------------------------------------------------------
+
+#if HW_PERFORMANCE==0
+#define AA 1
+#else
+#define AA 2   // make this 2 or 3 for antialiasing
+#endif
+
+#define PI 3.14159265
+#define TAU 6.2831853
+
+//---------------------------------------------------------------
+// NOISE FUNCTIONS
+// Hash without Sine by Dave_Hoskins: https://www.shadertoy.com/view/4djSRW
+//---------------------------------------------------------------
+float hash11(float p) {
+    p = fract(p * .1031);
+    p *= p + 33.33;
+    p *= p + p;
+    return fract(p);
+}
+
+float hash12(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+float hash13(vec3 p) {
+    p = fract(p * vec3(0.1031, 0.11369, 0.13787));
+    p += dot(p, p.yxz + 19.19);
+    return fract((p.x + p.y + p.z) * p.x);
+}
+
+vec2 hash22( vec2 p ) 
+{
+    const vec2 k = vec2( 0.3183099, 0.3678794 );
+    float n = 111.0*p.x + 113.0*p.y;
+    return fract(n*fract(k*n));
+}
+
+vec3 hash33(vec3 p3)
+{
+    p3 = fract(p3 * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yxz+33.33);
+    return fract((p3.xxy + p3.yxx)*p3.zyx);
+}
+//---------------------------------------------------------------
+
+//---------------------------------------------------------------
+// UTILITY FUNCTIONS
+//---------------------------------------------------------------
+
+// Claude
+float _sin(float x) {
+    x = fract(x / TAU + .5) * 2.0 - 1.0;
+    float y = x * (4.0 - 4.0 * abs(x));
+    return y * (0.775 + 0.225 * abs(y));
+}
+
+vec2 _sin(vec2 x) {
+    return vec2(_sin(x.x), _sin(x.y));
+}
+
+vec3 _sin(vec3 x) {
+    return vec3(_sin(x.x), _sin(x.y), _sin(x.z));
+}
+
+vec4 _sin(vec4 x) {
+    return vec4(_sin(x.x), _sin(x.y), _sin(x.z), _sin(x.w));
+}
+
+float _cos(float x) {
+    return _sin(x-11.);
+}
+
+vec2 _cos(vec2 x) {
+    return vec2(_cos(x.x), _cos(x.y));
+}
+
+vec3 _cos(vec3 x) {
+    return vec3(_cos(x.x), _cos(x.y), _cos(x.z));
+}
+
+vec4 _cos(vec4 x) {
+    return vec4(_cos(x.x), _cos(x.y), _cos(x.z), _cos(x.w));
+}
+
+// Shortest rotation dot by @FabriceNeyret2
+// https://www.shadertoy.com/view/XlsyWX
+#define rot2d(theta) mat2(_cos(theta+vec4(0,33,11,0)))
+
+//-----------------------------------------------
+// https://iquilezles.org/articles/distfunctions
+//-----------------------------------------------
+
+float dot2( in vec2 v ) { return dot(v,v); }
+float dot2( in vec3 v ) { return dot(v,v); }
+float ndot( in vec2 a, in vec2 b ) { return a.x*b.x - a.y*b.y; }
+
+float sdHexagon( in vec2 p, in float r )
+{
+    const vec3 k = vec3(-0.866025404,0.5,0.577350269);
+    p = abs(p);
+    p -= 2.0*min(dot(k.xy,p),0.0)*k.xy;
+    p -= vec2(clamp(p.x, -k.z*r, k.z*r), r);
+    return length(p)*sign(p.y);
+}
+
+float sdTunnel( in vec2 p, in vec2 wh )
+{
+    p.x = abs(p.x); p.y = -p.y;
+    vec2 q = p - wh;
+
+    float d1 = dot2(vec2(max(q.x,0.0),q.y));
+    q.x = (p.y>0.0) ? q.x : length(p)-wh.x;
+    float d2 = dot2(vec2(q.x,max(q.y,0.0)));
+    float d = sqrt( min(d1,d2) );
+
+    return (max(q.x,q.y)<0.0) ? -d : d;
+}
+
+float sdPie( in vec2 p, in vec2 c, in float r )
+{
+    p.x = abs(p.x);
+    float l = length(p) - r;
+	float m = length(p - c*clamp(dot(p,c),0.0,r) );
+    return max(l,m*sign(c.y*p.x-c.x*p.y));
+}
+
+float sdSphere( vec3 p, float s )
+{
+    return length(p)-s;
+}
+
+float sdBox( vec3 p, vec3 b )
+{
+  vec3 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+
+float sdRoundBox( vec3 p, vec3 b, float r )
+{
+  vec3 q = abs(p) - b + r;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r;
+}
+
+float sdCone( vec3 p, vec2 c, float h )
+{
+  vec2 q = h*vec2(c.x/c.y,-1.0);
+
+  vec2 w = vec2( length(p.xz), p.y );
+  vec2 a = w - q*clamp( dot(w,q)/dot(q,q), 0.0, 1.0 );
+  vec2 b = w - q*vec2( clamp( w.x/q.x, 0.0, 1.0 ), 1.0 );
+  float k = sign( q.y );
+  float d = min(dot( a, a ),dot(b, b));
+  float s = max( k*(w.x*q.y-w.y*q.x),k*(w.y-q.y)  );
+  return sqrt(d)*sign(s);
+}
+
+float sdCone(vec3 p, vec3 a, vec3 b, float ra, float rb)
+{
+    float rba  = rb-ra;
+    float baba = dot(b-a,b-a);
+    float papa = dot(p-a,p-a);
+    float paba = dot(p-a,b-a)/baba;
+    float x = sqrt( papa - paba*paba*baba );
+    float cax = max(0.0,x-((paba<0.5)?ra:rb));
+    float cay = abs(paba-0.5)-0.5;
+    float k = rba*rba + baba;
+    float f = clamp( (rba*(x-ra)+paba*baba)/k, 0.0, 1.0 );
+    float cbx = x-ra - f*rba;
+    float cby = paba - f;
+    float s = (cbx < 0.0 && cay < 0.0) ? -1.0 : 1.0;
+    return s*sqrt( min(cax*cax + cay*cay*baba,
+                       cbx*cbx + cby*cby*baba) );
+}
+
+float sdRoundCone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+{
+    vec3  ba = b - a;
+    float l2 = dot(ba,ba);
+    float rr = r1 - r2;
+    float a2 = l2 - rr*rr;
+    float il2 = 1.0/l2;
+
+    vec3 pa = p - a;
+    float y = dot(pa,ba);
+    float z = y - l2;
+    float x2 = dot2( pa*l2 - ba*y );
+    float y2 = y*y*l2;
+    float z2 = z*z*l2;
+
+    float k = sign(rr)*rr*rr*x2;
+    if( sign(z)*a2*z2 > k ) return  sqrt(x2 + z2)        *il2 - r2;
+    if( sign(y)*a2*y2 < k ) return  sqrt(x2 + y2)        *il2 - r1;
+                            return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
+}
+
+float sdEllipsoid( in vec3 p, in vec3 r )
+{
+    float k0 = length(p/r);
+    float k1 = length(p/(r*r));
+    return k0*(k0-1.0)/k1;
+}
+
+float sdTorus( vec3 p, vec2 t )
+{
+    return length( vec2(length(p.xz)-t.x,p.y) )-t.y;
+}
+
+float sdCylinder( vec3 p, vec3 c )
+{
+  return length(p.xz-c.xy)-c.z;
+}
+
+float sdCylinder( vec3 p, vec2 h )
+{
+    vec2 d = abs(vec2(length(p.xz),p.y)) - h;
+    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+float sdVerticalCapsule( vec3 p, float h, float r )
+{
+  p.y -= clamp( p.y, 0.0, h );
+  return length( p ) - r;
+}
+
+float sdVesicaSegment( in vec3 p, in vec3 a, in vec3 b, in float w )
+{
+    vec3  c = (a+b)*0.5;
+    float h = length(b-a);
+    vec3  v = (b-a)/h;
+    float y = dot(p-c,v);
+    vec2  q = vec2(length(p-c-y*v),abs(y));
+
+    h *= 0.5;
+    w *= 0.5;
+    float d = 0.5*(h*h-w*w)/w;
+
+    vec3  t = (h*q.x < d*(q.y-h)) ? vec3(0.0,h,0.0) : vec3(-d,0.0,d+w);
+
+    return length(q-t.xy) - t.z;
+}
+
+float sdCapsule( vec3 p, vec3 a, vec3 b, float r )
+{
+  vec3 pa = p - a, ba = b - a;
+  float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+  return length( pa - ba*h ) - r;
+}
+
+float sdTriPrism( vec3 p, vec2 h )
+{
+  vec3 q = abs(p);
+  return max(q.z-h.y,max(q.x*0.866025+p.y*0.5,-p.y)-h.x*0.5);
+}
+
+vec3 opRepetition(inout vec3 p, in vec3 s)
+{
+    vec3 cellId = floor(p / s);
+    p -= (cellId + 0.5) * s;
+    return cellId;
+}
+
+float opLimitedRepetition(inout float p, float spacing, int numLayers) {
+    float cell = clamp(round(p / spacing), 0.0, float(numLayers - 1));
+    p -= cell * spacing;
+    return cell;
+}
+
+float smin(float a, float b, float k) {
+    k *= 4.0;
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h * h * k * (1.0 / 4.0);
+}
+
+float smax(float a, float b, float k) {
+    float h = max(k - abs(a - b), 0.0) / k;
+    return max(a, b) + h * h * k * (1.0 / 4.0);
+}
+
+vec4 opElongate( in vec3 p, in vec3 h )
+{
+    vec3 q = abs(p)-h;
+    return vec4( max(q,0.0), min(max(q.x,max(q.y,q.z)),0.0) );
+}
+
+float opExtrusion( in vec3 p, in float sdf, in float h )
+{
+    vec2 w = vec2( sdf, abs(p.z) - h );
+  	return min(max(w.x,w.y),0.0) + length(max(w,0.0));
+}
+
+vec2 iBox( in vec3 ro, in vec3 rd, in vec3 rad )
+{
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;
+    vec3 k = abs(m)*rad;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+	return vec2( max( max( t1.x, t1.y ), t1.z ),
+	             min( min( t2.x, t2.y ), t2.z ) );
+}
+
+float pModPolar(inout vec2 p, float repetitions)
+{
+	float angle = 2.*PI/repetitions;
+	float a = atan(p.y, p.x) + angle/2.;
+	float r = length(p);
+	float c = floor(a/angle);
+	a = mod(a,angle) - angle/2.;
+	p = vec2(_cos(a), _sin(a))*r;
+	if (abs(c) >= (repetitions/2.)) c = abs(c);
+	return c;
+}
+
+vec2 pMod2(inout vec2 p, vec2 size) {
+	vec2 c = floor((p + size*0.5)/size);
+	p = mod(p + size*0.5,size) - size*0.5;
+	return c;
+}
+
+//---------------------------------------------------------------
+// MAIN
+//---------------------------------------------------------------
+
+#define ZERO (min(iFrame,0))
+#define px 1./iResolution.y
+
+// Winter Materials
+#define MAT_PINE_NEEDLES 20
+#define MAT_TREE_TRUNK 21
+#define MAT_GROUND 30
+#define MAT_SNOW 40
+#define MAT_CLOUD 70
+#define MAT_TREES 80
+#define MAT_ICE_CASTLE_WHITE 90
+#define MAT_ICE_CASTLE_FACADE 91
+#define MAT_ICE_CASTLE_ROOF 100
+
+#define MAT_ICE_BRIDGE 110
+
+#define MAT_BOY_HAIR 120
+#define MAT_BOY_SKIN 121
+#define MAT_BOY_COAT 122
+#define MAT_BOY_BOOTS 124
+#define MAT_BOY_FACE 127
+#define MAT_BOY_SCARF 129
+
+#define MAT_SNOWMAN_BODY 140
+#define MAT_SNOWMAN_ACCESSORIES 141
+
+#define MAT_POINSETTIA_CENTER 150
+#define MAT_POINSETTIA_PETALS 151
+
+#define MAT_CHRISTMAS_TREE 160
+
+#define MAT_GLOW 10001
+
+#define RI_SNOWY_GROUND    (1u << 0)
+#define RI_ICE_BRIDGE      (1u << 1)
+#define RI_BOY             (1u << 2)
+#define RI_CHRISTMAS_TREE  (1u << 3)
+#define RI_SNOWMAN         (1u << 4)
+#define RI_POINSETTIA      (1u << 5)
+#define RI_FLOWER_BED      (1u << 6)
+#define RI_CLOUDS          (1u << 7)
+#define RI_SNOWY_MOUNTAIN  (1u << 8)
+#define RI_ICE_CASTLE      (1u << 9)
+
+//---------------------------------------------------------------
+// SDF Figures
+//---------------------------------------------------------------
+
+#   define opMin(_v, _m) res = (_v < res.x) ? vec2(_v, _m) : res
+#   define opMinV(_v) res = (_v.x < res.x) ? _v : res
+
+float sdPortalTorus(vec3 p)
+{
+    vec3 q = p - vec3(0.0, 0.1, 0.7);
+    q.yz *= rot2d(PI/2.0);
+    return sdTorus(q, vec2(1.0, 0.02));
+}
+
+void sdSnowyGround(vec3 p, inout vec2 res)
+{
+    float area = sdCylinder(p-vec3(0,-.17,0), vec2(1.2,0.001))-0.1;
+    if(area-0.003 < res.x )
+    {
+        // Add snow texture with sparkles
+        float distortion = (_sin(10.*p.x)+_cos(20.*p.z)) * 0.001;
+        float sparkle = hash13(floor(p*50.0)) * 0.0005;
+        opMin(area-distortion+sparkle, MAT_SNOW);
+    }
+}
+
+//--------------- Ice Bridge Start ------------------
+vec3 getIceColor(float t)
+{
+    // Semi-transparent icy blue-white gradient
+    t = clamp(t, 0.0, 1.0);
+    vec3 ice1 = vec3(0.7, 0.85, 1.0);
+    vec3 ice2 = vec3(0.85, 0.95, 1.0);
+    return mix(ice1, ice2, t);
+}
+
+vec3 worldToIceBridge(vec3 p)
+{
+    p -=vec3(0.495, -0.08, .69);
+    p.x += .5*_sin(p.z*2.);
+    p.y -= .56*smoothstep(-.95,.95, p.z);
+    return p;
+}
+
+vec3 getIceBridgeColor(vec3 p)
+{
+    vec3 q = worldToIceBridge(p);
+
+    float width = 0.25*(1.-.5*q.z);
+
+    float colorT = (q.x + width * 0.5) / width;
+    colorT = clamp(colorT, 0.0, 1.0);
+
+    return getIceColor(colorT);
+}
+
+void sdIceBridge(vec3 p, bool inside, inout vec2 res)
+{
+    if (!inside && p.z > 0.75) return;
+    if (inside && p.z < 0.65) return;
+
+    if(sdBox(p-vec3(.5,.2,.6),vec3(.7,.32,1.)) < res.x)
+    {
+        vec3 q = worldToIceBridge(p);
+        vec3 boxSize = vec3(0.25*(1.-.56*q.z), 0.005*(1.-.9*q.z), 1.8) * 0.5;
+        opMin(sdBox(q, boxSize)-.01, MAT_ICE_BRIDGE);
+    }
+}
+//--------------- Ice Bridge End --------------------
+
+//--------------- Snowman Start -----------------
+#define SNOWMAN_POS vec3(0,-.06,-.8)
+#define SNOWMAN_HEIGHT .42
+#define SNOWMAN_SCALE 2.5
+
+void worldToSnowman(inout vec3 p)
+{
+    p -= SNOWMAN_POS;
+    p.x = abs(p.x)-.7;
+    p *= SNOWMAN_SCALE;
+}
+
+void sdSnowman(vec3 p, inout vec2 res)
+{
+    worldToSnowman(p);
+    float h = SNOWMAN_HEIGHT;
+
+    float bound = sdCylinder(p-vec3(0,.3,0),vec3(0,0,.31));
+    if(bound > res.x) return;
+
+    // Bottom snowball
+    if(p.y<.25&&p.y>-.06)
+    {
+        vec3 bottomP = p;
+        float bottom = sdSphere(bottomP-vec3(0,.05,0), .12);
+        opMin(bottom, MAT_SNOWMAN_BODY);
+    }
+
+    // Middle snowball
+    if(p.y<.45&&p.y>.12)
+    {
+        vec3 midP = p;
+        float mid = sdSphere(midP-vec3(0,.25,0), .09);
+        opMin(mid, MAT_SNOWMAN_BODY);
+    }
+
+    // Head snowball
+    if(p.y<.65&&p.y>.35)
+    {
+        vec3 headP = p;
+        float head = sdSphere(headP-vec3(0,.48,0), .07);
+        opMin(head, MAT_SNOWMAN_BODY);
+
+        // Carrot nose
+        vec3 noseP = headP-vec3(0,.48,-.07);
+        noseP.xz *= rot2d(PI/2.);
+        float nose = sdCone(noseP, vec3(0), vec3(0,.04,0), .01, 0.);
+        opMin(nose, MAT_SNOWMAN_ACCESSORIES);
+
+        // Coal eyes
+        vec3 eyeP = headP-vec3(0,.51,-.06);
+        eyeP.x = abs(eyeP.x)-.02;
+        float eyes = sdSphere(eyeP, .008);
+        opMin(eyes, MAT_SNOWMAN_ACCESSORIES);
+    }
+
+    // Stick arms
+    if(p.y<.4&&p.y>.2)
+    {
+        vec3 armP = p-vec3(0,.3,0);
+        armP.x = abs(armP.x)-.09;
+        armP.xy *= rot2d(-PI/6.);
+        float arms = sdCapsule(armP, vec3(0), vec3(.08,0,0), .005);
+        opMin(arms, MAT_SNOWMAN_ACCESSORIES);
+    }
+}
+//--------------- Snowman End -------------------
+
+//--------------- Christmas Tree Start ----------
+#define CHRISTMAS_TREE_POS vec3(-.9,0,.4)
+#define CHRISTMAS_TREE_ROTATION -PI/4.
+#define CHRISTMAS_TREE_SCALE 1.2
+
+void worldToChristmasTree(inout vec3 p)
+{
+    p *= CHRISTMAS_TREE_SCALE;
+    p -= CHRISTMAS_TREE_POS;
+    p.xz*=rot2d(CHRISTMAS_TREE_ROTATION);
+}
+
+void sdChristmasTree(vec3 p, inout vec2 res)
+{
+    worldToChristmasTree(p);
+
+    float bound = sdCylinder(p-vec3(0,.2,-.02),vec3(0,0,.32));
+    if(bound > res.x) return;
+
+    // Tree trunk
+    if(p.y<.15&&p.y>-.05)
+    {
+        float trunk = sdCylinder(p-vec3(0,.05,0), vec2(.02,.1));
+        opMin(trunk/CHRISTMAS_TREE_SCALE, MAT_TREE_TRUNK);
+    }
+
+    // Tree foliage - three cone layers
+    if(p.y<.6&&p.y>.05)
+    {
+        vec3 treeP = p;
+        float tree = sdCone(treeP-vec3(0,.15,0), vec2(0.7,0.7), .15);
+        tree = min(tree, sdCone(treeP-vec3(0,.25,0), vec2(0.7,0.7), .12));
+        tree = min(tree, sdCone(treeP-vec3(0,.33,0), vec2(0.7,0.7), .09));
+        opMin(tree/CHRISTMAS_TREE_SCALE, MAT_PINE_NEEDLES);
+    }
+}
+//--------------- Christmas Tree End ------------
+
+//--------------- Poinsettia Start --------------
+#define POINSETTIA_POS vec3(.8,-.06,-.8)
+#define POINSETTIA_SCALE 2.5
+
+vec3 worldToPoinsettia(vec3 p)
+{
+    p -= POINSETTIA_POS;
+    p *= POINSETTIA_SCALE;
+    return p;
+}
+
+void sdPoinsettia(vec3 p, inout vec2 res)
+{
+    p = worldToPoinsettia(p);
+
+    float bound = sdCylinder(p-vec3(0,.3,0),vec3(0,0,.31));
+    if(bound > res.x) return;
+
+    // Stem
+    if(p.y<.13&&p.y>-.03)
+    {
+        vec3 stemP = p-vec3(0,-.01,-.06);
+        float stem = sdVerticalCapsule(stemP, .14, .01);
+        opMin(stem, MAT_TREE_TRUNK);
+    }
+
+    // Red bracts (modified leaves that look like petals)
+    if(p.y<.75&&p.y>.19)
+    {
+        vec3 topP = p - vec3(0,.42,0);
+        topP.z-=-.035;
+        pModPolar(topP.xy, 8.);
+        topP.x-=.145;
+        float petals = sdEllipsoid( topP, vec3(.08,.045,.01));
+        petals-=abs(_sin(50.*topP.y-0.))*.002*clamp((.06-topP.x)/.08,0.,1.);
+        opMin(petals, MAT_POINSETTIA_PETALS);
+    }
+
+    // Center cluster
+    if(p.y<.75&&p.y>.19)
+    {
+        vec3 centerP = p - vec3(0,.42,0);
+        float center = sdSphere(centerP-vec3(0,0,-.04), .03);
+        opMin(center, MAT_POINSETTIA_CENTER);
+    }
+}
+//--------------- Poinsettia End ----------------
+
+//--------------- Boy Start ---------------------
+#define BOY_SCALE .9
+
+vec3 worldToBoy(vec3 p)
+{
+    p*=BOY_SCALE;
+    p-=vec3(0,.389,-.1);
+    return p;
+}
+
+void sdBoy(vec3 p, inout vec2 res)
+{
+    p = worldToBoy(p);
+
+    float bound = sdCylinder(p-vec3(0,-.2,0),vec2(.105,.25));
+    if(bound > res.x) return;
+
+    // Head
+    {
+        if(p.y>-.06)
+        {
+            vec3 headP = p;
+            float head = smin(length(headP-vec3(0,.01,0))-.0265, sdEllipsoid(headP-vec3(-.015, -.022, 0),vec3(.011, .012,.017)), .009);
+
+            vec3 eyeSocketP = headP-vec3(-.04, -.005, 0);
+            eyeSocketP.z = abs(eyeSocketP.z)-.01;
+            head = smax(head, -length(eyeSocketP)+.0011, .02);
+
+            vec3 noseP = headP-vec3(-.032, -.0175, 0);
+            head = smin(head, sdCapsule(noseP,vec3(0,0,0), vec3(.0055,.01,0), .001 ), .001);
+
+            vec3 jawP = headP-vec3(-.0212,-.036, 0);
+            jawP.z = abs(jawP.z)-.0006;
+            head = smin(head, sdCapsule(jawP,vec3(0,0,0), vec3(.017,.009,.01), .004 ), .003);
+
+            vec3 neckP = p-vec3(.000,-.05, 0);
+            head = min(head, sdCapsule(neckP,vec3(.002,0,0), vec3(.0,.02,.0), .01));
+
+            opMin(head, MAT_BOY_FACE);
+        }
+
+        // Short hair
+        if(p.y>-.11)
+        {
+            vec3 hairP = p;
+            float hair = sdSphere(hairP-vec3(0,.01,0), .03);
+            hair = smax(hair, -hairP.y+.02, .01);
+            opMin(hair, MAT_BOY_HAIR);
+        }
+    }
+
+    // Winter coat
+    if(p.y<-.04&&p.y>-.35)
+    {
+        vec3 coatP = p-vec3(.006,0,0);
+
+        vec3 topP = coatP-vec3(0,-.123, 0);
+        float w = mix(.03,.015,clamp((topP.y-.05)/-.1,.0,1.));
+        float t = .015+.007*abs(_sin(30.*topP.y+0.9));
+        float coat = sdBox(topP, vec3(t, .05, w))-.025;
+
+        vec3 bottomP = coatP-vec3(0,-.23, 0);
+        float bottom = sdBox(bottomP, vec3(.025, .1, .03))-.01;
+        coat = min(coat, bottom);
+
+        opMin(coat, MAT_BOY_COAT);
+
+        // Scarf
+        vec3 scarfP = coatP-vec3(0,-.05,0);
+        float scarf = sdTorus(scarfP, vec2(.025, .008));
+        opMin(scarf, MAT_BOY_SCARF);
+    }
+
+    // Legs
+    if(p.y<-.33)
+    {
+        vec3 legsP = p-vec3(.006,-.45,0);
+        float r = .009+.004*_sin(32.*legsP.y-1.5);
+        float legs = min(sdVerticalCapsule(legsP-vec3(0,0,-.012),.12,r),
+                            sdVerticalCapsule(legsP-vec3(-.017,0,.012),.12,r));
+        opMin(legs, MAT_BOY_COAT);
+
+        float foot = min(sdCapsule(legsP, vec3(0,0,-.012), vec3(-.025,0,-.025), .01),
+                            sdCapsule(legsP, vec3(-.017,0,.012), vec3(-.04,0,.02), .01));
+        opMin(foot, MAT_BOY_BOOTS);
+    }
+
+    // Arms
+    if(p.y<-.06&&p.y>-.16)
+    {
+        vec3 armsP, armsBaseP = armsP = p-vec3(.006,-.063,0);
+        armsP.z = abs(armsP.z)-.047;
+
+        float r1 = .0085+.0008*_sin(100.*armsP.y-.05),
+              r2 = .008+.0014*_sin(95.*armsP.z+1.2);
+        float arms = sdCapsule(armsP, vec3(0,0,.005), vec3(0,-.085,.01),r1);
+        arms = smin(arms, sdCapsule(armsP, vec3(-.005,-.083,.007), vec3(-.05,-.07,-.03),r2), .001);
+        vec3 handsP = armsBaseP-vec3(-.05,-.07,.0018);
+        float hands = min(sdEllipsoid(handsP, vec3(.012,.008,.022)), sdSphere(handsP-vec3(-0.001,-.0045,-.004),.01));
+        arms = min(arms, hands);
+
+        opMin(arms, MAT_BOY_SKIN);
+    }
+
+    res.x/=BOY_SCALE;
+}
+
+void _paintFace(vec3 p, inout vec3 FinalColor)
+{
+    float d;
+    vec2 eyeP = p.yz - vec2(-.009,0);
+    eyeP.y = abs(eyeP.y)-.01;
+    d = max(abs(length(eyeP)-.005)-.0005, -eyeP.x+.0025);
+    FinalColor = mix(FinalColor, vec3(0), smoothstep(px, 0.,d));
+
+    vec2 mouthP = p.yz - vec2(-.0173,0);
+    float ud = length(mouthP)-.01;
+    d = max(abs(ud)-.0004, mouthP.x+.007);
+    d = min(d, max(length(mouthP-vec2(-.017,0))-.01, ud));
+
+    FinalColor = mix(FinalColor,vec3(0.7608, 0.1176, 0.3373), smoothstep(px, 0.,d));
+}
+
+void paintBoyFace(vec3 p, inout vec3 FinalColor)
+{
+    p = worldToBoy(p);
+    _paintFace(p, FinalColor);
+}
+//--------------- Boy End -----------------------
+
+//--------------- Snowy Mountain Start ----------
+float getGroundHeight(vec2 p) {
+    float h = (_cos(1.9*p.x)+_cos(1.9*p.y))*.6-.3;
+    float distortion = (_sin(15.*h)+_cos(20.*p.y)) * 0.01;
+    return h + distortion;
+}
+
+vec2 getPositionInXZGrid(vec3 p, float cellSize, float margin, vec2 seed)
+{
+    vec2 n = floor(p.xz / cellSize);
+    vec2 o = hash22(n+seed);
+    o = o * (1.0 - 2.0*margin) + margin;
+    return (n + o) * cellSize;
+}
+
+void sdChristmasTrees(vec3 p, float innerBoundRadius, float outerBoundRadius, inout vec2 res)
+{
+    const float treeHeight = .025;
+    const float treeWidth = .01;
+
+    vec2 tp = getPositionInXZGrid(p, .15, .25, vec2(12,89));
+
+    float d = length(tp);
+    if (d > outerBoundRadius || d < innerBoundRadius) return;
+
+    float base = getGroundHeight(tp);
+    vec3 tree_center = vec3(tp.x,base+treeHeight*.5,tp.y);
+    vec3 q = p - tree_center;
+
+    d = sdEllipsoid(q, vec3(treeWidth, treeHeight, treeWidth));
+    if(d-0.002>res.x) return;
+
+    d += _sin(350.*p.y)*0.0008;
+    opMin(d, MAT_PINE_NEEDLES);
+}
+
+void sdSnowyMountain(vec3 p, inout vec2 res)
+{
+    float bound = sdCylinder(p-vec3(0,.23,0),vec2(1.,.33));
+    if(bound < res.x)
+    {
+        float area = p.y-getGroundHeight(p.xz);
+        area = smax(area,bound, .05);
+        opMin(area, MAT_SNOW);
+
+        if(max(bound, -sdCylinder(p, vec3(0,0,.58))) < res.x)
+            sdChristmasTrees(p, .6, .95, res);
+    }
+}
+//--------------- Snowy Mountain End ------------
+
+//--------------- Ice Castle Start --------------
+float sdBattlement(vec3 p, float radius, vec2 crenelSize, float count)
+{
+    pModPolar(p.xz, count);
+    return sdBox(p, vec3(radius, crenelSize));
+}
+
+vec2 sdIceCastleTower(vec3 p, float radius, float height, float floorCount, bool withBattlment)
+{
+    vec2 res = vec2( 1e10, 0.0 );
+    vec3 top = p-vec3(0,height,0);
+
+    float battH = radius * 0.7;
+    float battY = height - battH;
+
+    float r = radius;
+
+    r = mix(r, r * 1.2, smoothstep(battY - 0.02, battY, p.y));
+
+    if (floorCount > 1.0)
+    {
+        float y = p.y;
+        opLimitedRepetition(y, battY/floorCount, int(floorCount));
+        r = mix(r, r * 1.05, smoothstep(0.01, 0.0, abs(y)));
+    }
+
+    float base = max(sdCylinder(p, vec2(r, height)), -length(top)+radius+.01);
+    base = withBattlment?max(base, -sdBattlement(top, radius*1.5, vec2(.015,.015), 6.)):base;
+
+    opMin(base-.005, MAT_ICE_CASTLE_WHITE);
+
+    vec3 q = top+vec3(0,.01,0);
+    float h = 2.6*radius;
+    float roof = sdCone(q, vec3(0.0), vec3(0.0,h,0.0), radius*.9, 0. );
+    opMin(roof, MAT_ICE_CASTLE_ROOF);
+
+    return res;
+}
+
+vec2 sdIceCastleTowers(vec3 p, float radius, float towerRadius, float towerHeight, float floorCount, float count, bool withBattlment)
+{
+    pModPolar(p.xz, count);
+    p.x -= radius;
+    return sdIceCastleTower(p, towerRadius, towerHeight, floorCount, withBattlment);
+}
+
+vec2 sdIceBuildingBlock(vec3 p, vec4 rc, vec4 fc)
+{
+    float block = sdBox(p, vec3(.2,.22,.2));
+    vec2 res = vec2(block-.005, MAT_ICE_CASTLE_WHITE);
+
+    vec3 q = p;
+    q.xy-=vec2(.135, .26);
+    float blockRoof = sdTriPrism(q, vec2(rc.x,mix(rc.y,rc.z, q.y/rc.w)));
+    opMin(blockRoof, MAT_ICE_CASTLE_ROOF);
+
+    p-=vec3(.2,.10,0);
+    q = p.zyx;
+    float width = fc.y, height = fc.x;
+    vec4 w = opElongate( q, vec3(0.,fc.x,0.02) );
+    float facade = w.w+sdEllipsoid(w.xyz,vec3(fc.y,fc.y,0.01));
+    opMin(facade, MAT_ICE_CASTLE_FACADE);
+
+    return res;
+}
+
+void sdIceMainBuilding(vec3 p, inout vec2 res)
+{
+    opMin(max(length(p)-.45, p.y-.02), MAT_ICE_CASTLE_WHITE);
+    float boundCylinder = sdCylinder(p-vec3(0,.30,0),vec2(.4,.3));
+    if(boundCylinder < res.x)
+    {
+        vec3 q = p;
+        q.xz *= rot2d(PI/2.);
+        float faceId = pModPolar(q.xz, 6.);
+        q.x -= .1;
+
+        opMinV(sdIceBuildingBlock(q, vec4(.08,.11,.045,.08), vec4(.15,.045,2.,.005)));
+
+        opMinV(sdIceCastleTowers(p, .35, .04, .35, 3., 6., true));
+
+        q = p;
+        q.x = abs(q.x)-.22;
+        q.z = q.z-.1;
+        opMinV(sdIceCastleTower(q, .055, .45, 6., true));
+
+        p.xz*=rot2d(PI/2.);
+        opMinV(sdIceBuildingBlock(p-vec3(0,.17,0), vec4(.1,.17,.08,.17), vec4(.13,.08,1.5,0.02)));
+    }
+}
+
+void sdIceCastle(vec3 p, inout vec2 res)
+{
+    p-=vec3(0,.55,0);
+
+    if(length(p)-.7 < res.x && p.y>-.1)
+    {
+        float fort = max(sdCylinder(p, vec2(.6,.05)),-length(p)+.59);
+        fort = max(fort, -sdBattlement(p-vec3(0,.053,0),.7,vec2(.02), 50.));
+
+        {
+            vec3 q=p+vec3(0,0,.6);
+            vec4 w = opElongate( q, vec3(-0.01,0.03,0.0) );
+            float gateBuilding = w.w+opExtrusion( w.xyz,max(sdHexagon(w.yx,.08),-sdTunnel(q.xy+vec2(0,-.02),vec2(.04,.07))),.03);
+            opMin(gateBuilding-.01, MAT_ICE_CASTLE_WHITE);
+            opMin(sdBox(q,vec3(.07,.07,.005)), MAT_ICE_CASTLE_ROOF);
+        }
+
+        opMin(fort-.005, MAT_ICE_CASTLE_WHITE);
+
+        opMinV(sdIceCastleTowers(p, .6, .03, .09, 1., 6., false));
+
+        sdIceMainBuilding(p, res);
+    }
+}
+
+void paintIceCastleFacade(vec3 p, inout vec3 FinalColor)
+{
+    p-=vec3(0, .56, 2.2);
+    p.xz *= rot2d(PI/2.);
+    pModPolar(p.xz, 6.);
+    float d = sdTunnel(p.zy, vec2(.02,.04));
+    vec3 iceBlue = vec3(0.6, 0.8, 1.0);
+    FinalColor = mix(FinalColor, iceBlue, smoothstep(px, 0.,d));
+}
+//--------------- Ice Castle End ----------------
+
+//--------------- Clouds Start ------------------
+vec2 sdCloud(vec3 p, vec2 seed, float cloudRadius)
+{
+    p.y += 1.;
+
+    vec2 res = vec2(1000.,0);
+    float bound = sdCylinder(p-vec3(0,1.,0),
+                             vec2(cloudRadius + 0.35, 1.2));
+    if (bound > .5) return vec2(bound, 0);
+
+    const float spacing = 0.8;
+    const float cellSize = 0.8;
+
+    float rx = hash12(seed + vec2(.1, 0));
+    float rz = hash12(seed + vec2(0, .1));
+    vec2 gridOffset = vec2(mix(-0.4, -0.1, rx), mix(-0.4, -0.1, rz)) * cellSize;
+
+    vec2 q_xz   = (p.xz + gridOffset) / spacing;
+    vec2 cellId = floor(q_xz);
+
+
+    for (int ix = -1; ix <= 1; ++ix) {
+        for (int iz = -1; iz <= 1; ++iz) {
+            vec2 neighborId = cellId + vec2(float(ix), float(iz));
+
+            vec2 basePos = (neighborId + 0.5) * spacing - gridOffset;
+
+            float baseDist = length(basePos);
+            if (baseDist > cloudRadius) continue;
+
+            float baseNRadius = baseDist / cloudRadius;
+
+            float hx = hash12(neighborId + vec2(12.34, 56.78));
+            float hz = hash12(neighborId + vec2(78.91, 23.45));
+            float hy = hash12(neighborId + vec2(45.67, 89.01));
+            vec3 jitter = vec3(hx, hy, hz) * 2.0 - 1.0;
+            jitter.xz *= (spacing * 0.25);
+
+            vec2 worldPos = basePos + jitter.xz;
+
+            worldPos *= (1.0 - baseNRadius * 0.25);
+            jitter.y *= (1.0 - baseNRadius * 0.5) * .4;
+
+            float distFromCenter = length(worldPos);
+            if (distFromCenter > cloudRadius) continue;
+
+            float radius = mix(1.21, .34, distFromCenter / cloudRadius);
+
+            vec3 sphereCenter = vec3(worldPos.x, radius + jitter.y, worldPos.y);
+
+            float dist = length(p - sphereCenter) - radius;
+            opMin(smin(res.x, dist, .015), MAT_CLOUD);
+        }
+    }
+
+    res = res.x > 999. ? vec2(bound + 0.7, 0) : res;
+
+    return res;
+}
+
+void sdCloudLayer(vec3 p, float scale, inout vec2 res)
+{
+    p*=scale;
+    float bound = max(sdCylinder(p-vec3(0,2.1,0),vec2(13.5,2.7)),-sdCylinder(p, vec3(0,0,7.)));
+    if(bound < res.x)
+    {
+        const float layerSpacing = 2.6;
+        const int numLayers = 2;
+
+        p.y-=.8;
+        float layerId = opLimitedRepetition(p.y, layerSpacing, numLayers);
+
+        float angleId = pModPolar(p.xz, 12.);
+
+        vec2 seed = vec2(angleId, layerId);
+
+        float showHash = hash12(seed + vec2(160.0, 123.0));
+        if (showHash < 0.6) return;
+
+        p.x -= 9.0 + 2.0 * hash12(seed + vec2(12.34, 56.78)) - layerId*.2;
+
+        float cloudRadius = mix(1.0, 1.8, hash12(seed + vec2(0.5, 0)));
+
+        vec2 clouds = sdCloud(p, seed, cloudRadius);
+        clouds.x/=scale;
+        opMinV(clouds);
+    }
+}
+//--------------- Clouds End --------------------
+
+//--------------- Falling Snow - ADJUSTED FOR VISIBILITY --------------
+vec3 addFallingSnow(vec3 color, vec3 ro, vec3 rd, float t)
+{
+    // Layered falling snow effect with better visibility
+    // Snow is now slightly gray-blue for contrast against white sky
+    vec3 snowColor = vec3(1.95, 1.98, 1.92);  // Changed from pure white
+    float snowAmount = 0.0;
+
+    for(int i = 0; i < 3; i++)
+    {
+        float layer = float(i);
+        vec3 p = ro + rd * t * (0.5 + layer * 0.3);
+        p.y += iTime * (0.1 + layer * 0.05);
+        p *= 5.0 + layer * 3.0;
+
+        vec3 cellId = opRepetition(p, vec3(1.0));
+        vec3 h = hash33(cellId);
+
+        p += h * 0.5;
+
+        float snowflake = length(p) - 0.05;
+        float fade = smoothstep(0.1, 0.0, snowflake);
+        snowAmount += fade * (0.3 - layer * 0.08);
+    }
+
+    return mix(color, snowColor, snowAmount * 0.35);  // Slightly increased blend
+}
+//--------------- Falling Snow End --------------
+
+//--------------------------------------
+// MAIN SDF
+//--------------------------------------
+#define isVisible(mask) (riFlags & mask) != 0u
+vec2 mainWorld(in vec3 p, in uint riFlags)
+{
+    vec2 res = vec2(sdTorus(p-vec3(0,-.18,.0),vec2(1.215,0.09)),MAT_GROUND);
+
+    float bound = sdCylinder(p-vec3(0,.3,0),vec2(1.31,.5));
+    if(bound > res.x) return res;
+
+    if(isVisible(RI_SNOWY_GROUND)) sdSnowyGround(p, res);
+
+    if(isVisible(RI_ICE_BRIDGE)) sdIceBridge(p, false, res);
+
+    if(isVisible(RI_BOY)) sdBoy(p, res);
+
+    if(isVisible(RI_CHRISTMAS_TREE)) sdChristmasTree(p, res);
+
+    if(isVisible(RI_SNOWMAN)) sdSnowman(p, res);
+
+    if(isVisible(RI_POINSETTIA)) sdPoinsettia(p, res);
+
+    return res;
+}
+
+vec2 portalWorld(in vec3 q, in uint riFlags)
+{
+    vec3 p = q-vec3(0,-.05,2.2);
+    vec2 res = vec2(sdTorus(p-vec3(0,-.1,.0),vec2(1.,.09)),MAT_GROUND);
+
+    if(isVisible(RI_ICE_BRIDGE)) sdIceBridge(q, true, res);
+
+    if(isVisible(RI_CLOUDS)) sdCloudLayer(p-vec3(0,.05,0), 10., res);
+
+    if(isVisible(RI_SNOWY_MOUNTAIN)) sdSnowyMountain(p, res);
+
+    if(isVisible(RI_ICE_CASTLE)) sdIceCastle(p, res);
+
+    return res;
+}
+
+vec2 map(in vec3 p, in bool inside, in uint riFlags)
+{
+    return !inside? mainWorld(p, riFlags): portalWorld(p, riFlags);
+}
+
+float portal_intersect(vec3 ro, vec3 rd)
+{
+    const float planeZ = 0.7;
+    const float radius = 0.98;
+
+    if (abs(rd.z) < 1e-6) return 1e5;
+    float t = (planeZ - ro.z) / rd.z;
+    if (t <= 0.0) return 1e5;
+
+    vec3 hit = ro + rd * t;
+
+    vec2 center2D = hit.xy - vec2(0.0, 0.1);
+    if (length(center2D) < radius)
+        return t;
+
+    return 1e5;
+}
+
+// ----- Ray Intersection with Object Bounding Box : Start -----
+bool rayIntersectsBox(vec3 ro, vec3 rd, vec3 boxCenter, vec3 boxSize, float tmax, inout vec2 tb)
+{
+    tb = iBox(ro-boxCenter,rd,boxSize);
+
+    return (tb.x < tb.y && tb.y > 0.0 && tb.x < tmax);
+}
+
+uint getRayIntersectionFlags(vec3 ro, vec3 rd, float tmax)
+{
+    vec2 tb;
+    uint riFlags = 0u;
+
+    if(rayIntersectsBox (ro,rd, vec3(0,-.11,0), vec3(1.35,0.075,1.3), tmax, tb))
+        riFlags |= RI_SNOWY_GROUND;
+
+    if(rayIntersectsBox (ro,rd, vec3(.5,.2,.6), vec3(.7,.32,1.), tmax, tb))
+        riFlags |= RI_ICE_BRIDGE;
+
+    if(rayIntersectsBox (ro,rd, vec3(0.01,.2,-.11), vec3(.1,.28,.12), tmax, tb))
+        riFlags |= RI_BOY;
+
+    if(rayIntersectsBox(ro,rd, vec3(-.73,.3,.31), vec3(.21,.5,.21), tmax, tb))
+        riFlags |= RI_CHRISTMAS_TREE;
+
+    if(rayIntersectsBox(ro,rd, vec3(.0,.05,-.8), vec3(.84,.15,.13), tmax, tb))
+        riFlags |= RI_SNOWMAN;
+
+    if(rayIntersectsBox(ro,rd, vec3(.8,.25,-.8), vec3(.22,.34,.23), tmax, tb))
+        riFlags |= RI_POINSETTIA;
+
+    if(rayIntersectsBox(ro,rd, vec3(0,.26,2.2), vec3(1.2,.27,1.12), tmax, tb))
+        riFlags |= RI_CLOUDS;
+
+    if(rayIntersectsBox(ro,rd, vec3(0,.28,2.2), vec3(1.,.35, 1.), tmax, tb))
+        riFlags |= RI_SNOWY_MOUNTAIN;
+
+    if(rayIntersectsBox(ro,rd, vec3(0,.72,2.2),  vec3(.66,.36,.66), tmax, tb))
+        riFlags |= RI_ICE_CASTLE;
+
+    return riFlags;
+}
+// ----- Ray Intersection with Object Bounding Box : End -----
+
+// 3D GLOW TUTORIAL by alro : https://www.shadertoy.com/view/7stGWj
+float getGlow(float dist, float radius, float intensity)
+{
+    return pow(radius / max(abs(dist), 1e-6), intensity);
+}
+
+vec3 standardMaterial(vec3 base, vec3 shadow, float fresnelMult, float diffuse, float fresnel, float shadowMult) {
+    return mix(shadow, base, diffuse) * shadowMult + base * fresnel * fresnelMult;
+}
+
+vec3 calcColor(int matId, vec3 p, vec3 normal, float diffuse, float fresnel, bool insidePortal)
+{
+    vec3 base = vec3(0.0);
+    vec3 shadow = vec3(0.0);
+    float fresnelMult = 1.0;
+    float shadowMult = 1.0;
+
+    vec3 FinalColor = vec3(0.0);
+
+    switch (matId)
+    {
+        case MAT_BOY_SKIN:
+        case MAT_BOY_FACE:
+            base = vec3(1.0, 0.58, 0.4);
+            shadow = vec3(0.78, 0.46, 0.30);
+            fresnelMult = 1.2;
+            break;
+
+        case MAT_BOY_HAIR:
+            base = vec3(0.13, 0.05, 0.01);
+            shadow = base * 0.5;
+            fresnelMult = 3.0;
+            break;
+
+        case MAT_BOY_BOOTS:
+            base = vec3(0.02, 0.02, 0.03);
+            shadow = vec3(0.01, 0.01, 0.02);
+            fresnelMult = 0.3;
+            break;
+
+        case MAT_PINE_NEEDLES:
+            base = vec3(0.05, 0.3, 0.1);
+            shadow = vec3(0.02, 0.15, 0.05);
+            fresnelMult = 2.5;
+            shadowMult = 0.7;
+            break;
+
+        case MAT_TREE_TRUNK:
+            base = vec3(0.3, 0.2, 0.1);
+            shadow = vec3(0.15, 0.1, 0.05);
+            fresnelMult = 2.5;
+            shadowMult = 0.7;
+            break;
+
+        case MAT_SNOW:
+            // Adjusted snow color for better contrast
+            base = vec3(0.92, 0.94, 0.97);  // Slightly less bright white
+            shadow = vec3(0.65, 0.7, 0.8);   // Slightly darker shadows
+            fresnelMult = 1.5;
+            // Add sparkle
+            float sparkle = hash13(floor(p*100.0));
+            base += vec3(sparkle * 0.1);
+            break;
+
+        case MAT_SNOWMAN_BODY:
+            base = vec3(0.95, 0.95, 0.98);
+            shadow = vec3(0.85, 0.85, 0.9);
+            fresnelMult = 2.5;
+            break;
+
+        case MAT_SNOWMAN_ACCESSORIES:
+            base = vec3(0.1, 0.05, 0.02);
+            shadow = vec3(0.05, 0.02, 0.01);
+            fresnelMult = 1.5;
+            break;
+
+        case MAT_POINSETTIA_PETALS:
+            base = vec3(0.8, 0.05, 0.1);
+            shadow = vec3(0.6, 0.02, 0.05);
+            fresnelMult = 2.5;
+            break;
+
+        case MAT_POINSETTIA_CENTER:
+            base = vec3(0.9, 0.8, 0.1);
+            shadow = vec3(0.7, 0.6, 0.05);
+            fresnelMult = 2.5;
+            break;
+
+        case MAT_ICE_CASTLE_WHITE:
+        case MAT_ICE_CASTLE_FACADE:
+            base = vec3(0.85, 0.92, 1.0);
+            shadow = vec3(0.5, 0.7, 0.9);
+            fresnelMult = 1.5;
+            // Add icy shimmer
+            float shimmer = hash13(floor(p*50.0));
+            base += vec3(0.05, 0.08, 0.1) * shimmer;
+            break;
+
+        case MAT_ICE_CASTLE_ROOF:
+            base = vec3(0.6, 0.75, 0.95);
+            shadow = base * 0.7;
+            fresnelMult = 1.5;
+            break;
+
+        case MAT_GROUND:
+            base = vec3(0.28, 0.15, 0.05);
+            shadow = base * 0.5;
+            FinalColor = mix(shadow, base, mix(0.3, 1.0, diffuse));
+            return FinalColor + base * fresnel * 0.8;
+
+        case MAT_CLOUD:
+            base = vec3(1.0, 1.0, 1.0);
+            shadow = vec3(0.7, 0.75, 0.85);
+            FinalColor = mix(shadow, base, mix(0.3, 1.0, diffuse));
+            return FinalColor + base * fresnel * 0.8;
+
+        case MAT_BOY_COAT:
+            base = vec3(0.1, 0.2, 0.5);
+            shadow = vec3(0.05, 0.1, 0.3);
+            fresnelMult = 0.4;
+            break;
+
+        case MAT_BOY_SCARF:
+            base = vec3(0.8, 0.1, 0.1);
+            shadow = vec3(0.5, 0.05, 0.05);
+            fresnelMult = 0.8;
+            break;
+
+        case MAT_ICE_BRIDGE:
+            {
+                vec3 iceColor = getIceBridgeColor(p);
+                FinalColor = iceColor + iceColor * fresnel * (insidePortal ? 2.2 : 0.8);
+                return FinalColor + vec3(0.7, 0.85, 1.0) * pow(fresnel, 0.5) * (insidePortal ? 0.1 : 0.4);
+            }
+
+        default:
+            return vec3(0.1, 0.1, 0.1) * diffuse;
+    }
+
+    FinalColor = standardMaterial(base, shadow, fresnelMult, diffuse, fresnel, shadowMult);
+
+    switch(matId)
+    {
+        case MAT_BOY_FACE:
+            paintBoyFace(p, FinalColor);
+            break;
+        case MAT_ICE_CASTLE_FACADE:
+            paintIceCastleFacade(p, FinalColor);
+            break;
+    }
+
+    return FinalColor;
+}
+
+const vec3 SUN_DIR_PORTAL = normalize(vec3(-1.5, 0.15, 0.2));
+
+// Sky colors adjusted for better snow visibility
+vec3 getSkyColor(vec3 dir, bool insidePortal)
+{
+    if (!insidePortal) {
+        // Winter sky - more blue, less gray for better snow contrast
+        float t = smoothstep(0.1,0.6,0.5*(dir.y+1.0));
+        // More saturated blues for contrast
+        return mix(vec3(0.45, 0.55, 0.7), vec3(0.55, 0.7, 0.95), t);
+    } else {
+        float up = dir.y;
+        float skyDot = up*0.5 + 0.5;
+
+        float sunDot = dot(dir, SUN_DIR_PORTAL);
+        float sunProximity = (sunDot + 1.0) * 0.5;
+
+        // Cooler winter portal sky - also slightly more blue
+        vec3 warm = mix(vec3(0.85,0.85,1.0), vec3(0.9,0.9,1.0), pow(skyDot,0.1));
+        vec3 cool = mix(vec3(0.35,0.5,0.75), vec3(0.45,0.6,0.95), pow(skyDot,0.5));
+
+        float blend = smoothstep(0.1, 0.9, 1.0 - sunProximity);
+        vec3 sky = mix(warm, cool, blend);
+
+        float sunGlow = max(sunDot, 0.0);
+        sky += vec3(1.0,0.95,0.9) * pow(sunGlow, 10.0) * 2.5;
+
+        return sky;
+    }
+}
+
+//--------------------------------------
+// RAYMARCHING
+// https://iquilezles.org/articles/rmshadows
+//--------------------------------------
+float calcSoftshadow( in vec3 ro, in vec3 rd, in float tmin, in float tmax, in bool inside )
+{
+    uint riFlags = getRayIntersectionFlags(ro, rd, tmax);
+    float res = 1.0;
+    float t = tmin;
+    for( int i=ZERO; i<60; i++ )
+    {
+		float h = map( ro + rd*t , inside, riFlags).x;
+        if (h < 0.0001) return 0.0;
+        float s = clamp(30.*h/t,0.0,1.0);
+        res = min( res, s*s*(3.0-2.0*s) );
+        t += clamp(h, 0.001, 0.025);
+        if( res<0.005 || t>tmax ) break;
+    }
+    return clamp( res, 0.0, 1.0 );
+}
+
+// https://iquilezles.org/articles/normalsSDF
+vec3 calcNormal( in vec3 p, in bool inside )
+{
+    vec3 n = vec3(0.0);
+    for( int i=ZERO; i<4; i++ )
+    {
+        vec3 e = 0.5773*(2.0*vec3((((i+3)>>1)&1),((i>>1)&1),(i&1))-1.0);
+        n += e*map(p+0.0005*e, inside, 0xFFFu).x;
+    }
+    return normalize(n);
+}
+
+float calcAO( in vec3 p, in vec3 nor, in bool inside )
+{
+	float occ = 0.0;
+    float sca = 1.0;
+    for( int i=ZERO; i<5; i++ )
+    {
+        float hr = 0.001 + 0.003 * float(i)/4.0;
+        vec3 aopos =  nor * hr + p;
+        float dd = map( aopos , inside, 0xFFFu ).x;
+        occ += -(dd-hr)*sca;
+        sca *= 0.75;
+    }
+    return clamp( 1.0 - 2.5*occ, 0.0, 1.0 ) * (0.5+0.5*nor.y);
+}
+
+mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
+{
+	vec3 cw = normalize(ta-ro);
+	vec3 cp = vec3(sin(cr), cos(cr),0.0);
+	vec3 cu = normalize( cross(cw,cp) );
+	vec3 cv =          ( cross(cu,cw) );
+    return mat3( cu, cv, cw );
+}
+
+vec4 castRay(vec3 ro, vec3 rd, float time, inout float glow)
+{
+    float tmin = 3.0, tmax = 8.0, gt = 0.4; vec2 tb;
+    bool inside = false;
+    float portalDist = portal_intersect(ro, rd);
+    glow = 0.0;
+
+    if (rayIntersectsBox(ro,rd,vec3(0,.47,1.),vec3(1.31,.72, 2.35), tmax, tb))
+    {
+        tmin = max(tb.x, tmin);
+        tmax = min(tb.y, tmax);
+
+        float t = tmin;
+
+        uint riFlags = getRayIntersectionFlags(ro, rd, tmax);
+
+        for (int i = ZERO; i < 256; i++)
+        {
+            if (t > portalDist && portalDist < 1e5)
+            {
+                inside = !inside;
+                portalDist = 1e5;
+            }
+
+            vec3 p = ro + rd * t;
+            vec2 h = map(p, inside, riFlags);
+
+            float distToTorus = sdPortalTorus(p);
+            if (distToTorus < gt) {
+                glow += getGlow(distToTorus, 0.001, 0.55) * smoothstep(1.0, 0.0, distToTorus / gt);
+            }
+
+            if (distToTorus < h.x)
+            {
+                h.x = distToTorus;
+                h.y = float(MAT_GLOW);
+            }
+            float distToScene = h.x;
+
+            if (abs(distToScene) < 1e-4 * t)
+                return vec4(t, distToScene, h.y, inside ? 1.0 : 0.0);
+
+            t += min(distToScene * 0.5, 0.12);
+
+            if (t > tmax) break;
+        }
+    }
+
+    return vec4(tmax, 1e10, 0.0, inside ? 1.0 : 0.0);
+}
+
+vec3 render(in vec3 ro, in vec3 rd, in float t)
+{
+    float glow = 0.0;
+    vec4 res = castRay(ro, rd, t, glow);
+    bool insidePortal = res.w > 0.5;
+
+    vec3 finalColor = getSkyColor(rd, insidePortal);
+    vec3 glowColor = vec3(0.6,0.8,1.0); // Icy blue glow
+    float glowFactor = .1;
+
+    if(int(res.z) == MAT_GLOW)
+    {
+        finalColor = vec3(1);
+    }
+    else if(res.y < 0.002)
+    {
+        vec3 lightDir = normalize( insidePortal
+            ? SUN_DIR_PORTAL
+            : vec3(-0.5,1.1,-0.6) );
+        float lightIntensity = insidePortal ? 6.0 : 12.0;
+
+        vec3 p = ro + rd * res.x;
+        vec3 normal = calcNormal(p, insidePortal);
+        float ao = calcAO(p, normal, insidePortal);
+        float shadow = calcSoftshadow(p, lightDir, 0.0005, 12., insidePortal);
+        float NdL = clamp(dot(normal, lightDir),0.0,1.0);
+        float fresnel= pow(clamp(1.0+dot(normal,rd),0.0,1.0),2.4);
+        float diffuse= shadow * NdL * lightIntensity;
+
+        vec3 surfaceColor = calcColor(int(res.z), p, normal, diffuse, fresnel, insidePortal);
+        surfaceColor *= mix(0.22,1.0,ao);
+        surfaceColor = surfaceColor*0.4 + 0.6*surfaceColor*getSkyColor(normal,insidePortal);
+
+        finalColor = surfaceColor;
+
+        if(insidePortal)
+            finalColor = mix(finalColor, vec3(0.85, 0.9, 0.95), clamp(1.0 - exp(-.01 * res.x), 0.0, 0.95));
+    }
+
+    finalColor += glowColor * glow * glowFactor;
+
+    // Add falling snow effect with enhanced visibility
+    finalColor = addFallingSnow(finalColor, ro, rd, res.x);
+
+    return finalColor;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 mo = iMouse.xy / iResolution.xy;
+    float time = iTime;
+
+    const float ORBIT_RADIUS   = 4.6;
+    const float HEIGHT_MIN     = 0.7;
+    const float HEIGHT_RANGE   = 3.0;
+    const float MAX_MOUSE_YAW_RAD = radians(75.0);
+    const float MAX_TIME_YAW_RAD  = radians(40.0);
+
+    bool mouseActive = iMouse.z > 0.0;
+    float autoYaw = sin(time * 0.25) * MAX_TIME_YAW_RAD;
+    float mouseYawInput = clamp((mo.x - 0.5) * 2.0, -1.0, 1.0);
+    float mouseYaw = mouseYawInput * MAX_MOUSE_YAW_RAD;
+    float yaw = mouseActive ? mouseYaw : autoYaw;
+
+    float camHeight = HEIGHT_MIN + HEIGHT_RANGE * mo.y;
+    vec3 ro = vec3(
+        sin(yaw) * ORBIT_RADIUS,
+        camHeight,
+        -cos(yaw) * ORBIT_RADIUS
+    );
+
+    vec3 ta = vec3(0.0, 0.35, 0.0);
+
+    mat3 ca = setCamera(ro, ta, 0.0);
+
+    vec3 tot = vec3(0.0);
+
+#if AA>1
+    for( int m=ZERO; m<AA; m++ )
+    for( int n=ZERO; n<AA; n++ )
+    {
+        vec2 o = vec2(float(m),float(n)) / float(AA) - 0.5;
+        vec2 p = (-iResolution.xy + 2.0*(fragCoord+o)) / iResolution.y;
+#else
+        vec2 p = (-iResolution.xy + 2.0*fragCoord) / iResolution.y;
+#endif
+
+        const float fl = 6.0;
+
+        vec3 rd = ca * normalize(vec3(p, fl));
+
+        float t = time * 0.5;
+        vec3 col = render(ro, rd, t);
+
+        col = pow(col, vec3(0.4545));
+        col = mix(col, smoothstep(0.0, 1.0, col), 0.5);
+
+        tot += col;
+
+#if AA>1
+    }
+    tot /= float(AA*AA);
+#endif
+
+    fragColor = vec4(tot, 1.0);
+}

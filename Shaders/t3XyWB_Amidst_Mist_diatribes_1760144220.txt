@@ -1,0 +1,34 @@
+// ID: t3XyWB
+// Name: Amidst Mist
+// User: diatribes
+// Date: 1760144220
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,d,s,t = iTime;
+    
+    vec3 p = iResolution;
+    mat2 r = mat2(cos(.75+vec4(0,33,11,0)));
+    
+    u = (u-p.xy/2.)/p.y;
+    
+    for(o=vec4(0); i++<1e2;) {
+        p = vec3(u * d, d-32.),
+        p.yz *= r,
+        p.y+=t*.01;
+        
+        for(s = .01; s < 6.; s += s )
+            p.yz += cos(t+p.zx*.02),
+            p.yz -= abs(dot(sin(.02*p.z*s+.03*p.x+1.4*t + .32*p / s ), vec3(s)));
+        
+        p *= vec3(.3, .6, 1),
+        d += s = .3+.27*abs(4. - length(p.xy)),
+        o += 1e1/s;
+    }
+    
+    o = tanh(o/1e3);
+}
+

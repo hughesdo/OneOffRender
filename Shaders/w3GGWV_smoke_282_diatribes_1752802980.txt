@@ -1,0 +1,33 @@
+// ID: w3GGWV
+// Name: smoke [282]
+// User: diatribes
+// Date: 1752802980
+
+
+// ===== PASS 0: Image =====
+
+// there's a lot of variations of this that could be done,
+// probably better in less chars, but i like this one :)
+
+#define A(x,r) abs(dot(sin(x*p*m), r +z-z )) / m
+
+void mainImage(out vec4 c, vec2 u) {
+    
+    float s, m, o, k, e = iTime;
+    
+    vec3 p, z = iResolution;
+    for(c*=o;
+        o++<1e2;
+        k += s = .1 + abs(p.x) * .3,
+        c += 2. / s)
+        for(p = vec3((u-z.xy/2.)/z.y * k, k+e),
+            p.y -= e,
+            p.x += cos(p.y*.5),
+            m = .5;
+            m < 3.;
+            m += m )
+            p.x += A(1., .3),
+            p.x -= A(m, .1);
+    c = tanh(c  / k /1e2);
+}
+

@@ -8,6 +8,7 @@ import os
 import json
 import logging
 from pathlib import Path
+from datetime import datetime
 from flask import Flask, render_template, jsonify, request, send_from_directory
 from flask_cors import CORS
 import subprocess
@@ -23,9 +24,11 @@ TRANSITIONS_DIR = BASE_DIR / "Transitions"
 INPUT_AUDIO_DIR = BASE_DIR / "Input_Audio"
 INPUT_VIDEO_DIR = BASE_DIR / "Input_Video"
 THUMBNAILS_DIR = INPUT_VIDEO_DIR / "thumbnails"
+PROJECTS_DIR = BASE_DIR / "Projects"
 
-# Ensure thumbnails directory exists
+# Ensure required directories exist
 THUMBNAILS_DIR.mkdir(exist_ok=True)
+PROJECTS_DIR.mkdir(exist_ok=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -269,14 +272,108 @@ def list_transitions():
 def save_project():
     """Save the current timeline project."""
     try:
-        project_data = request.json
+        data = request.json
+        project_name = data.get('name', '').strip()
+        project_data = data.get('project', {})
 
-        # TODO: Implement project saving logic
-        # For now, just return success
+        if not project_name:
+            return jsonify({'success': False, 'error': 'Project name is required'}), 400
 
-        return jsonify({'success': True, 'message': 'Project saved'})
+        # Sanitize filename (remove invalid characters)
+        safe_name = "".join(c for c in project_name if c.isalnum() or c in (' ', '-', '_')).strip()
+        if not safe_name:
+            return jsonify({'success': False, 'error': 'Invalid project name'}), 400
+
+        # Add metadata
+        project_data['name'] = project_name
+        project_data['version'] = '1.0'
+        project_data['modified'] = datetime.now().isoformat()
+        if 'created' not in project_data:
+            project_data['created'] = project_data['modified']
+
+        # Save to file
+        project_path = PROJECTS_DIR / f"{safe_name}.json"
+        with open(project_path, 'w', encoding='utf-8') as f:
+            json.dump(project_data, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"Project saved: {project_path}")
+        return jsonify({
+            'success': True,
+            'message': 'Project saved successfully',
+            'filename': f"{safe_name}.json"
+        })
     except Exception as e:
         logger.error(f"Error saving project: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/load/<path:filename>')
+def load_project(filename):
+    """Load a saved project."""
+    try:
+        project_path = PROJECTS_DIR / filename
+        if not project_path.exists():
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        with open(project_path, 'r', encoding='utf-8') as f:
+            project_data = json.load(f)
+
+        logger.info(f"Project loaded: {project_path}")
+        return jsonify({'success': True, 'project': project_data})
+    except Exception as e:
+        logger.error(f"Error loading project: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/list')
+def list_projects():
+    """List all saved projects."""
+    try:
+        projects = []
+        for file_path in PROJECTS_DIR.glob('*.json'):
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                projects.append({
+                    'filename': file_path.name,
+                    'name': data.get('name', file_path.stem),
+                    'created': data.get('created', ''),
+                    'modified': data.get('modified', ''),
+                    'audio': data.get('audio', {}).get('name', 'Unknown'),
+                    'size': file_path.stat().st_size
+                })
+            except Exception as e:
+                logger.warning(f"Could not read project {file_path.name}: {e}")
+                projects.append({
+                    'filename': file_path.name,
+                    'name': file_path.stem,
+                    'created': '',
+                    'modified': '',
+                    'audio': 'Unknown',
+                    'size': file_path.stat().st_size
+                })
+
+        # Sort by modified date (most recent first)
+        projects.sort(key=lambda x: x.get('modified', ''), reverse=True)
+        return jsonify({'success': True, 'projects': projects})
+    except Exception as e:
+        logger.error(f"Error listing projects: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/project/delete/<path:filename>', methods=['DELETE'])
+def delete_project(filename):
+    """Delete a saved project."""
+    try:
+        project_path = PROJECTS_DIR / filename
+        if not project_path.exists():
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        project_path.unlink()
+        logger.info(f"Project deleted: {project_path}")
+        return jsonify({'success': True, 'message': 'Project deleted'})
+    except Exception as e:
+        logger.error(f"Error deleting project: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

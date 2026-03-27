@@ -1,0 +1,23 @@
+// ID: tcsyD4
+// Name: Eye Don't Know
+// User: diatribes
+// Date: 1755654073
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime,
+        f = ((tanh(cos(t*.3)*23.)*.3)*16.);
+    vec3  p = iResolution;    
+    u = (u+u-p.xy)/p.y;
+    for(o*=i; i++<64.;
+        d += s = .001 + abs(s),
+        o += (1.+cos(.3*p.z+vec4(3,1,0,0)))/s)
+        for (p = vec3(u * d, d),
+            s = max(cos(p.z*.3), (f)+.1-length(p.xy * sin(p.y*.1))),
+            a = .2; a < 16.; a += a)
+            s += abs(dot(sin(.3*t+p * a), .1+p-p)) / a;
+    o = tanh(o / 1e4  / max(f > 1. ? f * dot(u*=1.5,u) : 1.,.001));
+}
+

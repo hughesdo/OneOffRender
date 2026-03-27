@@ -1,0 +1,61 @@
+// ID: tc2SzW
+// Name: Wicked Woods
+// User: diatribes
+// Date: 1741662738
+
+
+// ===== PASS 0: Image =====
+
+
+#define N normalize
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define T (iTime * 1.2)
+
+vec3 P(float z) {
+    return vec3(
+         tanh(cos(z * .15) * .3) * 1.75 - 1.,
+         1.+sin(T*.2)*.1,
+         z
+    );
+}
+
+float orb(vec3 p) {
+    float t = T * 1.8;
+    return length(p - vec3(
+            P(p.z).x+sin(sin(p.z*.21)+t*.44) * 3.22,
+            P(p.z).y+sin(sin(p.z*1.33)+t*.15) *.5-.25,
+            4.5+T+tan(cos(t*.36)*.3)*8.));
+}
+
+float M(vec3 p) {
+    float s = 2. - p.y, l, w = 1.;
+    for (float a = .4; a < 8.;
+        s -=  abs(dot(sin(p * a * 4.)*.25, vec3(1.))) / a * .125,
+        a += a); 
+   
+    p.xy = mod(p.xy+1., 3.) - 1.5;
+    p.y *= .5;
+    p.z = mod(p.z, 3.) - 1.5;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.1/dot(p,p);
+    s = min(s,length(p)/w - .001);
+    return s;
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float i, s=.02;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(iTime*.3)*.4)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    for(i = 0.; i++ < 80. && s > .001;)
+        p += s*D,
+        o.rgb += (s = M(p))*.01+.02;
+    o.rgb /= orb(p);
+}
+

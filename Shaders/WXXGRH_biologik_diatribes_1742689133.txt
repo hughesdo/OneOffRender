@@ -1,0 +1,67 @@
+// ID: WXXGRH
+// Name: biologik
+// User: diatribes
+// Date: 1742689133
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .54) * .2) * 6., \
+                  tanh(cos((z) * .45) * .2) * 6., (z))
+#define T iTime
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+vec3 rgb = vec3(0);
+
+float M(vec3 p) {
+    float a, s, g = dot(sin(1.35*T+p*.3)+sin(p),cos(.1*T+p))+
+              dot(sin(1.6*T+p*1.3),cos(p*2.4));
+              
+    s = (sin(T*2.5)*1.5+4.) - length(p - P(p.z))-g*.5;
+    for (a = .15; a < 4.;
+        s -= abs(dot(sin(T+T+p * a * 32.), vec3(.0125))) / a,
+        a += a);
+        
+    p.x += tanh(sin(iTime*.5)*4.)*3. - g *.025;
+    p.y += g*.125 + sin(p.z*2.)*.25;
+    s = min(s, length(
+        (mod(vec3(p.xy - P(p.z).xy,p.z),1.5) - .75).xy
+    ) - .01);
+    for (a = .15; a < 4.;
+        s -= abs(dot(sin(T+T+p * a * 24.), vec3(.0125))) / a,
+        a += a);
+        
+    rgb += sin(p*.2) *.012 + .01;
+    return s;
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,d=0.,i=0.;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.2)*2.)*rot(tanh(sin(p.z*.5)*22.)*3.)*u, 1) 
+             * .4 * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    for(; i++ < 70. && s > .001;) {
+        p += (s = M(p))*D;
+        d += s;
+    }
+
+    r =  N(M(p) - vec3(M(p-e.xyy), 
+                       M(p-e.yxy), 
+                       M(p-e.yyx)));
+                         
+    rgb = 1.3 - rgb;
+    rgb *= i > 24. ? vec3(.9,.03,.03) : vec3(.6,.9,.9);
+    rgb *= exp(-d/(sin(T)*3.+8.));
+    rgb *= max(dot(r, normalize(ro-p)), .0);
+    rgb -= dot(u,u)*.4;
+    o.rgb = pow(rgb, vec3(.45));
+}

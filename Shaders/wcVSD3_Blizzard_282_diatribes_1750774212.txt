@@ -1,0 +1,41 @@
+// ID: wcVSD3
+// Name: Blizzard [282]
+// User: diatribes
+// Date: 1750774212
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime;
+    vec3  p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<80.;
+        // the snow is just cos(p.z) with some modifiers (pass time to move)
+        // *1.6 to scale, etc..
+        // using the translucency abs() trick seen in @Xor and @mrange shaders
+        // attenuate with A + abs(signed_distance) * B,
+        // where A and B are found through experimentation, but are generally
+        // between .001 and 1.
+        d += s = .01 + min(.03+abs(cos(2.*t+p.z)*1.6) *.4,
+                           .01+abs(.5+p.y)*.6),
+        // grayscale color based on distance
+        o += 1. /  s)
+        
+        // we're in the body of the above for loop now
+        // first line is the march, set s to .01 (our noise start)
+        // go up to s < 2. (noise end)
+        // the march translates to a standard: p = ro + rd *d then p.z += t *4.
+        for (p = vec3(u*d,d+t*4.),s = .01; s < 2.;
+             // add noise to our plane (used as .5+p.y above a few lines)
+             // so it looks like mountains... 
+             // our fog/snow is based on p as well, so it
+             // will be affected by the noise
+             p += abs(dot(sin(p * s *18.), p-p+.01)) / s,
+             s += s);
+    // tanh for tone mapping,  / 6e2 to divide down brightness,
+    // length(--u) makes our light off screen
+    o = tanh(o / 6e2 / length(--u));
+}
+
+

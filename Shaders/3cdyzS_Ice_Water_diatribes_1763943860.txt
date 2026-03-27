@@ -1,0 +1,33 @@
+// ID: 3cdyzS
+// Name: Ice Water
+// User: diatribes
+// Date: 1763943860
+
+
+// ===== PASS 0: Image =====
+
+#define A(x,r) abs(dot(sin(x*p/n), r +p-p )) * n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float r,i,s,n,d,t=iTime;
+    vec3  c,p = iResolution; 
+    u = (u-p.xy/2.)/p.y;
+    
+    if (abs(u.y) > .375) { o = vec4(0); return;}
+    
+    u += vec2(cos(t*.2)*.1, cos(t*.1)*.05);
+    
+    for (;i++<42.;
+         d += s = min(.007+.2*abs(s-1.),
+                  min(max(s, .01),.01+.5*abs(r))),
+         c += vec3(r < s ? 2. : 3.5,4.,5.)/ s
+           +  2.*vec3(1,2,5) / length(u-.2))
+        for(p = vec3(u * d, d),
+            p.xz += t*.2,
+            r = .2+p.y,
+            s = .1+p.y,
+            n = .01;n < 1.;n += n)
+                r += A(.4*t-.3*p.z-p.x + .6*t + 4., .05),
+                s += A(.1*p.z +.5,.25);
+    o.rgb = tanh(c*c /1e8 * exp(d / 5e4));
+}

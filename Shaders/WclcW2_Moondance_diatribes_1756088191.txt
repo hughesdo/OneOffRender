@@ -1,0 +1,63 @@
+// ID: WclcW2
+// Name: Moondance
+// User: diatribes
+// Date: 1756088191
+
+
+// ===== PASS 0: Image =====
+
+// moon color improvement from @JennySchub
+// thanks :D !
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime;
+    vec3  p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+ 
+    // sun
+    float sun = max(length(u-vec2(1.2, .6)), .001);
+    
+    // clear o, march 140 steps
+    for(o*=i; i++<140.;
+        
+        // accumulate distance
+        d += s = min(.005+.7*abs(s), e=max(.2*e, .001)),
+        
+        // little light + big light
+        o += .1/(mix(s,e,.1)) + .005/sun)
+        
+        // noise loop start, march
+        for (p = vec3(u*d,d), // p = ro + rd *d;
+            
+            // entity (orb), len(p - vec3(wigglez)) - radius
+            // p.y is mirrored
+            e = length(vec3(p.x, abs(p.y), p.z)
+                     - vec3(tanh(cos(t*.3)*3.) * 128. - 128.,
+                       sin(sin(t)+t) * 32. + 64.,
+                       256.+cos(t*.7)*24.))-.01,
+            
+            // plane
+            s = 16. + p.y,
+            
+            // move the gray stuff
+            p.x += t * 2.,
+            
+            // noise starts at .2 up to 4., grow by a+=a
+            a = .1; a < 4.; a += a)
+            
+            // apply turbulence
+            p += cos(a+p.yzx*.4)*.3,
+            
+            // apply noise
+            s += abs(dot(sin(p * a), vec3(.1))) / a;
+
+        // gradient sun color to green-blue
+        o *= mix(vec4(4,2,1,0),
+                 vec4(vec4(.1,.8,1.,1.)),
+                 smoothstep(.3, -.1, p.y*.001)),
+
+    // tanh tonemap, brightness
+    o = tanh(o/1e1);
+}

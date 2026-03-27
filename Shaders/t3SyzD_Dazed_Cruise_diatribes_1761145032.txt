@@ -1,0 +1,24 @@
+// ID: t3SyzD
+// Name: Dazed Cruise
+// User: diatribes
+// Date: 1761145032
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    vec3  p = iResolution;
+    float d=.4*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          i,s,w,l, T = iTime;
+    u = (u+u - p.xy ) / p.y;
+    for(o = vec4(0); i++ < 64.;) {
+        p = vec3( u*d, d + T * .3),
+        w = .1;
+        for (int i; i++ < 7; w *= l )
+            p *= l = 5./dot( p = (sin(p)) , p);
+        d += s = .001+.5*abs(length(p)/w) ;
+        o += (1.+cos(d*vec4(6,4,2,0)))/s*d;
+    } 
+    o = tanh(o/2e4);
+}
+

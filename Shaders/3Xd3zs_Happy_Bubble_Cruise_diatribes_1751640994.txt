@@ -1,0 +1,109 @@
+// ID: 3Xd3zs
+// Name: Happy Bubble Cruise
+// User: diatribes
+// Date: 1751640994
+
+
+// ===== PASS 0: Image =====
+
+/*
+    This is your brain 🧠
+    This is your brain on rgb 🍳
+    Let's have some phun 🌈
+    
+    I liked the super shape tunnel but it was boring by itself.
+    Added a sphere with some translucency, liked it so I kept it.
+    Made it dance around a bit and lol'd 😆, kept that
+    Gave the bubble a couple friends...
+    Then plasma, which makes the light glimmer effect
+    
+    Feedback welcome :)
+    
+*/
+
+
+// "P" for path, our trajectory
+#define P(z) vec3(cos(vec2(.07,.05)*(z))*8.,z)
+
+// golfed rotation matrix
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// tick... tock...
+#define T (iTime*6.)
+
+/* 
+    returns dist to bubble on path
+    
+    if you dig through my profile there are a lot shaders with floating "orbs",
+    especially my older tunnels before I went fractal crazy
+    here's one I like:
+        https://www.shadertoy.com/view/tXX3RX
+    
+    user @elsio has cool orb stuff too:
+        https://www.shadertoy.com/view/4ftyz8
+        https://www.shadertoy.com/view/XcVyWD
+    
+    and one of my favs by @Dave_Hoskins:
+        https://www.shadertoy.com/view/4sjSW1
+    
+*/
+float orb(vec3 p, float f, float zoffs) {
+    // blob time
+    float t = T * .3;
+    vec3 q = P(p.z);
+    // add periodic values to the blob path
+    // so they move around a bit
+    return length(p - vec3(
+            // left and right
+            q.x+sin(sin(f*.21)+t*.44) * 3.22,
+            // up and down
+            q.y+sin(sin(f*1.33)+t*.15) *1.55,
+            // put the blobs head of us, plus zoffs
+            zoffs+12.+T+cos(t*.5)*6.));
+}
+
+void mainImage(out vec4 o, vec2 u) {
+
+    // init
+    float i,a,s,t=T,d = .5*texelFetch(iChannel0, ivec2(u)%1024, 0).a;;
+    vec3  q,p = iResolution;
+    
+    // scale coords, rotate left and right
+    u = (u-p.xy/2.)/p.y * rot(sin(t*.01)*.2);
+    
+    // start on the path
+    vec3 ro = p = P(t);
+    
+    // look-at
+    vec3 Z = normalize( P(t+2.)- p),
+         X = normalize(vec3(Z.z,0,-Z)),
+         // rayDir * lookAt
+         D = vec3(u, 1)  * mat3(-X, cross(X, Z), Z);
+    
+    // clear o, accumulate color
+    for(o*=i; i++<72.;o += (1.+cos(.3*d+p.z+vec4(3,1,0,0)))/s)
+        // march
+        p = ro + D * d,
+        // blobs
+        s = min(orb(p, p.z*.4, 12.)-1.5,
+            min(orb(p, p.x, 8.) - 1.3,
+                orb(p, p.z*.8, 2.)-1.2)),
+        // save tunnel vec
+        q = p - P(p.z),
+        // repeat p
+        p = cos(p),
+        // super shape
+        p *= p*p*p*p,
+        // min(orb, max(min(tunnel, floor_and_ceiling), super_shape))
+        s = min(.0008+abs(s)*.75,
+            max(min(8. - length(q.xy), 6. - abs(q.y)),
+                .001 + abs(dot(p,p*.2)-.2))),
+        d += s;
+    // tone map,
+    // the abs(1./dot(cos(t+p), vec3(scale)) is plasma with additional modifiers
+    // I use it a lot, this one has bunches of it:
+    // https://www.shadertoy.com/view/W3jGRW
+    o = tanh(o/7e2 * abs(1. / dot(cos(.2*t+p+.01*t+q), vec3(d))));
+}
+
+

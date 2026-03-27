@@ -1,0 +1,39 @@
+// ID: wfjfzz
+// Name: Pumpkin n' Fireflies
+// User: diatribes
+// Date: 1761845931
+
+
+// ===== PASS 0: Image =====
+
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( t*c*24. ) * 16.,        \
+                    sin( t*c*18. ) * 12. + 12.,  \
+                    Z+cos(t*.5)*32. )  ) - c )
+void mainImage(out vec4 o, vec2 u) {
+    float d=.4*texelFetch(iChannel0, ivec2(u)%1024, 0).a,i,n,e,s,t=iTime;
+    vec3  p = iResolution;
+    u = (u+u-p.xy)/p.y;
+    for(o = vec4(0); i++<64.;
+        d += s = .02+.5*abs(min(p.y=.3*(p.y-3.), min(s, e))) ,
+        o += 3.*vec4(6,2,1,0)/s/d
+          + vec4(3e1,6e1,1,0)/max(e,.01)
+          + vec4(0,2,8,0)/(.1+abs(p.y))
+          + 2.*vec4(1,2,5,0) / max(length(u-.7), .01))
+        for(p = vec3(u * d, d - 14.),
+            p.x *= .8,
+            s = length(p) - 5. + cos(atan(p.x, p.z)*1e1) * .16,
+            e = max( .8* min( O( 1e1, .03),
+                         min( O( 2e1, .06),
+                         min( O( 3e1, .09),
+                         min( O( 4e1, .12),
+                              O( 5e1, .15) )))), .001 ),
+                n = .01; n < 1.; n += n)
+                    p.yz += cos(p.zx*.01),
+                    p.yz -= abs(dot(sin(.02*p.z*s+.03*p.x+t + .5*p / n ), p-p+n));
+
+ 
+     o = tanh(o / 2e3);
+
+}
+

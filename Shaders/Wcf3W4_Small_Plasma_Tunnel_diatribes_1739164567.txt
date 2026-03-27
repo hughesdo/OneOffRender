@@ -1,0 +1,27 @@
+// ID: Wcf3W4
+// Name: Small Plasma Tunnel
+// User: diatribes
+// Date: 1739164567
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 15.)
+#define path(z) (vec3(tanh(cos((z) * .04) * 3.3) * 3., \
+                      tanh(cos((z) * .05) * 2.2) * 4., (z)))
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = path(T);
+    float d = 0.,s;
+    do {
+        p = ro + vec3(u, 1.) * d;
+        s = 4. - length(p.xy - path(p.z).xy);
+        d += s;
+    } while(d < 100. && s > .01);
+    p = ro + vec3(u, 1.) * d;
+    float c = abs(sin(p.x)+sin(p.y)+sin(p.z));
+    o =vec4(pow(vec3(c+sin(p.z*.5), c*cos(p.z*.3), c)*3./pow(d,1.5),
+            vec3(.45)), 1.);
+}

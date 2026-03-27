@@ -1,0 +1,188 @@
+// ID: wcKczt
+// Name: Fireflies at Dusk
+// User: OneHung
+// Date: 1765075504
+
+
+// ===== PASS 0: Image =====
+
+// Fireflies at Dusk - Summer evening with glowing insects
+// Inspired by: diatribes' Night Field atmosphere, Blackle's glow techniques
+// Natural phenomenon: fireflies blinking in tall grass at twilight
+//
+// CC0 1.0 Universal
+
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+// Firefly blink pattern - not constant, they pulse
+float fireflyBlink(float time, float seed) {
+    // Each firefly has its own rhythm
+    float period = 2.0 + hash(vec2(seed, 0.0)) * 3.0; // 2-5 second cycle
+    float phase = hash(vec2(seed, 0.5)) * 6.28;
+    
+    // Sharp blink on, slow fade off (like real fireflies)
+    float t = mod(time + phase, period) / period;
+    float blink = smoothstep(0.0, 0.05, t) * smoothstep(0.3, 0.1, t);
+    
+    // Sometimes they do double-blinks
+    if (hash(vec2(seed, 0.7)) > 0.6) {
+        float t2 = mod(time + phase + 0.3, period) / period;
+        blink += smoothstep(0.0, 0.05, t2) * smoothstep(0.2, 0.1, t2) * 0.7;
+    }
+    
+    return blink;
+}
+
+// Grass blade silhouette
+float grass(vec2 uv, float x, float seed) {
+    float h = 0.15 + hash(vec2(x, seed)) * 0.25; // Height variation
+    float lean = (hash(vec2(x + 0.1, seed)) - 0.5) * 0.3; // Lean direction
+    float width = 0.003 + hash(vec2(x + 0.2, seed)) * 0.004;
+    
+    // Grass sways gently
+    float sway = sin(iTime * 0.8 + x * 5.0 + seed) * 0.02;
+    
+    // Blade shape - wider at base, curves at top
+    float bladeX = x + lean * uv.y / h + sway * uv.y / h;
+    float blade = smoothstep(width, 0.0, abs(uv.x - bladeX));
+    blade *= smoothstep(-0.02, 0.0, uv.y); // Ground level
+    blade *= smoothstep(h, h * 0.7, uv.y); // Taper at top
+    
+    return blade;
+}
+
+void mainImage(out vec4 O, in vec2 C) {
+    vec2 R = iResolution.xy;
+    vec2 uv = (C - 0.5 * R) / R.y;
+    
+    float t = iTime;
+    
+    // Twilight sky gradient - that magic hour
+    vec3 skyTop = vec3(0.15, 0.1, 0.25);      // Deep purple
+    vec3 skyMid = vec3(0.35, 0.2, 0.35);      // Dusty rose
+    vec3 skyHorizon = vec3(0.6, 0.35, 0.25);  // Orange glow
+    vec3 skyLow = vec3(0.3, 0.15, 0.2);       // Fading warmth
+    
+    float skyPos = uv.y + 0.3;
+    vec3 sky = mix(skyLow, skyHorizon, smoothstep(-0.1, 0.1, skyPos));
+    sky = mix(sky, skyMid, smoothstep(0.1, 0.4, skyPos));
+    sky = mix(sky, skyTop, smoothstep(0.4, 0.8, skyPos));
+    
+    vec3 col = sky;
+    
+    // First stars appearing
+    for (float i = 0.0; i < 40.0; i++) {
+        vec2 starPos = vec2(
+            hash(vec2(i, 1.3)) * 2.0 - 1.0,
+            hash(vec2(i, 2.7)) * 0.5 + 0.3
+        );
+        starPos.x *= R.x / R.y;
+        
+        float starBright = hash(vec2(i, 3.1));
+        // Stars fade in as sky darkens (toward top)
+        starBright *= smoothstep(0.2, 0.5, starPos.y);
+        // Twinkle
+        starBright *= 0.7 + 0.3 * sin(t * (2.0 + hash(vec2(i, 4.0))) + i);
+        
+        float star = smoothstep(0.003, 0.0, length(uv - starPos));
+        col += vec3(0.9, 0.85, 0.8) * star * starBright * 0.8;
+    }
+    
+    // Distant tree line silhouette
+    float treeLine = -0.15;
+    for (float i = 0.0; i < 10.0; i++) {
+        float x = (i / 10.0) * 2.5 - 1.25;
+        float treeH = 0.1 + hash(vec2(i, 10.0)) * 0.15;
+        float treeW = 0.05 + hash(vec2(i, 11.0)) * 0.08;
+        
+        // Simple tree shape
+        float tree = smoothstep(treeW, 0.0, abs(uv.x - x));
+        tree *= smoothstep(treeLine + treeH, treeLine, uv.y);
+        tree *= smoothstep(treeLine - 0.02, treeLine + 0.02, uv.y);
+        
+        col = mix(col, vec3(0.02, 0.03, 0.05), tree);
+    }
+    
+    // Grass field in foreground
+    float groundLevel = -0.25;
+    
+    // Multiple grass layers for depth
+    for (float layer = 0.0; layer < 3.0; layer++) {
+        float layerY = groundLevel - layer * 0.08;
+        float layerDensity = 80.0 - layer * 20.0;
+        float darkness = 0.02 + layer * 0.015;
+        
+        for (float i = 0.0; i < 80.0; i++) {
+            if (i >= layerDensity) break;
+            float x = (i / layerDensity) * 2.4 - 1.2;
+            x += hash(vec2(i, layer + 20.0)) * 0.03; // Randomize position
+            
+            vec2 grassUV = uv - vec2(0.0, layerY);
+            float g = grass(grassUV, x, layer * 100.0 + i);
+            
+            col = mix(col, vec3(darkness), g);
+        }
+    }
+    
+    // Ground
+    col = mix(col, vec3(0.015, 0.02, 0.01), smoothstep(groundLevel, groundLevel - 0.05, uv.y));
+    
+    // FIREFLIES - the magic
+    for (float i = 0.0; i < 35.0; i++) {
+        // Each firefly drifts in a lazy path
+        float seed = i * 127.1;
+        
+        // Base position
+        vec2 basePos = vec2(
+            hash(vec2(seed, 0.0)) * 2.0 - 1.0,
+            hash(vec2(seed, 1.0)) * 0.4 - 0.3
+        );
+        basePos.x *= 0.9;
+        
+        // Gentle drifting motion - figure-8 ish patterns
+        vec2 drift = vec2(
+            sin(t * 0.3 + seed) * 0.1 + sin(t * 0.7 + seed * 2.0) * 0.05,
+            cos(t * 0.4 + seed) * 0.06 + sin(t * 0.2 + seed) * 0.03
+        );
+        
+        vec2 fireflyPos = basePos + drift;
+        
+        // Distance from camera (affects size and brightness)
+        float depth = 0.3 + hash(vec2(seed, 2.0)) * 0.7;
+        float size = 0.008 / depth;
+        
+        // The blink!
+        float blink = fireflyBlink(t, seed);
+        
+        // Glow
+        float d = length(uv - fireflyPos);
+        
+        // Core (bright yellow-green)
+        float core = smoothstep(size, 0.0, d) * blink;
+        
+        // Soft glow halo
+        float glow = exp(-d * 40.0 * depth) * blink * 0.5;
+        
+        // Firefly color - warm yellow-green, slightly varies
+        vec3 fireflyCol = vec3(0.7, 0.9, 0.3);
+        fireflyCol = mix(fireflyCol, vec3(0.9, 0.8, 0.2), hash(vec2(seed, 3.0)) * 0.3);
+        
+        col += fireflyCol * core * 2.0;
+        col += fireflyCol * glow * 0.8;
+    }
+    
+    // Subtle warm ambient glow near ground (accumulated firefly light)
+    float ambientGlow = smoothstep(0.0, -0.4, uv.y) * 0.03;
+    col += vec3(0.4, 0.5, 0.2) * ambientGlow;
+    
+    // Very subtle vignette
+    col *= 1.0 - length(uv) * 0.2;
+    
+    // Slight color grade for that nostalgic summer feel
+    col = pow(col, vec3(0.95, 1.0, 1.05));
+    
+    O = vec4(sqrt(max(col, 0.0)), 1.0);
+}
+

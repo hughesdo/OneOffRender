@@ -1,0 +1,97 @@
+// ID: tXyXRy
+// Name: (⚠️lights) hpy wknd [visualizer]
+// User: diatribes
+// Date: 1754704609
+
+
+// ===== PASS 0: Image =====
+
+/*   
+
+\o\     \o/    /o/
+
+
+I think I listened to this same song for
+a couple hours straight :D
+
+
+*/
+
+
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+
+
+void M0( out vec4 o, in vec2 u )
+{
+    float i,n,s=.02,d, t = iTime, T = iChannelTime[0]*2., FT = fract(T), D;
+    vec3  w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<1e2 && s > .01; 
+         d += s = min(s,.01+.7*abs(3.+w.y)),
+         o += 2./d)
+        for(p = w = vec3(u * d, d + T*16.),
+            D = pow(texture(iChannel0, vec2(0., p.y) ).x, 2.),
+            w.z += t,
+            w.y += cos(t+w.z*.2)*.2+cos(t+w.z*.3)*.3,
+            p = abs(p),
+            s = min(4.*cos(FT)+8. - p.x, 16. - p.y),
+            n = 2.;
+            n < 8.;
+            w += N(4.*t+w, .3),
+            s += N(p, .1),
+            n *= 1.4);
+    o *= vec4(5,2,1,0);
+    o = mix(o, o.xzyw, smoothstep(0., 1., length(u)));
+    o = tanh(o / 
+             pow( abs(cos(.5*D+FT)*w.y+sin(FT)*N(FT+p, 16.)), D) * 
+             d /4e2/max(length(u), 2.) );
+}
+
+
+void M1( out vec4 o, in vec2 u )
+{
+    float i,n,s=.02,d, t = iTime, T = iChannelTime[0]*1., FT = fract(T), D;
+    vec3  w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    u += vec2(cos(FT)*.01, sin(FT)*.01);
+    for (o*=i;i++<1e2 && s > .01; 
+         d += s = min(s,.01+.7*abs(3.+w.y)),
+         o += 2./d)
+        for(p = w = vec3(u * d, d + T*16.),
+            D = pow(texture(iChannel0, vec2(0., p.y) ).x, 2.),
+            w.z += FT,
+            w.y += cos(t+w.z*.2)*.2+cos(t+w.z*.3)*.3,
+            s = 16. - length(p.xy),
+            n = 1.;
+            n < 4.;
+            w += N(2.*t+w, .14),
+            s += N(p, .1),
+            n *= 1.4);
+    o *= vec4(5,2,1,0);
+    o = mix(o, o.yzxw, smoothstep(0., 1., length(u)*4.));
+    o = tanh(o / 
+             pow( abs(cos(D+FT)*w.y+N(FT+p, 16.)), D) * 
+             d /2e2/abs(w.y)/max(length(u), .5) );
+}
+
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iChannelTime[0]*2.,
+          f = mod(iTime, 32.);
+    if (f > 16.) {
+        M0(o, u);
+    } else if (f > 8.) {
+        M0(o, u);
+        
+        vec4 c;
+        M1(c, u);
+        o *= .01+abs(c+o/12.);
+        
+     } else {
+        M1(o, u);
+     }
+}
+
+
+

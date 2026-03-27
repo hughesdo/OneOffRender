@@ -1,0 +1,48 @@
+// ID: W3fGDH
+// Name: Color Puffs
+// User: diatribes
+// Date: 1742949514
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) (vec3(tanh(cos((z) * .3) * .4) * 16., \
+                   tanh(cos((z) * .4) * .3) * 16., (z)))
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime,a, d = 0., s=.002,l,w,ws,j;
+    float f = tanh(sin(T*1.5)*1.35)*.25;
+    vec3  r = iResolution,
+          p = P(T),q=p,
+          Z = normalize( P(T+3.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(f)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    for(int i = 0; i++<90 && s > .001;) {
+        p = q + D * d;
+        o.rgb += sin(p*.3)*.01+.01;
+        p.xy -= P(p.z).xy;
+        p.xy *= .5;
+        p.y -= 1.75;
+        p.y += (.15*(sin(p.x+T*3.5)+
+                    sin(p.z+T*1.5)+
+                    sin(p.z+T*2.8)));
+        ws = .6;
+        w = .3;
+        for (j=0.; j++ < 6.; p *= l, w *= l )
+            p = clamp(p, -2.0, 2.0) * 2.0 - p,
+            p  = abs(sin(p)) - 1.,
+            l = ws/dot(p,p)+1.2;
+        o.rgb += sin(p*.3)*.05+.009;
+        s = length(p)/w;
+        for (a = .2; a < 1.;
+            s -= abs(dot(sin(T+(q + D * d) * a * 14.), vec3(.008))) / a,
+            a += a);
+        d += s;
+    }
+    o.rgb = pow((1. - o.rgb) * exp(-d/4.),vec3(.45));
+}
+

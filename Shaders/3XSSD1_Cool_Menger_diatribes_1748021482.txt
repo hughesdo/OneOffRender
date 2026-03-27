@@ -1,0 +1,108 @@
+// ID: 3XSSD1
+// Name: Cool Menger
+// User: diatribes
+// Date: 1748021482
+
+
+// ===== PASS 0: Image =====
+
+
+#define T (iTime*2.)
+
+#define L 100.
+
+#define P(z) (vec3(4.*iMouse.y/iResolution.y+tanh(cos((z) * .13) * .45) * 16., \
+                   4.*iMouse.x/iResolution.x+tanh(cos((z) * .15) * .5) * 16., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define inf 9e9
+#define TONEMAP(x) ((x) / ((x) + 0.155) * 1.019)
+
+// Modified from Shane's Menger function
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(in vec3 q){
+    vec3 p;
+    float d=inf, s = 4.;
+
+    MENGERLAYER(1., min, 3.);
+    MENGERLAYER(3., max, 3.5);
+    MENGERLAYER(4., max, 3.5);
+    return d;
+}
+
+float tunnel(vec3 p) {
+    vec2 t = P(p.z).xy;
+    float s;
+    s  = min(length(p.xy - t.xy),
+         min(length(p.xy - t.y) ,
+             length(p.xy - t.x )));
+
+    return 1.-s;
+}
+
+float map(vec3 p) {
+    float f = fractal(p);
+ 
+    return max(tunnel(p),f);
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+
+    u = (u-r.xy/2.)/r.y;
+     
+    vec3  p = P(T),ro=p,
+          e = vec3(.007,0,0),
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(tanh(sin(p.z*.1)*1.5)*2.)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+
+    o -= o;
+
+    while(i++ < L && s > .001)
+        p = ro + D * d,
+        p += cos(1.*T+p.yzx*3.)*.1,
+        d += (s = map(p)*.5);
+
+
+    float f = mod(p.z, 30.);
+    if (f > 20.)
+        o.rgb = (1.+cos(p.z+vec3(2,4,1)));
+    else if (f > 10.)
+        o.rgb = (1.+cos(p.z+vec3(1,6,4)));
+    else
+        o.rgb = (1.+cos(p.z+vec3(5,1,2)));
+
+    vec3 lights = abs(vec3(.1,.1,2) /
+                  dot(cos(iTime+p*.5),vec3(.05)));
+
+    r =  N(map(p) - vec3(map(p-e.xyy), 
+                         map(p-e.yxy), 
+                         map(p-e.yyx)));
+
+    o *= max(dot(r, normalize(ro-p)), .0);
+    o *= AO(p, r);
+    o.rgb = mix(o.rgb, lights, .01);
+
+    o.rgb = pow(TONEMAP(o.rgb*exp(-d/2.)), vec3(.45));
+
+}

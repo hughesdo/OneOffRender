@@ -1,0 +1,201 @@
+// ID: XXyBDy
+// Name: Tunnel Cave Experiment 4
+// User: diatribes
+// Date: 1738541667
+
+
+// ===== PASS 0: Image =====
+
+// References:
+// https://www.shadertoy.com/view/4cVyWW
+// https://www.shadertoy.com/view/XXyBR3
+// https://www.shadertoy.com/view/4XyBWy
+// https://iquilezles.org/articles/distfunctions/
+
+// Size
+#define CAVERN_RADIUS 30.
+#define RIVER_HEIGHT (CAVERN_RADIUS/2.)
+
+// Raymarch
+#define MAX_STEPS 255.
+#define MAX_DIST 255.
+#define SURFACE_DIST .01
+#define inf (MAX_DIST*2.)
+
+// Speed
+#define TIME_MULTIPLIER 12.
+
+// Length func
+#define LENGTH2_DISABLED
+
+// Fractal texture
+#define _FRACT_MIN  ((sin(iTime*.4)*.13)+(sin(iTime*.6)*.15+.5))
+#define FRACT_MIN  .5
+#define FRACT_MAX  1.75
+#define FRACT_OFFS 1.25
+
+float length2(vec2 p){
+#ifdef LENGTH2_ENABLED
+    float k = 20.;
+    p = pow(abs(p), vec2(k));
+    return pow(p.x + p.y, 1./k);
+#else
+    return length(p);
+#endif
+}
+
+vec3 path1(float z) {
+    return vec3(
+        1.*CAVERN_RADIUS-tan(cos(z * .001) * 1.)+(cos(z * .03) * CAVERN_RADIUS), 
+        sin(sin(z * .1)) * 6.3,
+        z
+    );
+}
+
+vec3 path2(float z) {
+    return vec3(
+        1.866*CAVERN_RADIUS-cos(z * .001) * .125,
+        sin(sin(z * .1)) * 5.3,
+        //3.,
+        z
+    ) ;
+}
+
+
+vec3 path3(float z) {
+    return vec3(
+        2.533*CAVERN_RADIUS-cos(z * .001) * .125,
+        sin(sin(z * .1)) * 9.3,
+        z
+    ) ;
+}
+
+
+float sdCone( vec3 p, vec2 c, float h ){
+  float q = length(p.xz);
+  return max(dot(c.xy,vec2(q,p.y)),-h-p.y);
+}
+
+vec3 fractal(vec3 p, int interations){
+  float m = 1.;
+  for (int i = 0; i < interations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,FRACT_MIN,FRACT_MAX)-FRACT_OFFS;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-2. * m)*2.5;
+  return vec3(p.xy,.5) * m;
+}
+
+vec3 plasma(vec2 uv) {
+    float t = iTime / 4.0;
+    uv *= 10.;
+    float r = distance(uv, vec2(sin(t), sin(t)));
+    float g = distance(uv, vec2(0, 3.));
+    float b = distance(uv, vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(uv.x+t) + cos(uv.y+t));
+    value = sqrt(value);
+    r/=value*2.;
+    g/=value*.5;
+    b/=value;
+
+    return vec3(r,g,b);
+}
+
+float scene(vec3 p, out vec3 rgb, bool skipRiver) {
+    float d1 = length2(p.xy - path1(p.z).xy);
+    float d2 = length2(p.xy - path2(p.z).xy);
+    float d3 = length2(p.xy - path3(p.z).xy);
+    
+    float w1 = sin(iTime+p.x*.3)*.7;
+    float w2 = cos(iTime+p.x*.2)*.5;
+    float w3 = cos(iTime+p.z*.3)*.5;
+    float river = skipRiver ? inf : RIVER_HEIGHT+p.y+w1+w2+w3;
+    float structure = CAVERN_RADIUS - min(d1, min(d2,d3));
+    float hit = min(structure, river);
+    rgb = vec3(.15,.15,.08);
+
+
+    if (hit == river) {
+        rgb *= plasma(sin(p.xz*.075+1.0/p.z));
+    } else {
+        float a = acos(dot(normalize(sin(p)),normalize(vec3(1.))));
+        float b = acos(dot(normalize(cos(p)),normalize(vec3(1.))));
+        vec3 psk = vec3(
+            CAVERN_RADIUS * cos(a) * cos(b),
+            CAVERN_RADIUS * sin(a),
+            CAVERN_RADIUS * cos(a) * sin(b)
+        );
+
+        float spike = sdCone(cos(.4*p-.5)+sin(p), vec2(.35,.25), CAVERN_RADIUS);
+        hit = hit+spike;
+        rgb = vec3(.325,.325,.28)
+            * texture(iChannel0,p.xy/200.).xyz;
+    }
+
+    return hit;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb, bool skipRiver) {
+    float dist = 0.0;
+    for(float i = 0.; i < MAX_STEPS; i++) {
+        vec3 p = ro + rd * dist;
+        float step = scene(p, rgb, skipRiver);
+        dist += step;
+        if(dist > MAX_DIST || step < SURFACE_DIST) {
+            break;
+        }
+    }
+    return dist;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+    vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+    vec3 ww = normalize(target - origin);
+    vec3 uu = normalize(cross(ww, rr));
+    vec3 vv = normalize(cross(uu, ww));
+    return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.01, 0);
+    vec3 rgb;
+    bool skipRiver = false;
+
+    vec3 n = scene(p,rgb,skipRiver) - vec3(
+        scene(p-e.xyy,rgb,skipRiver),
+        scene(p-e.yxy,rgb,skipRiver),
+        scene(p-e.yyx,rgb,skipRiver));
+
+    return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec3 rgb = vec3(1.);
+	
+    vec2 uv = -1.0 + 2.0*(fragCoord.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = vec3(0., 0., iTime*TIME_MULTIPLIER);
+	vec3 la = ro + vec3(0., 0., 1.);
+    
+    la.xy = ro.xy = path1(ro.z).xy;
+    
+    vec3 riverRgb;
+	vec3 rd = normalize(vec3(uv,1.)*lookAt(ro,la,0.));
+	float d = raymarch(ro, rd, rgb, true);
+	raymarch(ro, rd, riverRgb, false);
+    vec3 p = ro + rd * d;
+    
+    rgb = mix(rgb,riverRgb,.25);
+    rgb *= max(dot(normal(p), normalize(ro-p)), .3);
+    rgb *= 1./pow(d,d*.007);
+
+    
+    if (d >= MAX_DIST) {
+        rgb = vec3(.001,.001,.0);
+    } else {
+        fragColor = vec4(pow(rgb, vec3(.35)), 1.0);
+    }
+
+}

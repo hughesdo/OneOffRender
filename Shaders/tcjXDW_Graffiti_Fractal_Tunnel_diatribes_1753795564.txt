@@ -1,0 +1,107 @@
+// ID: tcjXDW
+// Name: Graffiti Fractal Tunnel
+// User: diatribes
+// Date: 1753795564
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -173 chars from @FabriceNeyret2
+    
+    557 chars from 730
+
+    Thanks!  :D
+    
+*/
+
+
+// This was sitting around and I saw the cool AA processing that could
+// be done to clean up some of the aliasing, so I added that and thought
+// it looked pretty neat :D
+
+// the fractal started as a kali fractal here
+// https://www.shadertoy.com/view/4XdfW4
+
+// the AA stuff I saw here
+// https://www.shadertoy.com/view/w33XD7
+
+
+#define P(z) vec3(tanh(cos((z) *.3) * .3 ) * 8., \
+                  tanh(cos((z) /4.) * .26) * 8., z )
+
+void M( out vec4 o, vec2 u )
+{
+    float i,j,d,s=.002, T=iTime;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = normalize( P(T+1.5) - p ),
+          X = normalize(vec3( Z.z, 0, -Z )),
+          D = vec3( ( u - r.xy/2. ) / r.y, 1 ) 
+             * mat3(-X, cross(X, Z), Z);
+               
+    for( ; i++ < 80. && s > .001; d += s )
+        s = 1.5 - length(p.xy - P(p.z).xy),
+        p += s*D*.8;
+        
+    for ( p = cos(p) ; j++ < 7.; 
+        p = abs(p) / clamp( abs(dot(p,vec3(.75))),.125,.7) -1.75 );
+        
+    o.rgb = tanh (4.*p / exp(d/3.) );
+}
+
+
+void mainImage(out vec4 O, vec2 u) {
+    
+    vec4 o; 
+    int AA = 4, k;
+    for (O *= 0. ; k<AA*AA; k++ ) {
+        M(o, u + vec2(k%AA-AA/2,k/AA-AA/2) / float(AA) - .5 );
+        O += o;
+    }
+    O /= float(AA * AA);
+}
+
+
+
+
+
+
+
+
+/*
+#define P(z) vec3(tanh(cos((z) * .3) * .3) * 8., \
+                  tanh(cos((z) * .25) * .26) * 8., (z))
+#define T iTime
+void mainImage_orig( out vec4 o, in vec2 u )
+{
+    float i,d,s=.002;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = normalize( P(T+1.5) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3((u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    while(i++ < 80. && s > .001)
+        p += (s = 1.5 - length(p.xy - P(p.z).xy))*D*.8,
+        d += s;
+    p = cos(p);
+    for (i=0.; i++ < 7.; 
+        p = abs(p)/clamp(abs(dot(p,vec3(.75))),.125,.7)-1.75);
+    o.rgb = tanh(4.*p/exp(d/3.));
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec4 tcol = vec4(0.0);
+    const int AA = 4;
+    for (int mx = 0; mx < AA; mx++)
+    for (int nx = 0; nx < AA; nx++) {
+        vec2 o = vec2(float(mx), float(nx)) / float(AA) - 0.5;
+        vec4 pixel; 
+        mainImage_orig(pixel, fragCoord + o);
+        tcol += clamp(pixel, 0.0, 1.0);
+    }
+    fragColor = tcol / float(AA * AA);
+}
+*/

@@ -1,0 +1,31 @@
+// ID: wcV3Rt
+// Name: Dream Entity #7351
+// User: diatribes
+// Date: 1748473804
+
+
+// ===== PASS 0: Image =====
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float e,i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        p = vec3(u * d, d);
+        e = length(p - vec3(sin(sin(t)+sin(t*.1))*1.,
+                             sin(sin(t*1.7)*.1 +
+                             sin(t*.1))*.1,
+                             sin(t*.5)*5.+12.)) - .8;
+        p.xy *= rot(sin(.2*t+sin(t*.01)*13.5)),
+        p.xz *= rot(sin(.5*t+sin(t*.01)*3.)),
+        p.yz *= rot(t*.3),
+        s = min(e, 8. - abs(p.y));
+        for (a = .1; a < 2.; a += a)
+            p += cos(t+p.yzx)*.3,
+            s -= abs(dot(sin(t+p * a * 4.), vec3(.1))) / a;
+        d += s = .007 + abs(s)*.1;
+    }
+    o = tanh(vec4(abs(vec4(6,1,2,2)/e)));
+}
+

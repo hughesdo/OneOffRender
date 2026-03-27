@@ -1,0 +1,51 @@
+// ID: tc23WK
+// Name: Orb Experiment
+// User: diatribes
+// Date: 1740758102
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 6.5)
+#define P1(z) (vec3(tanh(cos((z) * .04) * .6) * 24.1, \
+                    tanh(cos((z) * .05) * .6) * 26.5, (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define blue vec3(.2,1.,1.)
+#define red vec3(1.,.2,.1)
+
+#define LIGHTS_COUNT 12.
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+5.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.05))*u, 1.) * mat3(-lax, lay, laz) * .75,
+         rgb;
+    float orb[int(LIGHTS_COUNT)];
+    float d = 0.,s, i, o1, o2, os = 0.;
+    int oi;
+    do{
+        p = ro + rd * d;
+        s = 2.5 - min(length(p.y - P1(p.z).x),
+                  min(length(p.xy - P1(p.z).xy),
+                      length(p.xy - P1(p.z).y+1.)));
+        for (i = 0.; i < LIGHTS_COUNT; i++) {
+            orb[int(i)] = length(p - vec3(P1(p.z).xy+sin(.13*p.z*i*.13),
+                           (5.+i+sin(i))+15.+T+tanh(cos(i+T*1.43*.1)*1.4)*(15.+i)))-.4;
+            s = min(s, orb[int(i)]);
+            os += orb[int(i)];
+            orb[0] = min(orb[0],orb[int(i)]);
+        }
+        d += s;
+    } while (d < 75. && s > .01);
+
+    p = sin(ro + rd * d);
+    vec3 oc = vec3(1.)/orb[0]*1.5;
+    o.rgb = (oc*oc*oc)*length(p);
+    o =vec4(pow(vec3(o.rgb),vec3(.45)), 1.);
+}

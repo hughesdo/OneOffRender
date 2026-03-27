@@ -97,16 +97,16 @@ const API = {
     },
 
     /**
-     * Save the current project
+     * Save the current project with a name
      */
-    async saveProject(projectData) {
+    async saveProject(projectName, projectData) {
         try {
             const response = await fetch(`${this.baseUrl}/api/project/save`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(projectData)
+                body: JSON.stringify({ name: projectName, project: projectData })
             });
             const data = await response.json();
             if (!data.success) {
@@ -115,6 +115,59 @@ const API = {
             return data;
         } catch (error) {
             console.error('Error saving project:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Load a saved project
+     */
+    async loadProject(filename) {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/project/load/${encodeURIComponent(filename)}`);
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to load project');
+            }
+            return data.project;
+        } catch (error) {
+            console.error('Error loading project:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * List all saved projects
+     */
+    async listProjects() {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/project/list`);
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to list projects');
+            }
+            return data.projects;
+        } catch (error) {
+            console.error('Error listing projects:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Delete a saved project
+     */
+    async deleteProject(filename) {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/project/delete/${encodeURIComponent(filename)}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to delete project');
+            }
+            return data;
+        } catch (error) {
+            console.error('Error deleting project:', error);
             throw error;
         }
     },

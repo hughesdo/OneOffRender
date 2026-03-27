@@ -1,0 +1,145 @@
+// ID: wXj3Wt
+// Name: DDA Gem Cruise
+// User: diatribes
+// Date: 1744770225
+
+
+// ===== PASS 0: Image =====
+
+/*
+References that helped:
+https://lodev.org/cgtutor/raycasting.html
+https://www.shadertoy.com/view/X32SD3
+https://www.shadertoy.com/view/4dX3zl
+*/
+
+#define SCALE 32.
+#define GROUND 364.
+#define MORPH_FREQ tanh(sin(T*.0015)*8.)
+
+#define T (sin(iTime*.13)*100.+sin(iTime*.065)*400.+(.5*iTime*400.))
+#define N normalize
+#define P(z) (vec3(tanh(cos((z)*.0011) *  3.9) * 500., \
+                   tanh(cos((z) * .0021) *1.5) * GROUND, (z)))
+#define P2(z) (vec3(tanh(cos((z)*.0033) *  2.7) * 710., \
+                   tanh(cos((z) * .0037) *2.5) * GROUND, (z)))
+
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float side = 0.;
+
+float tunnels(vec3 p) {
+    vec2 t = P(p.z).xy;
+    vec2 sq = abs(p.xy - t);
+    float s,r = MORPH_FREQ*SCALE*2.75;
+
+    s  = min(length(p.xy - t.xy) - 275.,
+             length(p.y - 100. - t.x ) -125.);
+    t = P2(p.z).xy;
+    s  = min(s,
+         min(length(p.xy - t.xy) - 332.,
+             length(p.xy - t.y ) - 175.));
+    
+    return r-s;
+}
+
+// I based this on @chronos' "Lode Style Voxel DDA 3D"
+// https://www.shadertoy.com/view/X32SD3
+vec3 tex(vec3 ro, vec3 rd, vec3 p, vec3 n) {
+    vec3 rgb;                         
+    
+    // Solve ray plane intersection equation: dot(n, ro + t * rd - p = 0.
+    // for t 
+    float t = dot(n, p - ro) / dot(n, N(rd));
+    vec3 hit = ro + N(rd) * t;
+ 
+    if(side == 0.)
+        rgb = texture(iChannel0, hit.yz*.0725).rgb,
+        rgb.b*=2.2;
+    else if(side == 1.)
+        rgb = texture(iChannel1, hit.xz*.0675).rgb,
+        rgb.r*=1.3,
+        rgb.b *= sin(.01*T+hit.z*.2)*12.;
+    else
+        rgb = texture(iChannel2, hit.xy*.03875).rgb,
+        rgb.b*3.4;
+  
+    vec3 red = vec3(.63,.11,.11),
+         blue = vec3(.33,.11,.58)*1.5;
+    rgb = mix(rgb,abs(sin(.006*T+hit*n*4.) / dot(sin(.002*T+hit*.05),vec3(1.8))),.15);
+    rgb = mix(rgb,blue*blue*abs(sin(.001*T+hit*n*4.) / dot(sin(.003*T+hit*.1),vec3(1.1))),.15);
+   
+    rgb *= rgb * .6;
+    rgb *= 2.5;
+    return rgb;
+}
+
+vec4 marchVoxels(vec3 fp, vec3 sd, vec3 rs, vec3 dd, float iters, float minS) {
+
+    vec3 q;
+    float i,os=0.,s,d=0.;
+	for (i=0.; i++ < iters;) {
+
+        if(sd.x <= sd.y && sd.x <= sd.z){
+            sd.x += dd.x; // Add delta dist
+            fp.x += rs.x; // step right/left
+            side = 0.;    // yz wall
+        } else if(sd.y <= sd.z && sd.y <= sd.x) {
+            sd.y += dd.y; // Add delta dist
+            fp.y += rs.y; // step up/down
+            side = 1.;    // xz wall
+        }  else {
+            sd.z += dd.z; // Add delta dist
+            fp.z += rs.z; // step front/back
+            side = 2.;    // xy wall
+        }
+        
+        s = tunnels(fp*SCALE);
+        d += s;
+		if (s < minS) break;
+
+	}
+    
+    return vec4(fp, i);
+}
+
+void mainImage(out vec4 o, vec2 u) {
+
+    vec3  id,
+          blue = vec3(.15,.11,.57)*1.5,
+          red = vec3(.7,.11,.05)*2.5,
+          green = vec3(.11,.32,.11)*1.5,
+          r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+          // rayPos
+    vec3  p = P(T)/SCALE, ro = p,
+          Z = N( P(T+16.) - P(T)),
+          X = N(vec3(Z.z,0,-Z)),
+          
+          // rayDir
+          rd = vec3(rot(tanh(sin(p.z*.002)*11.)*3.)*rot(sin(T*.003)*.5)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+              
+    // rayStep
+	vec3 rs = sign(rd),
+         // deltaDist
+	     dd = 1. / abs(rd),
+         // sideDist
+		 sd = (rs * (floor(p) - p) + (rs * 0.5) + 0.5) * dd; 
+
+    o-=o;
+
+    vec4 vox = marchVoxels(floor(p), sd, rs, dd, 256., .01);
+    vec3 n = vec3(side==0., side==1., side==2.);
+    p = vox.xyz  + .5 - rs * .5;
+
+    vec3 lights = abs(red*sin(p.z)*blue*blue*sin(.01*T+vox.xyz) /
+                  dot(sin(.0005*T+vox.xyz),vec3(.08)))*.02;
+    o.rgb = blue*red*tex(ro, rd, p, n);
+
+    o.rgb *= red;
+    o.rgb *= max(dot(n, N(rd)), .075)*1.5;
+    o.rgb = mix(o.rgb, lights, .2);        
+    o.rgb = pow(o.rgb*exp(-vox.w/128.), vec3(.45));
+}
+

@@ -1,0 +1,112 @@
+// ID: Wcf3D7
+// Name: Commented Mini Tunnel
+// User: diatribes
+// Date: 1739229756
+
+
+// ===== PASS 0: Image =====
+
+// Please feel free to use this however you like
+// I threw this together very quickly as a reference
+// Please also correct me where I'm wrong
+
+// Time
+// Used as Z coordinate of view/camera 
+#define T (iTime * 15.)
+
+// The tunnel path
+/* 
+   https://graphtoy.com/?f1(x,t)=tanh(cos((x)%20*%20.6)%20*%203.3)%20*%203.&v1=true&f2(x,t)=&v2=true&f3(x,t)=&v3=true&f4(x,t)=&v4=true&f5(x,t)=&v5=false&f6(x,t)=&v6=false&grid=1&coords=0,0,12
+   In graphtoy, play with the numbers and watch how the path changes
+   We know our Z coordinate, it's just "T"
+   Based on that we can figure out where we are on our path
+   This is the basis for the tunnel path and adding objects
+   in front of or behind the viewer (like floating orbs)
+*/
+#define path(z) (vec3(tanh(cos((z) * .04) * 3.3) * 3., \
+                      tanh(cos((z) * .05) * 2.2) * 4., (z)))
+
+
+/* This is our entry point, we get the coordinate
+   of the image in the "in" parameter "u"
+   we are expected to set the "out" parameter "o"
+   "u" is the coordinate on the image (the fragment)
+   and o is the color we want it to be
+*/
+void mainImage(out vec4 o, in vec2 u) {
+    // This is the screen resolution
+    vec2 r = iResolution.xy; 
+    
+
+         // Center the view ( / 2)
+         // Scale the coordinate system so that
+         // it looks correct for the aspect ratio: ( / r.y)
+         u = (u - r.xy / 2.) / r.y;
+         
+    // p is our position on the raymarch
+    vec3 p,
+         // ro is our ray origin
+         ro = path(T);
+    // If you haven't done raymarching I can recommend
+    // this explanation:
+    // https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+    
+    // d is our distance traversed along the ray
+    // s is the distance to the nearest object
+    float d = 0.,s;
+    do {
+
+        // Start at the ray origin ro
+        // add the direction vector u
+        // go distance d
+        // i.e., march!
+        // p is now the current point on our march
+        p = ro + vec3(u, 1.) * d;
+        
+        // The length() and subtration is calculating
+        // the distance from our current position on the ray
+        // to the position on our path
+        // 4 - is doing two things, as I understand it,
+        // We're taking a 4 steps back so we get a tunnel
+        // and not just a single point line,
+        // and it's the complement of the distance
+        // which allows us to be iniside the tunnel
+        
+        // This is because if you're inside the tunnel
+        // without taking the complement, the distance is
+        // always zero, so we can't march anywhere!
+        
+        // By taking the complement we get positive distances
+        // while being inside the tunnel
+        s = 4. - length(p.xy - path(p.z).xy);
+        
+        // Now we add the distance to the tunnel to the total
+        // distance "d" which will, at the top of the loop,
+        // march forward again
+        d += s;
+        
+        // We do this until our distance hits 100.
+        // Experiment with the 100 and .01
+        // The s > .01 is checking to see if we are
+        // still more that .01 away from the object
+        // Once we're equal to or below .01 from the object
+        // or we've marched a distance of 100., we exit
+        // our raymarch loop
+    } while(d < 100. && s > .01);
+    p = ro + vec3(u, 1.) * d;
+    // This is the basis for our color
+    // It's a mini plasma effect! It's simply the sum of
+    // the sin of the components of the last point on
+    // our raymarch
+    float c = abs(sin(p.x)+sin(p.y)+sin(p.z));
+    
+    // Because c is a scalar, we need to play with it to get
+    // different rgb values (3 values from 1).
+    // Simply add the sine of the current
+    // z coordinate at different frequencies for a little color
+    
+    // Finally we divide by the distance for a distance fade
+    // And the last step is to correct the gamma (the pow .45)
+    o =vec4(pow(vec3(c+sin(p.z*.5), c*cos(p.z*.3), c)*3./pow(d,1.5),
+            vec3(.45)), 1.);
+}

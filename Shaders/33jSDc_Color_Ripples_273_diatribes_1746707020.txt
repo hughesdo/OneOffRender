@@ -1,0 +1,26 @@
+// ID: 33jSDc
+// Name: Color Ripples [273]
+// User: diatribes
+// Date: 1746707020
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Inspired by Xor's recent raymarchers with comments!
+    https://www.shadertoy.com/view/tXlXDX
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s;
+    for(o*=i; i++<1e2; ) {
+        vec3 p = d * normalize(vec3(u+u,0) - iResolution.xyx );
+        for (s = .1; s < 1.;
+            p -= dot(sin(p * s * 16.), vec3(.01)) / s,
+            p.xz *= mat2(cos(.3*iTime+vec4(0,33,11,0))),
+            s += s);
+        d += s = .01 + abs(p.y);
+        o += (1.+cos(d+vec4(4,2,1,0))) / s;
+    }
+    o = tanh(o / 6e3);
+}

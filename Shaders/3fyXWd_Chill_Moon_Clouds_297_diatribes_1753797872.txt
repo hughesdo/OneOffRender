@@ -1,0 +1,23 @@
+// ID: 3fyXWd
+// Name: Chill Moon Clouds [297]
+// User: diatribes
+// Date: 1753797872
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u+u-p.xy)/p.y;
+    for(o*=i; i++<64.;
+        d += s = .05 + abs(s)*.2,
+        o += 1./s)
+        for (p = vec3(u * d, d + t),
+            s = 8. - length(p.xy * sin(p.y*.25)),
+            a = .05; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(.5*t+.1*p.z+p * a * 12.), .05+p-p)) / a;
+    o = tanh(o*o / 3e6 / dot(u,u));
+}
+

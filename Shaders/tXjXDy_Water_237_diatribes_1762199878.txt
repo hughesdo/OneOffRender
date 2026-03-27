@@ -1,0 +1,26 @@
+// ID: tXjXDy
+// Name: Water [237]
+// User: diatribes
+// Date: 1762199878
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -3 by @FabriceNeyret2
+   
+    -11 by @bug (very very slight visual change)
+    
+    thanks!!  :D
+
+*/
+
+void mainImage( out vec4 o, vec2 u ) {
+    float s=.3,i,n;
+    vec3 r = iResolution,p;
+    for(u = (u-r.xy/2.)/r.y-s; i++ < 32. && ++s>.001;)
+        for (p += vec3(u*s,s),s = p.y,
+            n =.01; n < 1.;n+=n)
+            s += abs(dot(sin(p.z + iTime + p/n),  r/r)) * n*.1;
+    o = tanh(i*vec4(5,2,1,0)/length(u-.1)/5e2);
+}

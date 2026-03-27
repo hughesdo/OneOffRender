@@ -1,0 +1,85 @@
+// ID: tfGcRc
+// Name: Sky Falls
+// User: diatribes
+// Date: 1764961709
+
+
+// ===== PASS 0: Image =====
+
+float mist(vec3 p) {
+    
+    float i,d,s,t = iTime;
+    vec4 o = vec4(0);
+    mat2 r = mat2(cos(1.6+vec4(0,33,11,0)));
+    
+    // step back
+    p.z -= 5e2 + t * 2e1;
+    
+    // rot little less than 90*
+    p.yz *= r;
+    
+    // move the water/mist
+    p.z += t*2e1;
+
+    // noise
+    for(s = .03; s < 3.; s += s )
+        p.z += cos(p.x*.3)*4.,
+        p.yz -= abs(dot(sin(2.*t+.7*p / s ), vec3(s)));
+
+    // stretch
+    
+    // distance to tunnel
+    d += s = .1+.2*abs(64. - length(p.xy));
+    return s;
+    
+}
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float w,d,a,i,s,k;
+    vec3  p,r = iResolution;    
+    // scale coords
+    u = (u+u-r.xy)/r.y;
+    
+    // cinema bars
+    if (abs(u.x) > 1.25) { o *= 0.; return; }
+ 
+    for(o*=i; i++<1e2;
+    
+
+        // accumulate distance
+        d += s = min(.6+.2*abs(k), min(w, .1+.6*abs(s))),
+        
+        // grayscale color
+        o += mix(vec4(6e3)/(s), 2e1*vec4(1,2,5,0)/w, .99)
+          + (iMouse.z < 70. ?  2e1*vec4(3,2,5,0)/length(vec2(u.x, u.y-.5)) : vec4(0))
+          
+    )
+        
+        // noise loop start, march
+        for(p = vec3(u*d,d + iTime * 2e1), // p = ro + rd *d
+            w = mist(p),
+            k = 3e2 - p.y,
+            // mirrored planes 20 units apart
+            s = 2e1 - min(abs(p.x), -p.y),
+            
+            // noise starts at .03 up to 1.,
+            // grow by a+=a
+            a = .03; a < 1.; a += a)
+            
+            // apply noise
+            s += abs(dot(sin(.05*p.z+.1*p / a ), a+a+a+p-p)),
+            k -= abs(dot(sin(iTime+.01*p / a ), a*16.+p-p));
+    
+    // tanh tonemap, brightness
+    o = tanh(o*o/6e8);
+}
+
+
+
+
+
+
+
+
+

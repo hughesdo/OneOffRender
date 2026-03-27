@@ -1,0 +1,27 @@
+// ID: 3fdXzf
+// Name: data vortex
+// User: diatribes
+// Date: 1749410798
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, n, t=-iTime*.2;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        p = vec3(u * d, d + t*32.)*.5;
+        p.xy *= mat2(cos(p.z*.3+vec4(0,33,11,0))),
+        s = cos(p.y-t)+cos(p.x/t)+cos(p.x+t);
+        p.xy += cos(t+vec2(.05,.09)*p.z)*8.;
+        p.xy *= mat2(cos(2.*t+vec4(0,33,11,0)));
+        for (n = 1.5; n < 16.; n += n )
+            s -= abs(dot(step(.3, sin(t+p*n )), vec3(1))) / n;
+        d += s = .01 + abs(s)*.4;
+        o += 1. / s;
+    }
+    o = tanh(vec4(3,9,2,1)*o*o / d / 9e5);
+}
+

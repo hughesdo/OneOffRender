@@ -1,0 +1,25 @@
+// ID: 33lGz4
+// Name: Little Gem Flight
+// User: diatribes
+// Date: 1742781808
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float T=iTime, s=.002,l,w=1.,i=70.,d,f=tanh(sin(T*.5)*10.)*1.55;
+    vec3 r = iResolution, p = vec3(f,0,T),q;
+    o -= o;
+    while(i-- > 0. && s > .001) {
+        q = p;
+        w = 1.;
+        for (s = 0.; s++ < 8.; q *= l, w *= l )
+            q  = abs(sin(q)) - 1.,
+            l = 1.2/dot(q,q)-(tanh(cos(T))*.3)*.5;
+        p += (s = length(q)/w)*vec3((u-r.xy/2.)/r.y, 1);
+        d += s;
+        o.rgb += (abs(sin(q))*.035+.005)*vec3(1,f,1);
+    }
+    o.rgb *= exp(-d/3.);
+}
+

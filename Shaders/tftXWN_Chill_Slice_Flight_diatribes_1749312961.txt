@@ -1,0 +1,82 @@
+// ID: tftXWN
+// Name: Chill Slice Flight
+// User: diatribes
+// Date: 1749312961
+
+
+// ===== PASS 0: Image =====
+
+
+#define T (iTime*.4)
+#define P(z) (vec3((cos((z) * .4) * .3) * 6., \
+                   (cos((z) * .3) * .3) * 6., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define inf 9e9
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+
+float tunnel (vec3 p, float r) {
+    p.xy -= P(p.z).xy;
+    return r - abs(p.y);
+}
+
+float gyroid(vec3 p) {
+    return dot(tanh(p), sin(p+cos(p.yzx)));
+}
+
+float map(vec3 p) {
+ 
+    return min(tunnel(p, 6.),
+           max(tunnel(p, .3), gyroid(p)));
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.02,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  e = vec3(.001,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.2)*.4)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+             
+    o *= 0.;
+    while(i++ < 135. && s > .01)
+        p = ro + D * d * .5,
+        d += map(p);
+        
+    r =  N(map(p) - vec3(map(p-e.xyy), 
+                         map(p-e.yxy), 
+                         map(p-e.yyx)));
+    
+    o.rgb = pow(tex3D(iChannel1, p*.5, r), vec3(2.2));
+    for (i = .2; i < .8;
+        o += abs(dot(sin(o.rgb * i * 4.), vec3(.5))) / i,
+        i *= 1.4142);    
+ 
+    o *= max(dot(r, normalize(ro-p)), .05);
+    o *= AO(p, r);
+    o = tanh(o/max(d,10.)*exp(-d/32.)/2.);
+}

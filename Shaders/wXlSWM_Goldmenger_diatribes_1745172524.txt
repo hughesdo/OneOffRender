@@ -1,0 +1,126 @@
+// ID: wXlSWM
+// Name: Goldmenger
+// User: diatribes
+// Date: 1745172524
+
+
+// ===== PASS 0: Image =====
+
+/*
+
+Original Menger from Shane's "Winding Menger Tunnel"
+https://www.shadertoy.com/view/4scXzn
+
+You can modify the Menger pretty easily with the
+MENGERLAYER macro in the fractal() function. 
+
+*/
+
+#define T (iTime * .5)
+#define P(z) (vec3((cos((z) * .3) * .4) * 8., \
+                   (cos((z) * .25) * .4) * 8., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define inf 9e9
+
+bool orbHit = false;
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+
+// @Shane's Menger function hacked up
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(in vec3 q){
+    float d, s = 32.;
+    
+    vec3 p = q*2.;
+    p = mod(p, 5.) - 2.5;
+    p.x-=1.5;
+    float l, w = 1.;
+    for (int i; i++ < 7; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.7/dot(p,p);
+        
+    d = length(p)/w;
+    MENGERLAYER(16.,max, 3.);
+    MENGERLAYER(8., max, 3.5);
+    MENGERLAYER(16., max, 4.5);
+    return d;
+}
+
+float map(vec3 p) {
+    float n, s;
+    vec3 q = p;
+    p.xy -= P(p.z).xy;
+    s = inf;
+    float r = 3.;
+    s = min(s, r - (p.x) - (p.y));
+    s = min(s, r - (p.y) + (p.x));
+    s = min(s, r + (p.y) - (p.x));
+    s = min(s, r + (p.y) + (p.x));
+
+    s = min(s, fractal(p));
+    
+    return s;
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(-rot(tanh(sin(p.z*.05)*3.)*3.5)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    while(i++ < 180. && s > .001)
+        p = ro + D * d,
+        d += (s = map(p)*.65);
+        
+    // I may not need all these for a tunnel
+    r =  N(map(p) - vec3(map(p-e.xyy)-map(p+e.xyy), 
+                         map(p-e.yxy)-map(p+e.yxy), 
+                         map(p-e.yyx)-map(p+e.yyx)));
+    if (mod(p.z, 10.) > 5.) // do smoothstep+mix intead
+        o.rgb= pow(tex3D(iChannel1, p*2.5, r), vec3(2.2));
+    else
+        o.rgb = pow(tex3D(iChannel2, p*1.5, r), vec3(2.2)),
+        o.rgb *= 3.,
+        o.rg *= 1.5;
+ 
+     
+    vec3 lights = abs((vec3(1.6, 1.2, .8)) /
+                  dot(cos(.75*T+p*.3),vec3(.01)))*.01;
+ 
+    o *= max(dot(r, normalize(ro-p)), .05);
+    o *= AO(p, r)*12.;
+    o.rgb *= lights;
+    o.rgb = pow(tanh(vec3(1.5,1.,.7)*o.rgb*exp(-d/1.5))
+                - dot(u,u)*.3, vec3(.45));
+}

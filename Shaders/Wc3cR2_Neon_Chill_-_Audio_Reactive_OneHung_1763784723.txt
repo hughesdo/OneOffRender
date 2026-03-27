@@ -1,0 +1,114 @@
+// ID: Wc3cR2
+// Name: Neon Chill - Audio Reactive
+// User: OneHung
+// Date: 1763784723
+
+
+// ===== PASS 0: Image =====
+
+// Neon Chill - Audio Reactive Version
+// Original by diatribes (ID: tcXfW8)
+// Audio-reactive enhancement inspired by Bigwings
+// 
+// Design Philosophy: Pleasant, organic audio response that enhances the neon waves
+// - Bass frequencies drive the overall rotation and twist
+// - Mid frequencies modulate wave amplitudes for flowing motion
+// - High frequencies add sparkle and glow variations
+// - Everything flows smoothly, nothing jarring
+
+/* 
+   Thanks to Diatribes and BigWings. These are solid vibe coding examples,
+   and I still have a lot to learn, but GLSL is only part of the journey for me.
+   I am experimenting with context from people who are much smarter than I am.
+
+   What I am building here will show up in a post on X soon. I will include a short video.
+   Many of us are starting to see how powerful AI tools like Claude can be once it has
+   the right context. I have been feeding it a lot more than just your examples.
+
+   More is coming. Follow me on X. I share what I learn and the people I learn it from.
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+    // Time with subtle audio modulation for organic flow
+    float bass = texture(iChannel0, vec2(0.01, 0.25)).x; // Low frequencies
+    float mids = texture(iChannel0, vec2(0.1, 0.25)).x;  // Mid frequencies  
+    float highs = texture(iChannel0, vec2(0.3, 0.25)).x; // High frequencies
+    float kick = texture(iChannel0, vec2(0.0, 0.25)).x;  // Sub-bass for punch
+    
+    // Smooth the audio values for pleasant reactions
+    bass = smoothstep(0.0, 0.5, bass);
+    mids = smoothstep(0.1, 0.6, mids);
+    highs = smoothstep(0.2, 0.7, highs);
+    kick = smoothstep(0.0, 0.3, kick);
+    
+    // Time flow - audio affects speed subtly
+    float t = iTime * (.2 + bass * .1);
+    
+    // Setup coordinates
+    vec3 p = iResolution;
+    u = (u + u - p.xy) / p.y;
+    
+    // Audio-reactive rotation matrix
+    // Bass drives the main twist, mids add secondary rotation
+    float rotBase = length(u * (3.5 - bass * 1.5)) + mids * .5;
+    u *= mat2(cos(rotBase + vec4(0, 33, 11, 0)));
+    
+    // Wave amplitudes modulated by audio
+    // Each frequency band affects different wave layers
+    float amp1 = .1 + mids * .15 + highs * .05;   // Subtle reaction
+    float amp2 = .2 + mids * .2 + bass * .1;       // More movement
+    float amp3 = .3 + bass * .2 + mids * .1;       // Bass-driven
+    float amp4 = .4 + bass * .3 + kick * .2;       // Strongest bass response
+    
+    // Line thickness responds to kick drum for pulse effect
+    float thickness = 1.0 + kick * .5 + bass * .2;
+    
+    // Color intensity boosted by high frequencies for sparkle
+    float colorBoost = 1.0 + highs * .5 + mids * .2;
+    
+    // Build the neon waves with audio modulation
+    vec4 wave1 = vec4(.5, .1, 2, 0) * colorBoost / 
+                 (.001 * thickness * length(u.x + sin(8. * t - u.y * 1.) * amp1));
+    
+    vec4 wave2 = vec4(1, .1, 0, 0) * (colorBoost + highs * .3) / 
+                 (.002 * thickness * length(u.x + sin(4. * t - u.y * 2.) * amp2));
+    
+    vec4 wave3 = vec4(1, .6, 0, 0) * (colorBoost + mids * .2) / 
+                 (.003 * thickness * length(u.x + sin(3. * t - u.y * 4.) * amp3));
+    
+    vec4 wave4 = vec4(1, 2, 0, 0) * (colorBoost + bass * .3) / 
+                 (.004 * thickness * length(u.x + sin(2. * t - u.y * 8.) * amp4));
+    
+    // Combine waves with slight audio-reactive brightness
+    float brightness = 2e4 / (1.0 + bass * .3 + mids * .2);
+    
+    // Add subtle glow pulse on strong beats
+    vec4 glowPulse = vec4(1, .5, 2, 0) * kick * .02;
+    
+    // Final composition with smooth tonemap
+    o = tanh((wave1 + wave2 + wave3 + wave4) / brightness + glowPulse);
+    
+    // Optional: Add subtle overall color shift based on audio energy
+    float audioEnergy = (bass + mids + highs) / 3.0;
+    o.rgb = mix(o.rgb, o.rbg, audioEnergy * .1); // Subtle color rotation
+}
+
+/* 
+Audio Reactive Design Notes:
+
+Following Bigwings' philosophy and the Shader Design Philosophy:
+1. VISUAL BEAUTY FIRST: The audio enhances, never overwhelms the original aesthetic
+2. PLEASANT REACTIONS: All modulations are smoothed and scaled for organic feel
+3. LAYERED RESPONSE: Different frequency bands affect different visual elements
+4. SIMPLE MATH: No complex FFT analysis, just tasteful frequency sampling
+
+Key Audio Mappings:
+- Bass (0.01): Controls rotation twist and wave amplitude for flowing motion
+- Mids (0.1): Adds secondary movement and color variations  
+- Highs (0.3): Creates sparkle and brightness boosts
+- Kick (0.0): Provides rhythmic pulse to line thickness
+
+The result maintains the original "Neon Chill" vibe while adding musical life.
+Each neon wave dances to different aspects of the music, creating depth.
+*/

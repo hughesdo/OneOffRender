@@ -1,0 +1,22 @@
+// ID: WXV3zc
+// Name: Foreverever
+// User: diatribes
+// Date: 1753970238
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d ,s,n,t = iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    u += vec2(cos(t*.3)*.2, sin(t*.2)*.15);
+    for(o*=i; i++<1e2;d += s = .001+abs(s)*.8, o += 1./s)
+        for (p = vec3(u * d, d+t*4.),
+             p.xy *= mat2(cos(.02*t-p.z*.1+vec4(0,33,11,0))),
+             s = tanh(1.+p.y),
+             n = 2.; n < 16.; n *= 1.37 )
+                 s += abs(dot(step(1./d, cos(t+p.z+p*n)), vec3(.4))) / n;
+    o = tanh(vec4(d/5e1,.2, 1e1/d,0)*o / 1e4 / max(length(u), .01));
+}
+

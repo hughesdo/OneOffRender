@@ -1,0 +1,78 @@
+// ID: tffyRS
+// Name: Dimensional Drift
+// User: diatribes
+// Date: 1755824601
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+
+    float
+          // raymarch iterator
+          i,
+          // total distance
+          d,
+          // signed distance
+          s,
+          // entity (orb) distance
+          e,
+          // time (orb movement, camera sway, etc.)
+          t=iTime,
+          // flight time, z and x coord speed for flight
+          zt = t * 64.,
+          xt = t * 48.,
+          // noise value
+          n;
+          
+    vec3 p = iResolution;
+    
+    // scale coords and move the camera around a bit
+    u = (u+u-p.xy)/p.y+cos(t*.3)*vec2(.8,.3);
+    
+    // clear o, march up to 128
+    for(o*=i; i++<128.;
+        
+        // accumulate distance of orb, plane or clouds
+        d += s = min(e = .01+abs(e)*.4, min(5.+ p.y *.6, 8.-p.y*.06)),
+        
+        // accumulate brightness
+        o.r += (s + .1/e),
+        
+        // plaaaaaaaaaaaaaaaaaaasma!
+        o += .2*sqrt( abs(vec4(2,4,16,0) /
+                      dot(cos(.3*t+p*.03), vec3(.1)))) )
+        
+        // noise start
+        for(p = vec3(u*d,d+zt), // p = ro + rd * d, p.z += zt;
+
+            // entity (orb), a sphere
+            e = length(p - vec3(
+                // x
+                sin(sin(t*.3)+t*.4)*16.,
+                // y
+                sin(sin(t*.2)+t*.2)*12. + 6.,
+                // z
+                128.+zt+cos(t*.15)*16.))
+                // radius
+                - .5,
+
+            // rotate left and right very slightly
+            p.xy *= mat2(cos(cos(t*.2)*.1+vec4(0,33,11,0))),
+
+            // move along x axis
+            p.x -= xt,
+
+            // start noise at .02, until 2, grow by s += s
+            s = .02;
+            s < 1.;
+            s += s)
+                 // apply noise
+                 n = abs(dot(sin(p * s), p-p+.17)) / s,
+                 p += n, e -= n*.5;
+    
+    
+    // tanh tonemap, brightness
+    o = tanh(o*o/6e5);
+}
+

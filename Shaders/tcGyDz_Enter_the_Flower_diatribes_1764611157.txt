@@ -1,0 +1,48 @@
+// ID: tcGyDz
+// Name: Enter the Flower
+// User: diatribes
+// Date: 1764611157
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 q,p = iResolution;
+    
+    float i, s,
+          // start the ray at a small random distance,
+          // this will reduce banding
+          d = .125*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          t = iTime*.7, st = sin(t);
+          
+    // scale coords
+    u =(u+u-p.xy)/p.y;
+    
+    for(o*=i; i++<64.; ) {
+        
+        // shorthand for standard raymarch sample, then move forward:
+        // p = ro + rd * d, p.z + t*4.
+        q = p = vec3(u * d, d + t * 4.);
+        
+        q.z = fract(q.z*.7)-.2;
+        p.z = cos(p.z*.3);
+
+        // turbulence
+        for (s = 1.; s++ <8.;
+            q += sin(.6*t+p.zxy*s*.2)*.4,
+            p += sin(t+p.yzx*s)*.25);
+
+        // distance to spheres
+        d += s = .01 + abs(min(length(p)-9., length(q)-6.))*.2;
+        
+        // color: 1.+cos so we don't go negative, cos(d+vec4(6,4,2,0)) samples from the palette
+        // divide by s for form and distance
+        o += (1.+cos(p.z+vec4(6,4,2,0))) / s
+          +  vec4(1.2,.8,.2,0)/ dot(u, u);
+        
+    }
+    
+    // tonemap and divide brightness
+    o = tanh(o / 2e3);
+}

@@ -1,0 +1,228 @@
+// ID: tfdSRn
+// Name: Chill Cloud (Interactive)
+// User: diatribes
+// Date: 1748797376
+
+
+// ===== PASS 0: Image =====
+
+//----------------------------
+// CAMERA FROM @morimea:https://www.shadertoy.com/view/sltyR2
+//----------------------------
+void SetCamera(vec2 uv, out vec3 ro, out vec3 rd);
+
+void mainImage(out vec4 o, vec2 u) {
+    float od,i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    vec3 ro = vec3(u, 1), rd = ro;
+    SetCamera(u, ro, rd);
+    for(o*=i; i++<90.; ) {
+        p = ro + rd * d;
+        p.z += t;
+        od = length(p - vec3(
+                            // Cloud X
+                            sin(sin(t)+sin(t*.3))*4.,
+                            // Cloud Y
+                            sin(sin(t*.5) + sin(t*.3))*2.,
+                            // Cloud Z
+                            t+sin(t*.5)*5.+7.)) - 1.;
+        s = min(od, 4. - abs(p.y));
+        for (a = .1; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(.4*t+p * a * 8.), vec3( .05))) / a;
+        d += s = .03 + abs(s)*.11;
+        o += 1. / s;
+    }
+    o = tanh(o / 2e2 / abs(vec4(3,2,1,1)*od));
+}
+
+
+
+
+
+
+
+//----------------------------
+// CAMERA FROM @morimea:https://www.shadertoy.com/view/sltyR2
+//----------------------------
+
+#define load(P) texelFetch(iChannel0, ivec2(P), 0)
+#define SS(x, y, z) smoothstep(x, y, z)
+
+const ivec2 POSITION = ivec2(1, 0);
+const ivec2 VMOUSE = ivec2(2, 0);
+
+void SetCamera(vec2 uv, out vec3 ro, out vec3 rd)
+{
+    ro = load(POSITION).xyz;
+    vec2 m = load(VMOUSE).xy;
+    m.y = -m.y;
+    float fov=70.;
+    float aspect = iResolution.x / iResolution.y;
+    float screenSize = (1.0 / (tan(((180.-fov)* (3.1415926 / 180.0)) / 2.0)));
+    rd = vec3(uv*screenSize, 1./aspect);
+    rd = normalize(rd);
+    mat3 rotX = mat3(1.0, 0.0, 0.0, 0.0, cos(m.y), sin(m.y), 0.0, -sin(m.y), cos(m.y));
+    mat3 rotY = mat3(cos(m.x), 0.0, -sin(m.x), 0.0, 1.0, 0.0, sin(m.x), 0.0, cos(m.x));
+    rd = (rotY * rotX) * rd;
+}
+//----------------------------
+
+
+
+    
+
+// ===== PASS 1: Buffer A =====
+
+//----------------------------
+// CAMERA FROM @morimea:https://www.shadertoy.com/view/sltyR2
+//----------------------------
+
+
+// only camera control
+// License - CC0 or use as you wish
+
+#define keyboard_texture iChannel3
+#define self_texture iChannel0
+
+const vec3 start_pos = vec3(0); //vec3(12.0, 9.0, -11.0);
+const vec2 start_mouse = vec2(0); //vec2(-.88,-0.55);
+
+#define iTimeDelta min(iTimeDelta,1./10.)
+
+void store(ivec2 P, ivec2 ipx, vec4 V, inout vec4 fc){ if(ipx==P) fc = V;}
+
+vec4 load(ivec2 P, sampler2D self){return texelFetch(self, ivec2(P), 0);}
+float key(int K, sampler2D kb){return step(0.5, texelFetch(kb, ivec2(K, 0), 0).x);}
+
+const ivec2 MEMORY_BOUNDARY = ivec2(4, 3);
+
+const ivec2 RES_LAST = ivec2(0, 0);
+const ivec2 INIT = ivec2(0, 1);
+const ivec2 TARGET = ivec2(0, 2);
+
+const ivec2 POSITION = ivec2(1, 0);
+const ivec2 POSITION_last = ivec2(1, 1);
+
+const ivec2 VMOUSE = ivec2(2, 0);
+const ivec2 VMOUSE_last = ivec2(2, 1);
+
+const ivec2 INPUT = ivec2(3, 0);
+const ivec2 PMOUSE = ivec2(3, 1);
+
+
+const int Key_Backspace = 8, Key_Tab = 9, Key_Enter = 13, Key_Shift = 16, Key_Ctrl = 17, 
+Key_Alt = 18, Key_Pause = 19, Key_Caps = 20, Key_Escape = 27, Key_Space = 32, 
+Key_PageUp = 33, Key_PageDown = 34, Key_End = 35,Key_Home = 36, Key_LeftArrow = 37, 
+Key_UpArrow = 38, Key_RightArrow = 39, Key_DownArrow = 40, Key_Insert = 45, 
+Key_Delete = 46, Key_0 = 48, Key_1 = 49, Key_2 = 50, Key_3 = 51, Key_4 = 52,
+Key_5 = 53, Key_6 = 54, Key_7 = 55, Key_8 = 56, Key_9 = 57, Key_A = 65, Key_B = 66, 
+Key_C = 67, Key_D = 68, Key_E = 69, Key_F = 70, Key_G = 71, Key_H = 72,Key_I = 73, 
+Key_J = 74, Key_K = 75, Key_L = 76, Key_M = 77, Key_N = 78, Key_O = 79, Key_P = 80,
+Key_Q = 81, Key_R = 82, Key_S = 83, Key_T = 84, Key_U = 85,Key_V = 86, Key_W = 87, 
+Key_X = 88, Key_Y = 89, Key_Z = 90, Key_LeftWindow = 91, Key_RightWindows = 92, 
+Key_Select = 93, Key_Numpad0 = 96, Key_Numpad1 = 97, Key_Numpad2 = 98, Key_Numpad3 = 99,
+Key_Numpad4 = 100, Key_Numpad5 = 101, Key_Numpad6 = 102, Key_Numpad7 = 103, 
+Key_Numpad8 = 104, Key_Numpad9 = 105, Key_NumpadMultiply = 106, Key_NumpadAdd = 107,
+Key_NumpadSubtract = 109, Key_NumpadPeriod = 110, Key_NumpadDivide = 111, Key_F1 = 112,
+Key_F2 = 113, Key_F3 = 114, Key_F4 = 115, Key_F5 = 116, Key_F6 = 117, Key_F7 = 118,
+Key_F8 = 119, Key_F9 = 120, Key_F10 = 121, Key_F11 = 122, Key_F12 = 123, 
+Key_NumLock = 144, Key_ScrollLock = 145,Key_SemiColon = 186, Key_Equal = 187, 
+Key_Comma = 188, Key_Dash = 189, Key_Period = 190, Key_ForwardSlash = 191, 
+Key_GraveAccent = 192, Key_OpenBracket = 219, Key_BackSlash = 220, 
+Key_CloseBraket = 221, Key_SingleQuote = 222;
+
+
+
+vec2 KeyboardInput(sampler2D kb) {
+    ivec4 inputs1 = ivec4(Key_UpArrow, Key_DownArrow, Key_RightArrow, Key_LeftArrow); //ARROWS
+    ivec4 inputs2 = ivec4(Key_W, Key_S, Key_D, Key_A);//WASD
+    //ivec4 inputs2 = ivec4(Key_E, Key_D, Key_F, Key_S);//ESDF
+    
+	vec2 i = vec2(max(key(inputs1.z,kb),key(inputs2.z,kb))   - max(key(inputs1.w,kb),key(inputs2.w,kb)), 
+                  max(key(inputs1.x,kb),key(inputs2.x,kb)) - max(key(inputs1.y,kb),key(inputs2.y,kb)));
+    
+    float n = abs(abs(i.x) - abs(i.y));
+    return i * (n + (1.0 - n)*0.707106);
+}
+
+vec3 CameraDirInput(vec2 vm, sampler2D kb) {
+    vec2 m = vm;
+    m.y = -m.y;
+    
+    mat3 rotX = mat3(1.0, 0.0, 0.0, 0.0, cos(m.y), sin(m.y), 0.0, -sin(m.y), cos(m.y));
+    mat3 rotY = mat3(cos(m.x), 0.0, -sin(m.x), 0.0, 1.0, 0.0, sin(m.x), 0.0, cos(m.x));
+    
+    return (rotY * rotX) * vec3(KeyboardInput(kb), 0.0).xzy;
+}
+
+
+void Collision_floor(vec3 prev, inout vec3 p) {
+    p.y = .25;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{   
+    ivec2 ipx = ivec2(fragCoord);
+    fragColor=vec4(0.);
+    if (any(greaterThan(ipx, MEMORY_BOUNDARY))) return;
+    
+    fragColor = load(ipx, self_texture);
+    
+    vec3 position_l = load(POSITION, self_texture).xyz;
+    vec2 vm_l = load(VMOUSE, self_texture).xy;
+    bool is_init = load(INIT, self_texture).x>1.;
+    
+    if (iFrame == 0 || !is_init) {
+        vm_l=start_mouse;
+        position_l=start_pos;
+        store(POSITION, ipx, vec4(start_pos, 0.), fragColor);
+        store(POSITION_last, ipx, vec4(position_l, 0.), fragColor);
+        store(TARGET, ipx, vec4(start_pos, 0.), fragColor);
+        store(VMOUSE, ipx, vec4(start_mouse,0.,0.), fragColor);
+        store(VMOUSE_last, ipx, vec4(vm_l,0.,0.), fragColor);
+        store(PMOUSE, ipx, vec4(start_mouse,0.,0.), fragColor);
+        store(INIT, ipx, vec4(2.,0.,0.,0.), fragColor);
+        store(INPUT, ipx, vec4(2.,0.,0.,0.), fragColor);
+        store(RES_LAST, ipx, vec4(iResolution.xy,0.,0.), fragColor);
+        return;
+    }
+
+    vec3 target      = load(TARGET, self_texture).xyz;   
+    vec3 position    = load(POSITION, self_texture).xyz;
+    vec2 pm          = load(PMOUSE, self_texture).xy;
+    vec3 vm          = load(VMOUSE, self_texture).xyz;
+    vec2 res_l       = load(RES_LAST, self_texture).xy;
+    
+    vec3 ptarget = target;
+    target += CameraDirInput(vm.xy, keyboard_texture) * iTimeDelta * 5.0;
+    
+    Collision_floor(ptarget, target);
+    
+    vec3 lp = position;
+    position += (target - position) * iTimeDelta * 5.0;
+    
+    bool input_registered = false;
+    input_registered = ivec2(res_l)!=ivec2(iResolution.xy);
+    if(length(abs(position)-abs(lp))>0.0001)input_registered=true;
+    
+    store(TARGET, ipx, vec4(target, 0.0), fragColor);
+    store(POSITION, ipx, vec4(position, 0.0), fragColor);
+    
+    if (iMouse.z>0.0) {
+        input_registered=true;
+    	store(VMOUSE, ipx, vec4(pm + (abs(iMouse.zw) - iMouse.xy)/iResolution.y, 1.0, 0.0), fragColor);
+    }
+    else if (vm.z != 0.0) {
+    	store(PMOUSE, ipx, vec4(vm.xy, 0.0, 0.0), fragColor);
+    }
+    store(POSITION_last, ipx, vec4(position_l, 0.), fragColor);
+    store(VMOUSE_last, ipx, vec4(vm_l,0.,0.), fragColor);
+    
+    store(INPUT, ipx, vec4(input_registered?2.:0.,0.,0.,0.), fragColor);
+    
+    store(RES_LAST, ipx, vec4(iResolution.xy,0.,0.), fragColor);
+    
+
+}

@@ -1,0 +1,30 @@
+// ID: WcyXzm
+// Name: Water Cavern
+// User: diatribes
+// Date: 1749967096
+
+
+// ===== PASS 0: Image =====
+
+#define A(x,r) abs(dot(sin(x*p*n), r +p-p )) / n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float r,i,s,n,t=iTime,
+          d = 2.*fract(dot(u,sin(u)));
+    vec3  q, p = iResolution; 
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<80.;
+         d += s = .01 + abs(min(s,r))*.5,
+         o += vec4(r < s ? 2 : 3,4,5,1)/ s)
+        for(p = vec3(u * d, d + t*4.),
+            r = 3.+p.y+sin(1.5*t+p.z*.25)*.3+sin(2.*t+p.z*.33)*.2,
+            s = 4. - length(p.xy + p.yx/4.),
+            n = .2;
+            n < 2.22;
+            n *= 1.4)
+            q = 1.+cos(p),
+            r += A(4.*t+p.z + .6*t + 4., .027),
+            s += A(.65,.35);
+    u.y += .3;
+    o = tanh(o / 3e3);
+}

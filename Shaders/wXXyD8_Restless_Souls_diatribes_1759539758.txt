@@ -1,0 +1,52 @@
+// ID: wXXyD8
+// Name: Restless Souls 👻
+// User: diatribes
+// Date: 1759539758
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime * .6
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( T*c*6. ) * 16. ,        \
+                    sin( T*c*4. ) * 4. + 1.5,  \
+                    Z +12.  +cos(T*.5) *16. )  ) - c )
+
+
+// couple tweaks to the forked shader for a sp00ky version
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s;
+    vec3  ep, p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    u += vec2(cos(T*.4)*.3, cos(T*.8)*.1);
+    
+    for(o*=i; i++<1e2;
+
+        // accumulate distance
+        d += s = .01+.35*abs(s),
+        
+        // color
+        o += vec4(1)/(s+max(.5*e, .01)) + .02*vec4(1,2,5,0)/length(u-.65))
+        
+        // noise loop start, march
+        for (p = vec3(u*d,d), // p = ro + rd *d, p.z + T;
+    
+            e = max( .8* min( O( 12., .1),
+                         min( O( 16., .2),
+                              O( 14., .3) )), .001 ),
+                    
+            // plane, mix with entity/orb
+            s = mix(e*.02,4.+p.y, smoothstep(0., 12., e)),
+            
+            // noise params
+            a = .05; a < 3.; a += a)
+            
+            // apply noise
+            s -= abs(dot(cos(T+.2*p.z+p / a ), .3+p-p)) * a;
+    
+    // tanh tonemap, brightness
+    o = tanh(o/4e1);
+}

@@ -1,0 +1,73 @@
+// ID: w3cGWj
+// Name: Noisy Twisty
+// User: diatribes
+// Date: 1751762235
+
+
+// ===== PASS 0: Image =====
+
+/*
+    for sound handling i referenced this shader:
+        https://www.shadertoy.com/view/tfK3Dy
+    
+    this is the only other sound reactive shader i have:
+        https://www.shadertoy.com/view/tcG3Dm
+        
+    appreciate feedback on what improvements i could make, idk know
+    much about sound-reactive techniques
+*/
+
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage( out vec4 o, in vec2 u )
+{
+    // the music timing stuff i grabbed from the above referenced
+    // shader. d is set to an initial random value from the blue
+    // noise texture to help hide banding
+    float i,n,s=.002,
+          T = iChannelTime[1]*1.9, ft = fract(T),
+          t = floor(T)+sqrt(ft),
+          d = .2*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    
+    // scale coords
+    vec3 w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    
+    // clear o, march up to 64 steps or while we're further
+    // than .001 units away from the surface of something
+    for (o*=i;i++<64. && s > .001; 
+         // make translucent by abs() and + .001 (tune .001)
+         // min of s (tunnel) and abs of w.x, which is
+         // 4 units of space between a mirrored w.x plane
+         d += s = .05+.8*abs(min(s,4.-abs(w.x))),
+         // accumulate color, using half-time (i think that's what i'm doing)
+         // index into our palette with the w.z and p.z coords scaled by *.1
+         // div by s/d for depth
+         o += (1.+cos(fract(t*.5)+.1*w.z+p.z*.1+ vec4(3,1,0,0)))/s/d)
+        // into the for-loop body...
+        // p = w = march
+        for(p = w = vec3(u * d, d),
+            // rotate w.xy by the w.z coord and time, twist it
+            w.xy *= R(t+w.z*.2),
+            // same, but p.xy and p.z
+            p.xy *= R(t+p.z*.5),
+            // start noise at 1.5
+            n = 1.5,
+            // save tunnel dist to s
+            s = 5. - length(p.xy);
+            // noise goes up to 16.
+            n < 16.;
+            // add noise to tunnel
+            s += N(3.*t+p, .3),
+            // add noise to w vec, which will be used to make
+            // some w.x mirrored planes
+            w += N(6.*t+w, .2),
+            // grow noise by n += n
+            // can try n *= 1.42 or n *= 1.32 etc...
+            n += n);
+    // tanh() tonemap
+    // some soup i'll come back to when i'm less tired :D
+    o = tanh(o/6e1/length(u)/pow(ft,.125)/length(cos(4./ft*T*u/log((1.+cos(t)*16.+32.)/d))));
+}
+
+

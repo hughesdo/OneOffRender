@@ -1,0 +1,27 @@
+// ID: tfSczm
+// Name: Chilly Wee Imp
+// User: diatribes
+// Date: 1756475930
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,e,d,s,t=iTime;
+    vec3  p,r = iResolution;
+    for(o*=i; i++<1e2;
+        d += s = .001+abs(min(s*.5,e*.7)) ,
+        o += 1. / max(s+e, .01))
+        for (p = vec3(((u-r.xy/2.)/r.y+cos(t*.3)*vec2(.02,.03)) * d, d - 24.),
+            s = length(p) - 8.,
+            e = length(p - vec3(
+                    sin(sin(t*2.)+t*.7)*6.,
+                    sin(sin(t*3.)+t*.5)*6.,
+                    cos(t*4.)*3.+14.))-.1,
+            p.xz *= mat2(cos(t*.1+vec4(0,33,11,0))),
+            a = .6; a < 16.; a += a)
+            p += cos(p.yzx*2.)*.2,
+            s -= abs(dot(sin(p * a), .3+p-p)) / a;
+    o = tanh(vec4(1,2,9,0)*o / 1e1);
+}
+

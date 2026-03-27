@@ -1,0 +1,36 @@
+// ID: WXSSWm
+// Name: Little Color Wind  [256]
+// User: diatribes
+// Date: 1746140980
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime*.4,i,z,d;
+    for(O *= i; i++ < 99.;
+        O += vec4(abs(p)*.5,1.) / d / 2e4)
+        p = z * normalize(vec3(I*.5,1)+iResolution.zyy),
+        p += cos(t+p.yzx),
+        p += cos(t+p.yzx)*4.,
+        p += cos(t+p.yzx)*8.,
+        z += d = dot(abs(p-floor(p+.06)-.5), vec3(.05))+.003;
+}
+
+/*
+
+// now i like this one better :D
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime*.4,i,z,d;
+    for(O *= i; i++ < 99.;
+        O += vec4(abs(p)*.5,1.) / d / 2e4)
+        p = z * normalize(vec3(I*.5,1)+iResolution.zyy),
+        p += cos(t+p.yzx),
+        p += cos(t+p.yyx)*4.,
+        p += cos(t+p.yzx)*8.,
+        z += d = dot(abs(p-floor(p+.06)-.5), vec3(.05))+.003;
+}
+*/

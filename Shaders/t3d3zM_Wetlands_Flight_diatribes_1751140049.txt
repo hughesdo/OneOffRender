@@ -1,0 +1,68 @@
+// ID: t3d3zM
+// Name: Wetlands Flight
+// User: diatribes
+// Date: 1751140049
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) (vec3(cos((z) * .03) * 32., \
+                   cos((z) * .04)*5. + 2., (z)))
+
+void mainImage(out vec4 o, vec2 u) {
+
+    // init
+    bool water = false;
+    float i,d,s,w,t=iTime*6.;
+    vec3  q,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    // origin and look-at
+    vec3  p = P(t),
+          ro=p,
+          // look slightly ahead (t+2) of the path
+          Z = normalize( P(t+3.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          // add some rotation on the xy
+          rd= vec3(mat2(cos(sin(t*.1)*.2+vec4(0,33,11,0)))*-u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    // clear o, loop up to 100.        
+    for(o*=i; i++<1e2;
+        // surface dist is the min of water, clouds, terrain
+        s = min(w, min(.1+abs(16.-q.y)*.3, 3. + p.y)),
+        // accumulate distance
+        d += s  * .7,
+        // check if water was the min dist (was the water hit)
+        water = s == w,
+        o += s)
+        // we're in the body of the above for-loop now
+        // march, save to q and p
+        for (q = p = ro + rd * d,
+             
+             // water is a plane
+             w = 5.+p.y,
+             
+             //init noise loop
+             s = .04;
+             // up to 1.
+             s < 1.;
+             // distort the terrain plane to look like hills
+             p += abs(dot(sin(.1*p.z+p * s * 4.), p-p+.03)) / s,
+             // distort the cloud plane to look like clouds, and move a bit
+             q += abs(.01+dot(sin(.2*p.z+.05*t+q * s * 5.), p-p+.04)) / s,
+             // counter-act the directional bias the noise has
+             p.x++,
+             // grow noise
+             s += s);
+             
+    // gradient from green to blue
+    o *= mix(vec4(2,4,6,0),
+             vec4(2,4,2,0),
+             smoothstep(.5, -.5, p.y));
+             
+    // if we hit water, do lots of blue
+    o.b *= water ? 3. : 1.;
+    // tanh to tone map and /4e2 to divide down brightness
+    o = tanh(o/4e2);
+}
+

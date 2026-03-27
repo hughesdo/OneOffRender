@@ -1,0 +1,58 @@
+// ID: WclGWH
+// Name: Cloud Colors Darkmode
+// User: diatribes
+// Date: 1739137394
+
+
+// ===== PASS 0: Image =====
+
+// Added fluffies, as inspired by
+// https://www.shadertoy.com/view/Xf3yR8
+#define T (iTime * 1.5)
+
+vec3 lpath(float tanx, float tany, float cx, float cy, float s, float z) {
+    float t = T * 5.;
+    return vec3(
+        tanh(cos(t * cx) * tanx) * s,
+        tanh(cos(t * cy) * tany) * s,
+        z + T + tanh(cos(T * z / 20.) * z / 2.) * z * .5);
+}
+   
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = vec3(0.,0.,T),
+         la = lpath(1., 4., .08, .05, 1., 5.3);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0., -1., 0))),
+         lay = cross(lax, laz);
+    vec3 rd = vec3(u, 1.) * mat3(-lax, lay, laz) * .1;
+    float d = 0., od1, od2, od3;
+    for (float i = 0.; i < 200.; i++) {
+        p = ro + rd * d;
+
+        float n = 0.;
+        od1 = length(p - la) - .3;
+        od2 = length(p - lpath(3.25, 3.3, .08, .12, 2.5, 4.3)) - .3;
+        od3 = length(p - lpath(2.50, 4.2, .08, .15, 1.75, 3.4)) - .3;
+
+        float hit = min(od1, min(od2, od3));
+        hit = min(hit, 2. - length(p.y - ro.y));
+       
+        for (float a = .4; a < 24.;
+            n -= abs(dot(sin(p * a * 4.), vec3(1.))) / a * .08,
+            a += a);
+        float s = hit + n;
+        
+        d += s;
+        if (d > 100. || s < .001) {
+            break;
+        }
+    }
+
+    o = vec4(pow(
+        vec3(0., .2, 0.) / od1 +
+        vec3(0., 0., .2) / od2 +
+        vec3(.2, 0., 0.) / od3, vec3(.45)), 1.);
+}

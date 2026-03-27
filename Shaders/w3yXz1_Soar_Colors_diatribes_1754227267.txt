@@ -1,0 +1,167 @@
+// ID: w3yXz1
+// Name: Soar Colors
+// User: diatribes
+// Date: 1754227267
+
+
+// ===== PASS 0: Image =====
+
+// coffee fork... where did saturday go?
+// similar vibe but has controls: https://www.shadertoy.com/view/3c3SRX
+
+
+/*
+    I wanted to see how @Shane does the surface texture in
+    "Glowing Spiral Lava Tunnel"
+
+    This is just me tinkering with bits of code from it.
+    
+    https://www.shadertoy.com/view/Wcd3W2
+
+*/
+
+#define T (iTime*4.)
+#define P(z) (vec3(cos((z) * .05)* 12., \
+                   cos((z) * .1)* 12., (z)))
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+
+// @Shane
+// Commutative smooth minimum function. Provided by Tomkh, and taken 
+// from Alex Evans's (aka Statix) talk: 
+// http://media.lolrus.mediamolecule.com/AlexEvans_SIGGRAPH-2015.pdf
+// Credited to Dave Smith @media molecule.
+float smin(float a, float b, float k){
+
+   float f = max(0., 1. - abs(b - a)/k);
+   return min(a, b) - k*.25*f*f;
+}
+
+// 2D vector version.
+vec2 smin(vec2 a, vec2 b, float k){
+
+   vec2 f = max(vec2(0), 1. - abs(b - a)/k);
+   return min(a, b) - k*.25*f*f;
+}
+
+// @Shane
+vec3 tex3D(sampler2D tex, vec3 p, vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+float drawObject(in vec3 p){
+    p = abs(cos(p));
+    return dot(p, p);
+}
+
+// @Shane, modified
+// see https://www.shadertoy.com/view/Wcd3W2
+float cellTile(in vec3 p){
+    
+    // throughout the tile. Hand coding the positions cuts down on calculation.
+    vec4 v, d; 
+    p *= .5;
+    d.x = drawObject(p - vec3(.4, .5, .6));
+    p.xy = vec2(p.y - p.x, p.y + p.x);
+    d.y = drawObject(p - vec3(.6, .5, .4));
+    p.yz = vec2(p.z - p.y, p.z + p.y);
+    d.z = drawObject(p - vec3(.2, .4, .5));
+    p.xz = vec2(p.z - p.x, p.z + p.x);
+    d.w = drawObject(p - vec3(.3, .4, .6));
+    
+    v.xy = smin(d.xz, d.yw, .05);
+    d.x =  smin(v.x, v.y, .05);
+        
+    return d.x; // Return the distance.
+}
+
+
+float map(vec3 p) {
+
+    // path
+    vec3 q = P(p.z);
+    
+    // tunnels
+    float s = 4. - 
+                    min(length(p.y - q.x - 3.),
+                    min(length(p.xy - q.xy),
+                    length(p.xy - q.y + 4.)));
+    // slice plane
+    s = max(s, q.x+q.y);
+    
+    // carve out surface
+    s -= cellTile(p);
+    
+    // dist
+    return s;
+
+}
+
+// idk mix(@Shane, @iq, .5)
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = .6;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+// @kosalos
+vec4 fog(vec4 rgba, float d) {
+    float fogDistance = 4. + sin(T) * .5;
+    float fogAmount = .04 + sin(T * 0.1) * 0.01;
+    if(fogDistance != 0.0) {
+        float f = d - fogDistance;
+        if(f > 0.0) {
+            f = min(1.0,f * fogAmount);
+            rgba = mix(rgba, vec4(1,2,4,0)*vec4(0.2 + f),f);
+        }
+    }
+    return rgba;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+
+    float s=.002,d=0.,i=0.,a;
+    
+    vec3  r = iResolution,
+          e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+4.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.2)*.3)*(u-r.xy/2.)/r.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+   for(o *= i; i++<1e2;)
+        p = ro + D * d,
+        d += s = map(p)*.5,
+        o += (1.+cos(p.z+vec4(6,2,3,4)));
+
+    // normal
+    r =  N(map(p) - vec3(map(p-e.xyy)-map(p+e.xyy), 
+                         map(p-e.yxy)-map(p+e.yxy), 
+                         map(p-e.yyx)-map(p+e.yyx)));
+    // texture
+    o.rgb *= tex3D(iChannel0, p, r) * 8.;
+    // slight noise
+    o.rgb -= abs(dot(sin(p.z*.4+p * 4.), vec3(.5)));
+    o.rgb -= abs(dot(sin(p.z*.4+p * 16.), vec3(.5)));
+    
+    // ao
+    o.rgb *= AO(p, r)*6.,
+    // diffuse
+    o.rgb *= max(dot(r, normalize(ro-p)), .01);
+        
+    
+    // tanh tonemap, fog, 3e2 div for brightness, d div for depth
+    o = tanh(fog(o/3e2/max(d, 4.), d));
+    
+}

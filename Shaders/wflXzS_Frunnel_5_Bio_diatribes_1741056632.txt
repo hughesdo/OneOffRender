@@ -1,0 +1,100 @@
+// ID: wflXzS
+// Name: Frunnel 5: Bio
+// User: diatribes
+// Date: 1741056632
+
+
+// ===== PASS 0: Image =====
+
+// forked from Frunnel 4: Splat here
+// https://www.shadertoy.com/view/3fsXWM
+// Still things to improve based on Fabrice's feedback in the
+// the Splat shader, I'll get there at some point :D
+
+#define T (iTime*2.)
+#define DIST_MAX 200.
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define P1(z) (vec3(tanh(cos((z) * .15) * .55) * 20., \
+                    tanh(cos((z) * .19) * .14) * 16., (z)))
+
+float link(vec3 p){
+    p.xy *= rot(sin(p.z*3.6)*.1);
+    p.xy -= - P1(p.z).xy;
+    p = mod(p, 2.) - 1.;
+    return length(p.xy) * .25;
+}
+
+vec3 colorize(vec3 p) {
+    return vec3(.8, .02, .1)*abs(p / dot(p,vec3(.1)));
+}
+
+float map(vec3 p) {
+    
+    float s,w = 1., l;
+    
+    // tubes
+    s = length(
+       (mod(vec3(p.xy - P1(p.z).xy+1.,p.z),.5) - .25).xy
+    ) - .01;
+    s = min(s, link(p));
+    
+    p.xy -= P1(p.z).xy;
+    s = min(s, 4.-length(p.xy));
+
+    p.xy = mod(p.xy+1., 3.) - 1.5;
+    p.x -= 1.3;
+    p.y += .3;
+    p.z = mod(p.z, 3.) - 1.5;
+    
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.3/dot(p,p)-(tanh(cos(T)*1.3)*.3)*.5;
+        
+    return min(s,length(p)/w - .001);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.02, 0);
+    vec3 n = map(p) - vec3(
+        map(p-e.xyy),
+        map(p-e.yxy),
+        map(p-e.yyx));
+
+    return normalize(n);
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+4.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.1)*.3)*u, 1.) * mat3(-lax, lay, laz) *.75;
+	if (iMouse.z > 40.) {
+        float a = atan(.0, -1.);
+        rd.yz *= rot(-a * .5 + iMouse.y/r.y * a);
+        rd.zx *= rot(a - iMouse.x/r.x * a * 2.);
+    }
+
+    float d = 0.,s;
+    float steps = 0.;
+    do{
+        p = ro + rd * d;
+        s = map(p);
+        d += s;
+        steps++;
+    } while (steps < 120. && d < DIST_MAX && s > .001);
+    if (d < DIST_MAX && steps < 120.) {
+        o.rgb = colorize(sin(p));
+        o.rgb *= max(dot(normal(p), normalize(ro-p)), .0);
+    } else {
+        o = vec4(colorize(sin(p))*.01,1.);    
+    }
+    o.rgb *= exp(-d/2.);
+    o.rgb = pow(o.rgb, vec3(.45));
+}
+

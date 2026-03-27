@@ -1,0 +1,28 @@
+// ID: tfcXWl
+// Name: Polar Cascade
+// User: diatribes
+// Date: 1749662661
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, s1, s2, n, t=iTime*.65;
+    vec3 p = iResolution, q;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        q = p = vec3(u * d, d)-2.;
+        q.z -= t*14.;
+        s2 = 16. + p.y - abs(cos(p.x*.1)*8.);
+        p.xy -= cos(vec2(.15,.03)*p.z)*8.;
+        p += cos(p.yzx)*.3;
+        s1 = min(1.+cos(p.x), 32. + p.y - length(p.y));
+        for (n = .1; n < 4.; n += n )
+            s2 += abs(dot(sin(p*n*1.), vec3(.23))) / n,
+            s1 += abs(dot(sin(t+q*n*4.), vec3(.13))) / n;
+        d += s = .02 + abs(min(s1,s2))*.3;
+        o += 1. / s;
+    }
+    o = tanh(vec4(s1 > s2?6:4,5, s1 > s2?7:8,1)*o*o  / 6e6 / dot(u-=.3,u));
+}
+

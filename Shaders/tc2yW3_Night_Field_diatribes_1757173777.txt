@@ -1,0 +1,29 @@
+// ID: tc2yW3
+// Name: Night Field
+// User: diatribes
+// Date: 1757173777
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime;
+    vec3  r,q,p = iResolution;
+    u = (u+u-p.xy)/p.y;
+    
+    for(o*=i; i++<128.;
+        r = abs(r),
+        s = min(2. - r.x, 4. - r.y),
+        d += s = .01 + abs(min(.5 - p.y*.3,
+                           max(s, .5 + q.y*.3)))*.4,
+        o += 1. /  s + vec4(2,3,5,0)/length(u-.5)*4.)
+        
+        for (r = p = vec3(u* d,d),s = .05; s < 1.;
+             q = p += cos(t+p.z+p.yzx*.02)*.01,
+             q += abs(dot(sin(p.z+p * s * 24.), vec3(.8))) / s,
+             p += .2*abs(dot(sin(t+.3*p.z+p * s * 16.), vec3(.01))) / s,
+             s += s);
+
+    o = tanh(o / 6e4 / max(length(.5*u.y), .1));
+}
+

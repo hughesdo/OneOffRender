@@ -1,0 +1,99 @@
+// ID: wcKGz3
+// Name: Nox Purple Flight
+// User: diatribes
+// Date: 1748363692
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Very similar to other ones I've done, but I added comments so
+    figured it was worth publishing ¯\_(ツ)_/¯
+    Nothing too new though, but we modify the sky plane in this one,
+    and I tried to make it easier to see the different components
+    in the main loop.
+    
+    Two planes, sky and ground, one noise loop, planes are modified
+    slighlty differently in the same noise loop. They're done grayscale
+    and a 2d gradient is added afterwards (from purple to red).
+    This shader does the same thing for the water to sky, just a 2d gradient.
+        https://www.shadertoy.com/view/tfc3W2
+        
+    There's also a refactored version of that shader here:
+        @PrzemyslawZaworski:
+            https://www.shadertoy.com/view/Wf33Df
+
+    After the two planes are distorted, we colorize then add the light thing (sun/moon).
+    
+    Translucency stuff can also be seen in shaders such as:
+        @Xor:
+            https://www.shadertoy.com/view/wctGz8
+        @mrange:
+            https://www.shadertoy.com/view/WfcGWj
+            
+*/
+
+
+// this is the noise in the noise loop as a macro
+// you pass in the detail level (x) and scale (r)
+#define N(x,r) abs(dot(sin(x*p*s), r +p-p )) / s
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, t=iTime;
+    mat2 m;
+    vec3 q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        // march, save to q and p, / 2. is zoom, try it without
+        q = p = vec3(u * d, d + t*6.) / 2.;
+        
+        // Create rotation matrix frequency of t*.6 scale of .12
+        // slight wobble left and right
+        m = mat2(cos(cos(t*.6)*.12+vec4(0,33,11,0))),
+        
+        // Use rot matrix against p and q xy
+        q.xy *= m,
+        p.xy *= m,
+        
+        // fly up and down
+        p.y += sin(t*.3);
+        
+        // start noise loop
+        for (s = .03; s < 2.;s += s)
+            // modify p, our ground plane, low detail, big scale
+            p += N(16., .012),
+            // modify q, our sky plane, big detail, low scale, passes time through
+            // so the noise moves (clouds)
+            q += N(t+q+24., .002);
+            
+        // 2 planes, p and q
+        d += s = .04 + min(
+        
+        // Sky plane, attentuate here,
+        // .3 - q = height, play with it
+        // change .2 and .001 to attenuate
+        .2*abs(3. - q - cos(p.x)*.2 )+.001,
+        
+        // Ground plane, attenuate here,
+        // 1. + p = height, play with it too :)
+        // change .9 and .005 to attenuate
+        .9*abs( 1.+p ) + .005).y ;
+        o += 1./s;
+    }
+
+    
+    // move light right and up
+    u -= vec2(.3, .2);
+
+    // use mix and smoothstep to 2d colorize based on u.y
+    // this is simply a 2 color gradient from top of the screen to 
+    // the bottom. You can remove this line to see the grayscale base.
+    o *= mix(pow(vec4(1.,.25,.5,0),vec4(1.5)),
+                 vec4(3.5,3,4,0),
+                 smoothstep(.2, -.5, u.y));
+     
+    // tonemap and add light
+    o = tanh(o*o  / 3e6 / length(u));
+}
+
+

@@ -1,0 +1,56 @@
+// ID: tXyGzW
+// Name: Somewhere Else
+// User: diatribes
+// Date: 1752080289
+
+
+// ===== PASS 0: Image =====
+
+// a hacky doodle, very soupy, sorry :)
+
+#define A(x,r) abs(dot(sin(x*p*n), r +p-p )) / n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float l,i,s,d,n,t=iTime;
+    vec3  p = iResolution; 
+    u = (u-p.xy/2.)/p.y;
+    
+    // sway camera side-to-side and up-and-down
+    u += vec2(cos(t*.5)*.3, cos(t*.4)*.1+.2);
+    
+    // clear o, 100 steps, accumulate distance, accumulate color
+    for (o*=i;i++<1e2;
+         d += s * .9,
+         o += vec4(2,1,3,4) / abs(.01+s) )
+        // noise loop, march and move forward
+        for(p = vec3(u * d, d + t*32.),
+            // ground plane
+            s = p.y+ abs(p.x*.3) * .3,
+            // noise start
+            n = .08;
+            // noise end
+            n < .8;
+            // grow noise
+            n *= 1.4)
+            // apply noise
+            s += A(.3,.3);
+    
+    // The stars are just some tinkering
+    // I came up with in another shader and
+    // grab whenever I need them :)
+    // I'm sure it could be done in the above
+    // raymarch loop, this is just laziness :)
+    if (length(o) < length(vec4(1e2))) {
+        for(d = 0., i = 0., o*=0.;
+        i++<20.;
+        p = vec3(u * d, d),
+        p.xy+=t+max(sin(p.z*.1),cos(p.z*.3))*3.,
+        p.x += t+t,
+        p *=.15,
+        l = dot(abs(p-floor(p)-.5), vec3(5)),
+        d += s = l*.5,
+        o += 16. / s);
+        o *= vec4(1,2,3,4)*2.;
+    }
+    o = tanh(o/3e4);
+}

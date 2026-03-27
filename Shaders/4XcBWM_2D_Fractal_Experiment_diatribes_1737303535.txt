@@ -1,0 +1,53 @@
+// ID: 4XcBWM
+// Name: 2D Fractal Experiment
+// User: diatribes
+// Date: 1737303535
+
+
+// ===== PASS 0: Image =====
+
+// this is just me trying to get an idea
+// of the fractal() function in this shader:
+// https://www.shadertoy.com/view/4XdfW4
+
+// original fractal()
+/*
+vec3 fractal(vec3 p)
+{
+    float z = p.z * 2.;
+    p.z = abs(.5 - fract(z));
+    float m = 100.;
+    for (int i = 0; i < 4; i++)
+    {
+        p = abs(p)/clamp(abs(p.x*p.y*p.z),.2,1.) - 2.;
+        m = min(m, min(abs(p.z),min(abs(p.x),abs(p.y))));
+    }
+    m = exp(-10. * m)*2.;
+    vec3 col=vec3(p.xz, 1.) * m;
+    return col;
+}
+*/
+
+// modified
+vec3 fractal(vec3 p){
+  float z = p.z;
+  float m = 1.;
+  for (int i = 0; i < 5; i++) {
+        float n = abs(p.x*p.y*p.z);
+        p = abs(p)/clamp(n,.2,1.)-1.75;
+        m = abs(min(p.x,min(p.y,p.z)));
+    }
+    m = exp(-2. * m)*2.;
+    vec3 col=vec3(1.0, p.xy) * m;
+    return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    float t = iTime / 2.0;
+    vec2 uv = fragCoord.xy / iResolution.xy - .5;
+    uv.x *= iResolution.x/iResolution.y;
+    vec3 p = vec3(uv.xy, sin(iTime*.1));
+    vec3 color = fractal(p);
+    fragColor = vec4 (color, 1.0);
+}
+

@@ -1,0 +1,50 @@
+// ID: wcfSWs
+// Name: 13h
+// User: diatribes
+// Date: 1741438293
+
+
+// ===== PASS 0: Image =====
+
+// lowres effect from @chaos51 https://www.shadertoy.com/view/WfSGzm
+
+#define T (iTime*.75)
+#define P(z) (vec3(tanh(cos((z) * .4) * .15) * 12., \
+                     tanh(cos((z) * .31) * .14) * 15., (z)))
+#define N normalize
+
+float M(vec3 p) {
+    float s,w = 1., l;
+    s = 1.5 - length(p.xy - P(p.z).xy);    
+    p.xy -= P(p.z).xy ;
+    p.x += 1.25;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return min(s, length(p)/w - .01); 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy, 
+         e = vec2(.1, 0);
+         u = (u - r.xy / 2.) / r.x;
+    u.x = floor(u.x*320.)/320.; // lowres effect
+    u.y = floor(u.y*200.)/200.; // lowres effect
+    vec3 p,
+         ro = P(T),
+         la = P(T+2.);
+    vec3 laz = N(la - ro),
+         lax = N(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(u, 1.) * mat3(-lax, lay, laz);
+
+    float d = 0.,s = .1;
+    for(int i = 0; i++ < 120 && s > .0125;
+        p = ro + rd * d,
+        d += s = M(p)); 
+
+    o.rgb = texture(iChannel0, p.xz*.3).xyz;
+    o.rgb *= pow(vec3(exp(-d/2.)) , vec3(.45));
+}
+

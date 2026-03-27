@@ -1,0 +1,55 @@
+// ID: Wfj3DV
+// Name: 6 Paths Large
+// User: diatribes
+// Date: 1740443476
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 8.5)
+#define P1(z) (vec3(tanh(cos((z)*.04) *  .3) * 24.1, \
+                       tanh(cos((z) * .055) * .6) * 26.5, (z)))
+#define P2(z) (vec3(tanh(cos((z)*.16) *  .23) * 14.1, \
+                       tanh(cos((z) * .061) * .7) * 14.5, (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+vec3 plasma(vec3 p) {
+    float t = p.z ;
+    p *= 4.;
+    float r = distance(p.xz, vec2(sin(t), sin(t)));
+    float g = distance(p.xz, vec2(0, 3.));
+    float b = distance(p.xz, vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(p.x+t) + cos(p.y+t));
+    return vec3(r,g,b)/value*.125;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.x;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+5.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.05))*u, 1.) * mat3(-lax, lay, laz) * .75,
+         rgb;
+    float d = 0.,s, s1, s2, i;
+    do{
+        p = ro + rd * d;
+        s1 = min(length(p.xy - P1(p.z).x+1.),
+             min(length(p.xy - P1(p.z).xy),
+                 length(p.xy - P1(p.z).y+1.)));
+        s2 = min(length(p.xy - P2(p.z).x+1.),
+             min(length(p.xy - P2(p.z).xy),
+                 length(p.xy - P2(p.z).y+1.)));
+
+        s = 6.5 - min(s1, s2);
+        for(i = 0.; i < 4.; i++) {
+            s += i * .25 * dot(sin(p), vec3(.3));
+        }
+        d += s;
+    } while (d < 150. && s > .01);
+    p = ro + rd * d;
+    o =vec4(pow(plasma(sin(.1*p+T*.05))*plasma(sin(p))/sqrt(d),vec3(.45)), 1.);
+}

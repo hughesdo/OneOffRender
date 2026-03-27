@@ -1,0 +1,159 @@
+// ID: tfsSzB
+// Name: Frunnel 6: Magic Paint
+// User: diatribes
+// Date: 1741061815
+
+
+// ===== PASS 0: Image =====
+
+// a bunch of people have helped me on shadertoy
+// so I figured I'd comment this to heck as a ty
+// please correct where I'm wrong
+
+#define T (iTime*3.)
+#define DIST_MAX 100.
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+// Our path, for a given z coord, get the xy, z untouched
+// There's frequency, amplitude, and duration, if I understand correctly,
+// You have those as parameters to a few wave functions,
+// combine them in a way that makes things look cool
+// on the screen. Elsio showed me tanh and it's a great way
+// to have movement that isn't as continous as sin/cos
+// so I like to play with that
+#define P1(z) (vec3(tanh(cos((z) * .11) * .35) * 15., \
+                      tanh(cos((z) * .19) * .14) * 16., (z)))
+
+// Orb (sphere) distance to center of orb
+// Need to subtract radius from this method
+float orb(vec3 p) {
+    float t = T*.3;
+    return length(p - vec3(
+            // Relative to our path x, add a squiggly line
+            // (Move the orb side to side)
+            P1(p.z).x+tanh(sin(p.z*.1+t) * .75)*.6,
+            
+            // Relative to our path y, add a squiggly line
+            // (Move the orb up and down)
+            P1(p.z).y+sin(sin(p.z*.5)+t*2.5) *.125,
+            
+            // Relative to our path z, add a squiggly line
+            // It can go behind you too :)
+            4.+T+tan(cos(t*.36)*.6)*3.));
+}
+
+// See Elsio's Panacota for a nice use of these
+// https://www.shadertoy.com/view/cljfRc
+float link(vec3 p){
+    // rotate the xy based on the sin of p.z
+    p.xy *= rot(sin(p.z*3.6)*.1);
+
+    // Move with the path
+    p.xy -= - P1(p.z).xy;
+    
+    // Repeat often'ish
+    p = mod(p, 2.) - 1.;
+    
+    // return distance
+    // can modify scale here
+    return length(p.xy) * .25;
+}
+
+float map(vec3 p) {
+    
+    float s,w = 1., l;
+    
+    // tubes
+    // or "link" (the squiggly thin tubes)
+    s = min(length(
+       (mod(vec3(p.xy - P1(p.z).xy+1.,p.z),.5) - .25).xy
+    ) - .01, link(p));
+    
+    // orb or tube or link
+    s = min(s, orb(p) - .1);
+    
+    // move with path xy
+    p.xy -= P1(p.z).xy;
+    
+    // wrapper tunnel for rays to hit
+    // or orb or tube or link
+    s = min(s, 3.-length(p.xy));
+
+    // repeat xyz
+    // +1 to get us close to an open spot on the fractal pattern
+    p = mod(p+1., 3.) - 1.5;
+    // adjust a little more so we're in the middle
+    p.x -= .75;
+    p.y += .6;
+ 
+    
+    // Was modified from a pb shader, which credited Space Monolith
+    // Then deconstructed and hacked up by me
+    // Then golfed by Fabrice
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.3/dot(p,p);
+    
+    // tube, link, orb, tunnel, or fractal
+    return min(s,length(p)/w - .001);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.02, 0);
+    vec3 n = map(p) - vec3(
+        map(p-e.xyy),
+        map(p-e.yxy),
+        map(p-e.yyx));
+
+    return normalize(n);
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         // Our xy is based on T, z will come back as T
+         ro = P1(T),
+         // Similar, but jump ahead in time so we look where we're going
+         la = P1(T+2.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         // minor xy rotation, i do this on lots of tunnels,
+         // just to add a little something extra
+         rd = vec3(rot(sin(T*.1)*.3)*u, 1.) * mat3(-lax, lay, laz);
+	if (iMouse.z > 40.) {
+        float a = atan(.0, -1.);
+        rd.yz *= rot(-a * .5 + iMouse.y/r.y * a);
+        rd.zx *= rot(a - iMouse.x/r.x * a * 2.);
+    }
+    float d = 0.,s = .1;
+    
+    
+    // maybe this is my new raymarch loop
+    // from Fabrice's suggestions on another shader
+    int i;
+    for(i = 0; i++ < 80 && s > .001 && d < DIST_MAX;
+        p = ro + rd * d,
+        d += s = map(p)); 
+        
+    if (d < DIST_MAX && i < 80) {
+        // diffuse lighting
+        o.rgb = vec3(1.);
+        o.rgb *= max(dot(normal(p), normalize(ro-p)), .0);
+    } else {
+        // colors if dist or steps over max
+        o.rgb = vec3(1.)*vec3(sin(T*.5)*.5,.5,sin(T*.7)*.5);    
+    }
+    
+    // plasma stretched
+    // normal plasma function but not repeated over a short distance
+    // instead stretched over a long distance for big glowies
+    o.rgb = mix(o.rgb,abs(p / dot(sin(p*.5)*.5,vec3(15.))),.6);
+    // orb light
+    o.rgb /= orb(p);
+    // gamma
+    o.rgb = pow(o.rgb, vec3(.45));
+}
+

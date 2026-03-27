@@ -1,0 +1,24 @@
+// ID: W3K3Dm
+// Name: Think
+// User: diatribes
+// Date: 1760231450
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,n;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o = vec4(0); i++<1e2;
+        d += s = .001+.5*abs(s),
+        o += 1./s)
+        for (p = vec3(u * d, d - 7.),
+             p.y *= .7,
+             p.x *= .8,
+             s = length(p) - 2.,
+             n = .02; n <.4; n += n )
+                 s -= abs(dot(cos(iTime+p/n),sin(2.*p.yzx)*.26)) * n;
+    o = tanh(vec4(6,1.125,1,0)*o*o/5e7*abs(u.x));
+}
+

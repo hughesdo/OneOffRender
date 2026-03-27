@@ -1,0 +1,25 @@
+// ID: tcSyDm
+// Name: Starfire2
+// User: diatribes
+// Date: 1756681931
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        d += s = .01+abs(s) * .6,
+        o += vec4(14,2.7-cos(.5*t)*.6,.8,0)/s)
+        for (p = vec3(u * d, d - 9.),
+            p.z *= .3,
+            p.xy *= mat2(cos(.01*t+p.z*d*.005+vec4(0,33,11,0))),
+            s = max(6. - length(p.xy), length(p) - 16.),
+            a = 1.; a < 8.; a += a)
+            p += cos(.2*t+a+p.yzx)*.3,
+            s -= abs(dot(sin(t+p * a * 6.), .03+p-p)) / a;
+    o = tanh(o / 1e4 / max(dot(u += u.yx * 2.,u), .1));
+}
+

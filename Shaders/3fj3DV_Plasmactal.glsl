@@ -1,0 +1,58 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Plasmactal
+// Created by diatribes
+// Shadertoy ID: 3fj3DV
+// https://www.shadertoy.com/view/3fj3DV
+
+#define T (iTime * 4.)
+#define P(z) (vec3(tanh(cos((z)*.04) *  .3) * 24.1, \
+                       tanh(cos((z) * .05) * .6) * 26.5, (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+vec3 plasma(vec3 p) {
+    float t = p.z ;
+    p *= sin(p.z)*(sin(T*.1))*5.+10.+16.;
+    float r = distance(p.xz, vec2(sin(t), sin(t)));
+    float g = distance(p.xz, vec2(0, 3.));
+    float b = distance(p.xz, vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(p.x+t) + cos(p.y+t));
+    return vec3(r,g,b)/value;
+}
+
+void main() {
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.x;
+    vec3 p,
+         ro = P(T),
+         la = P(T+5.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.05))*u, 1.) * mat3(-lax, lay, laz) * .75,
+         rgb;
+    float d = 0., s, i;
+    do{
+        p = ro + rd * d;
+        s = 2.5 - min(length(p.xy - P(p.z).x + .75),
+                  min(length(p.xy - P(p.z).xy),
+                      length(p.xy - P(p.z).y + .75)));
+
+        d += s;
+    } while (d < 100. && s > .01);
+    p = ro + rd * d;
+    vec3 f = mix(vec3(.0,.0,1.)/exp(d)*1.8,
+                 vec3(.0,1.,1.)/d,
+                 smoothstep(30.,1.,d));
+    o =vec4(pow(mix(f, plasma(sin(p*.3))/d, .2),vec3(.45)), 1.);
+    
+    fragColor = o;
+}
+

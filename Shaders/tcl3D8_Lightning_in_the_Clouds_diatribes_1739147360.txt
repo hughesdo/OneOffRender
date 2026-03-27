@@ -1,0 +1,47 @@
+// ID: tcl3D8
+// Name: Lightning in the Clouds
+// User: diatribes
+// Date: 1739147360
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 1.5)
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = vec3(0.,0.,T),
+         la = vec3(
+            tanh(cos(T * .1) * 4.) * 5.,
+            tanh(cos(T * .05) * 2.) * 3.,
+            4. + T + tanh(cos(T) * 3.) * .5);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0., -1., 0))),
+         lay = cross(lax, laz);
+    vec3 rd = vec3(u, 1.) * mat3(-lax, lay, laz) *.25;
+    float d = 0.;
+    for (float i = 0.; i < 100.; i++) {
+        p = ro + rd * d;
+        float n = 0.;
+        float hit = 2. - length(p.y - ro.y);
+       
+        for (float a = .2; a < 16.;
+            n -= abs(dot(sin(p * a * 8.)*.3, vec3(1.))) / a * .125,
+            a += a);
+        float s = hit + n;
+        
+        d += s;
+        if (d > 100. || s < .001) {
+            break;
+        }
+    }
+    float lightningFreq = abs(tanh(cos(T*1.)*13.)) +
+                          sin(T*2.)+cos(T*1.)+sin(T*.5)
+                          *.04+sin(T);
+    vec3 lightning = clamp(vec3(1./lightningFreq),vec3(.5),vec3(5.));
+    d = length(lightning)+pow(length(p - la),1.5);
+    o = vec4(1.2*lightning*pow(
+        vec3(.4, .3, .2) / d, vec3(.45)), 1.);
+}

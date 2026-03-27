@@ -1,0 +1,26 @@
+// ID: wfjczc
+// Name: Light Streamers
+// User: diatribes
+// Date: 1756927977
+
+
+// ===== PASS 0: Image =====
+
+// saw @chronos' Starfall shaders and had to tinker with colorful lights :)
+// inspo from https://www.shadertoy.com/view/Wc2cRc
+
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float i,s,
+          d = .1*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          t=iTime;
+    vec3  p,r = iResolution; 
+    for (o*=i; i++<1e2; o += (1.+cos(t+2.*p.z+vec4(3,1,0,0)))/s)
+            p = vec3((u+u-r.xy)/r.y * d, d),
+            p += cos(t+p.yzx*6.)*.2,
+            p.yz *= R(.15*t+.6*p.z)+sin(p.x)*.3,
+            p.xz *= R(.05*t+.08*p.z)+sin(p.y)*.2,
+            d += s = dot(abs(p-floor(p)-.5), vec3(.1));
+    o = tanh(o*o/5e6);
+}

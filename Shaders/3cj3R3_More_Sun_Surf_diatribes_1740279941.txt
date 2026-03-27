@@ -1,0 +1,51 @@
+// ID: 3cj3R3
+// Name: More Sun Surf
+// User: diatribes
+// Date: 1740279941
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 128.)
+#define path1(z) (vec3(0., tanh(cos((z) * .01) * .5) * 25., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+vec3 plasma(vec3 p) {
+    float t = iTime*.3;
+    p = sin(p);
+    float r = length(p.xz - vec2(sin(t), sin(t)));
+    float g = length(p.xz - vec2(0, 3.));
+    float b = length(p.xz - vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(p.x+t) + cos(p.y+t));
+    return vec3(r,g,b)/value;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = path1(T),
+         la = path1(T+5.);
+    vec3 laz = normalize(la - ro) *.6,
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz);
+    vec3 rd = vec3(rot(sin(T*.01)*.25)*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s;
+    do {
+        p = ro + rd * d;
+        s = 8. - (p.y - path1(p.z).y);
+        s += dot(sin(.03*T+p * .01)*1.7, sin(.02*T+p*.15));
+        d += s;
+    } while(d < 350. && s > .01);
+    if (d < 350.) {
+        o =vec4(mix(vec3(0., .7, .7),
+                vec3(1., 0., 1.),
+                smoothstep(300.,10.,d)) *
+                plasma(p), 1.);
+    } else {
+        d = length(vec2(u.x,u.y-sin(T*.005)*.5));
+        o = vec4(.5, .3, 1.7, 1.)/d;
+    }
+    d /= (sin(T*.005)*.5+.5)*d;
+    o = vec4(pow(o.rgb/d, vec3(.45)), 1.) - dot(u,u)*.1;  
+}

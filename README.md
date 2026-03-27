@@ -1,5 +1,7 @@
 # OneOffRender - Advanced Audio-Reactive Video Generator
 
+> **📌 Development Note:** This repository is developed and mastered **locally**. GitHub is a backup only — it can be overwritten at any time. Do not treat the GitHub copy as a source of truth.
+
 A sophisticated video creation system that creates stunning audio-reactive videos using GLSL shaders. Choose from three powerful workflows:
 
 - **🎨 Web Editor** (RECOMMENDED): Professional browser-based timeline editor with drag-and-drop interface
@@ -67,10 +69,6 @@ venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
-
-# 4. Verify installation
-python verify_installation.py
-python verify_ffmpeg.py
 ```
 
 ### First-Time Setup
@@ -78,15 +76,6 @@ python verify_ffmpeg.py
 2. **Add Video Files** (optional): Place green screen videos in `Input_Video/` folder
 3. **Launch**: Run `StartWebEditor.bat` or `RunMe.bat`
 4. **Create**: Start making audio-reactive videos!
-
-### Verify Installation
-```bash
-# Check all components
-python verify_installation.py
-
-# Check FFmpeg specifically
-python verify_ffmpeg.py
-```
 
 ### Dependencies (Automatically Installed)
 - **Core Rendering**: numpy, Pillow, moderngl, scipy
@@ -97,36 +86,13 @@ python verify_ffmpeg.py
 
 ## 🔄 Keeping OneOffRender Updated
 
-### Automatic Updates from GitHub
+> **📌 Repository Note:** Development happens **locally**. GitHub is a backup that may be overwritten. To get the latest version, contact the author or clone from GitHub — but local files always take precedence.
 
-Stay up-to-date with the latest shaders, features, and improvements using the built-in update system:
-
-**One-Click Update:**
+### Manual Update from GitHub
 ```bash
-# Double-click to update from GitHub
-refresh.bat
-```
-
-**What the update does:**
-- ✅ **Pulls latest code** - New features, bug fixes, and improvements
-- ✅ **Downloads new shaders** - Fresh audio-reactive effects and visuals
-- ✅ **Updates transitions** - New transition effects between shaders
-- ✅ **Refreshes metadata** - Updated shader descriptions and ratings
-- ✅ **Preserves your files** - Your audio, videos, and settings stay safe
-- ✅ **Clears cache** - Ensures fresh compilation of updated code
-
-**Safe Update Process:**
-- 🔒 **Stashes local changes** - Your customizations are preserved
-- 🔒 **Non-destructive** - Virtual environment and user files untouched
-- 🔒 **Rollback support** - Can restore your changes with `git stash pop`
-- 🔒 **Smart detection** - Only updates when new changes are available
-
-### Manual Update (Alternative)
-```bash
-# If you prefer manual Git commands
+# Pull latest changes (GitHub → local)
 git pull origin main
 CacheClear.bat
-python update_audio_metadata.py
 ```
 
 ### After Updating
@@ -155,7 +121,7 @@ The **Web Editor** is the most comprehensive and user-friendly way to create vid
 - **Precise positioning**: Move, resize, and arrange all elements visually
 
 #### Asset Management
-- **Shader browser**: Browse 35+ included shaders with preview images
+- **Shader browser**: Browse included shaders with preview images
 - **Star ratings**: Rate shaders for easy organization (1-3 stars)
 - **Audio reactivity indicators**: See which shaders respond to music
 - **Descriptions**: Detailed information about each shader's visual style
@@ -337,11 +303,7 @@ RunMe.bat
 - **Duration**: Full audio length with synchronized visuals
 
 ### 🔧 Manual Verification
-Verify your installation:
-```bash
-python verify_ffmpeg.py
-python verify_installation.py
-```
+If you hit issues, check the console output of `RunMe.bat` or `StartWebEditor.bat` for error messages.
 
 ---
 
@@ -375,7 +337,7 @@ OneOffRender/
 │   └── thumbnails/             # Auto-generated video thumbnails
 ├── Output_Video/                 # ✅ Generated videos appear here
 │   └── *.mp4
-├── Shaders/                      # 🌈 GLSL shader files (35+ shaders)
+├── Shaders/                      # 🌈 GLSL shader files
 │   ├── *.glsl                  # Shader source files
 │   ├── *.JPG                   # Preview images
 │   └── metadata.json           # Shader ratings & descriptions
@@ -495,7 +457,7 @@ Preference Levels:          Working Status:
 
 ## 🌈 Included Shaders & Transitions
 
-### Shader Library (35+ Shaders)
+### Shader Library
 
 The application includes a diverse collection of professionally crafted GLSL shaders:
 
@@ -564,25 +526,25 @@ Over 100 professionally crafted transition effects:
 - **Frequency Resolution**: Sample rate / 1024 Hz per bin (e.g., 43Hz per bin at 44.1kHz)
 
 ### Audio Texture Format
-Shaders receive high-resolution audio data via a 512x256 texture:
+Shaders receive audio data via a **512×2 texture** (`iChannel0`):
+
+| Row | Y coord | Content |
+|-----|---------|---------|
+| Row 0 | `0.0` | FFT spectrum — 512-bin frequency data |
+| Row 1 | `1.0` | Waveform — 512-sample audio waveform |
+
 ```glsl
-uniform sampler2D iChannel0; // High-resolution audio texture (512x256)
+uniform sampler2D iChannel0; // Audio texture (512x2)
 uniform float iTime;         // Current time
 uniform vec2 iResolution;    // Screen resolution
 
-// Row 0 (Y=0.0): Full 512-bin FFT spectrum (Shadertoy-compatible)
-// Get specific frequency bin (0-511)
+// Row 0 (Y=0.0): Full 512-bin FFT spectrum
 float freq_bin_100 = texture(iChannel0, vec2(100.5/512.0, 0.0)).r;
+float bass   = texture(iChannel0, vec2(0.1,  0.0)).r;  // Low frequencies
+float treble = texture(iChannel0, vec2(0.9,  0.0)).r;  // High frequencies
 
-// Get normalized frequency (0.0 = 0Hz, 1.0 = Nyquist)
-float mid_freq = texture(iChannel0, vec2(0.5, 0.0)).r;
-
-// Legacy compatibility - bass and treble ranges
-float bass = texture(iChannel0, vec2(0.1, 0.0)).r;    // Low frequencies
-float treble = texture(iChannel0, vec2(0.9, 0.0)).r;  // High frequencies
-
-// Rows 2-255: High-resolution waveform data (512 samples wide)
-float waveform = texture(iChannel0, vec2(x_coord, y_coord)).r;
+// Row 1 (Y=1.0): Waveform data (512 samples wide)
+float waveform = texture(iChannel0, vec2(x_coord, 1.0)).r;
 ```
 
 ### Advanced Audio Functions
@@ -736,7 +698,7 @@ RunMe.bat handles these automatically:
 - **Shader compilation fails**: Check shader syntax, ensure it follows GLSL 3.3+ standards
 - **Slow performance**: Try lower resolution in `config.json`, close other GPU-intensive applications
 - **Out of memory**: Reduce resolution, close other applications, ensure 4GB+ RAM available
-- **FFmpeg errors**: Run `python verify_ffmpeg.py` to check FFmpeg installation
+- **FFmpeg errors**: Ensure `ffmpeg/` folder exists in the project root (it is excluded from git — must be present locally)
 
 #### Quality Issues
 - **File size too large**: Increase CRF value (18-23) in `config.json`
@@ -746,8 +708,6 @@ RunMe.bat handles these automatically:
 
 #### Getting Help
 - **Check logs**: Look at console output for detailed error messages
-- **Verify installation**: Run `python verify_installation.py`
-- **Test FFmpeg**: Run `python verify_ffmpeg.py`
 - **Check documentation**: See `Documentation/` folder for detailed guides
 
 ## Technical Architecture
@@ -763,7 +723,7 @@ RunMe.bat handles these automatically:
 - **Fast Streaming Mode**: Raw video data processing (3-5x faster than frame-by-frame)
 - **High-Resolution FFT**: 1024-point FFT processing at 60fps with real-time smoothing
 - **Memory Optimization**: Minimal temporary file usage with efficient spectrum caching
-- **GPU Acceleration**: Hardware-accelerated shader rendering with 512x256 audio textures
+- **GPU Acceleration**: Hardware-accelerated shader rendering with 512×2 audio textures
 - **Batch Processing**: Automatic multi-file processing with progress tracking
 
 ### Quality Assurance

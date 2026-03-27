@@ -1,0 +1,77 @@
+// ID: 33jfWR
+// Name: Bubble Glow Apollo
+// User: diatribes
+// Date: 1762399661
+
+
+// ===== PASS 0: Image =====
+
+/*
+    A lot of this was golfed in the forked shader by Fabrice :D
+    
+    https://www.shadertoy.com/view/WX3SD7
+
+*/
+
+
+// "orb" or bubble macro, it returns the distance to a sphere
+// sphere's x, y, z are modulated with some sines
+// T + z coord to keep in sync with the camera
+#define O(f,Z,c) abs( c - length(                 /* orb */   \
+          p - vec3( sin( sin(p.z*f*2.3 ) +T*.7 ) * 1. ,        \
+                    sin( sin(p.z*f*2.) +T*.5 ) * 1.,  \
+                    Z +4.+ T+T +cos(T*.5) *6. )  ) )
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,i,e,s,w,l, T = iTime;
+    vec3  q,p = iResolution;
+    
+    // scale coords
+    u = ( u - p.xy/2. ) / p.y
+        // move camera around
+        + vec2(sin(T*.4)*.2,
+              sin(T*.3)*.1);
+
+    // clear o, 100 iterations
+    for(o = vec4(0); i++ < 1e2;
+        // grayscale + bubble coloring
+        o += 1./s + 3e2*vec4(9,1,1,0)/e) {
+        
+        // q = p + ro + rd * d, p.z += T + T
+        q = p = vec3( u*d, d+T+T ),
+        
+        // bubbles
+        e = .01 + .8* min( O(.3, 6., .4),
+                      min( O(.1, 3., .2),
+                           O(.6, 4., .3) ));
+       
+        // sample floor
+        s = max(2.+p.y, .001);
+        
+        // move out of the way of the fractal
+        p.y -= 2.75;
+        // scale fractal space
+        p *= vec3(.6, .5, .4);
+        // turbulence on fractal space
+        p += cos(p.yzx * 4. + p.xzy * 3. + p.zxy *2.)*.15;
+        
+        // scale x, afterthought to get the path wider
+        p.x *= .5;
+        
+        // fractal weight
+        w = .5; 
+        
+        // fractal loop (apollonian)
+        for (int i; i++ < 8; w *= l )
+            p *= l = 1.4/dot( p = abs(sin(p))-1. , p);
+
+        // min(min(bubbles, floor), fractal)
+        d += s = .001+.7*abs(min( min(e,s),
+                      length(p)/w*2.5 )); // fractal(p)
+    } 
+    
+    // tanh tone map. divide brightness, add light streaks
+    o = tanh(o/1e6/length(u)
+          * abs(vec4(1,2,9,0)/ dot(cos(.5*T+.3*q),vec3(1))) );
+}
+

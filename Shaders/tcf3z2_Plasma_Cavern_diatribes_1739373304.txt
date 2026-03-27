@@ -1,0 +1,135 @@
+// ID: tcf3z2
+// Name: Plasma Cavern
+// User: diatribes
+// Date: 1739373304
+
+
+// ===== PASS 0: Image =====
+
+#define R 3.5
+#define S 3.5
+
+vec3 path1(float z) {
+    return vec3(
+        tanh(cos(z * .07)*3.) * 4.,
+        tanh(cos(z * .1)*1.) * 4.,
+        z
+    );
+}
+
+float length2(vec2 p){
+    float k = 20.;
+    p = pow(abs(p), vec2(k));
+    return pow(p.x + p.y, 1./k);
+}
+
+vec3 lightPosition(vec3 p, int i) {
+    p.xy-=path1(p.z).xy;
+    switch(i) {
+    case 0:
+        return p-vec3(
+                tanh(cos(iTime*3.)*2.)*.75,
+                tanh(cos(iTime*2.)*2.)*.75,
+                12.+iTime*S+tanh(cos(iTime*.4)*8.)*8.
+            );
+        break;
+    case 1:
+        return p-vec3(
+                tanh(cos(iTime*2.)*3.)*.35,
+                tanh(cos(iTime*2.6)*2.)*.65,
+                13.+iTime*S+tanh(cos(iTime*.33)*8.)*9.
+            );
+        break;
+    }
+}
+
+float plasma(vec3 p, out vec3 rgb){
+    float t = p.z;
+    float r = length(p - vec3(-3.0,3.0,p.z));
+    float g = length(p - vec3(1.0, r,p.z)); 
+    float b = length(p - vec3(r, g,p.z));
+    float v = ((sin(r)*.5+.8) + (sin(g)*.5+.8) + (sin(b)*.5+.8));
+    v *= 10.0;
+    rgb = vec3(r/v,g/v,b/v);
+    return length((rgb));
+}
+
+float scene(vec3 p, out vec3 rgb) {
+    
+    float pl = plasma(p, rgb);
+    float p1 = pl+length2(p.xy - path1(p.z).xy);
+    float o1 = length(lightPosition(p,0))-.3;
+    float o2 = length(lightPosition(p,1))-.3;
+    float hit = min(o1,min(o2,R - p1));
+    float n = 0.;
+    for (float a = .32; a < 16.;
+        n -= abs(dot(sin(p * a * 2.)*.5, vec3(1.))) / a * .125,
+        a += a);
+    return hit + n;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+   float d = 0.;
+   for(float i = 0.; i < 200.; i++) {
+        float step = scene(ro + rd *d, rgb);
+        d += step;
+        if(d > 100. || step < .001) {
+            break;
+        }
+    }
+    return d;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+    vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+    vec3 ww = normalize(target - origin);
+    vec3 uu = normalize(cross(ww, rr));
+    vec3 vv = normalize(cross(uu, ww));
+    return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.01, 0);
+    vec3 rgb;
+    vec3 n = scene(p,rgb) - vec3(
+         scene(p-e.xyy,rgb),
+         scene(p-e.yxy,rgb),
+         scene(p-e.yyx,rgb));
+    return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec3 rgb = vec3(1.);
+    vec2 uv = -1.0 + 2.0*(fragCoord.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = path1(iTime*S);
+	vec3 rd = normalize(vec3(uv,1.)
+            * lookAt(ro, 
+                     vec3(ro.x,ro.y,ro.z)-lightPosition(ro,0),
+                     sin(2.*sin(iTime*.6))));
+                     
+	float d = raymarch(ro, rd, rgb);
+    vec3 p = ro + rd * d;
+
+    float diffuse = max(dot(normal(p), normalize(ro-p)), .0);
+    if (d < 100.) {
+        
+        float o1 = abs(length(lightPosition(p,0)));
+        float o2 = abs(length(lightPosition(p,1)));
+        
+        vec3 oc = mix(vec3(.7,0.,1.)/o1,
+                vec3(.6,.0,.1)/o2,.5);
+        d = o1+o2;
+        rgb *= 1./(pow(d,d*.025));
+        rgb *= diffuse;
+        rgb = mix(rgb,oc,.5);
+
+    } else {
+        vec3 red = vec3(.3, 0.00, 0.125);
+        vec3 blue = vec3(0.0, 0.125, 0.25);
+        rgb = mix(red.xyz, blue.xyz, uv.y);
+    }
+
+    fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+}

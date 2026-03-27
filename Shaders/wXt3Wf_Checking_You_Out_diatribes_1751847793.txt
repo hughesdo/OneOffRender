@@ -1,0 +1,48 @@
+// ID: wXt3Wf
+// Name: Checking You Out
+// User: diatribes
+// Date: 1751847793
+
+
+// ===== PASS 0: Image =====
+
+// lol
+
+#define T iTime
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+
+float orb(vec3 p, float f, float zoffs) {
+    vec3 q = vec3(0);
+    return length(p - vec3(
+            q.x+sin(.2*p.z+sin(f*.6)+T*1.4) * 1.5,
+            q.y+sin(sin(f*1.3)+T*.2) *1.9,
+            zoffs+20.+tanh(cos(T*.5)*3.)*16.));
+}
+
+void mainImage(out vec4 o, vec2 u )
+{
+    float w,g,i,n,s=.002,d;
+    vec3  q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    vec2 l = vec2(u.x, u.y-.3);
+    for (o*=i;i++<64. && s > .001;
+         w = .003+.8*abs(6.+q.y),
+         g = .005+.6*abs(g),
+         d += s = min(g,min(.005+s*.8,w)),
+         o += 5./d*(w==s||g==s?vec4(0,1,0,0):vec4(1)))
+        for(p = q = vec3(u * d, d ),
+            n = .9,
+            g = orb(p, p.z*.6, 1.)-1.,
+            g = min(g, orb(p, p.z*.2, 4.)-.6),
+            g = min(g, orb(p, p.z*.3, 8.)-1.),
+            g = min(g, orb(p, p.z*.6, 16.)-1.3),
+            q.z += T*3.,
+            s = 8. - length(p.xy);
+            n < 8.;
+            q.y += N(2.*T+q, .14),
+            s += N(p, .06),
+            n *= 1.4);
+    o = tanh(o/d);
+}
+
+

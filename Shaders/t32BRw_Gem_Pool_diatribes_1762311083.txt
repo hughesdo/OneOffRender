@@ -1,0 +1,28 @@
+// ID: t32BRw
+// Name: Gem Pool
+// User: diatribes
+// Date: 1762311083
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    // note that d is modulated
+    float i,s, t=iTime*.5, d=3.+sin(t+t);
+    vec3  p,r = iResolution;
+    for(o = vec4(0); i++ < 64.;
+        // accumulate color
+        o += d*vec4(1,2,7,0)+(1.+cos(p.z+vec4(6,4,2,0)))/s )
+        // p = ro + rd * d
+        p = vec3((u+u-r.xy)/r.y * d, d),
+        // spin by time, twist by z
+        p.xy *= mat2(cos(-.01*t+p.z*.4+vec4(0,33,11,0))),
+        // turbulence
+        p += cos(3.*t+t+p.zxy)+cos(t+p.yzx*3.),
+        // ripples
+        p += cos(2.*t+dot(cos(t+t+p), p) *  p),
+        // light field (it's like an array of dot lights)
+        d += s = dot(abs(p-floor(p)-.5), vec3(.02));
+    // tonemap and brightness
+    o = tanh(o/1e4);
+}

@@ -1,0 +1,42 @@
+// ID: tcdyRN
+// Name: Menger Soup
+// User: diatribes
+// Date: 1763347724
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime*1e1
+#define P(z) vec3(cos((z)*.05)*16., cos((z)*.09)*16., (z))
+void mainImage(out vec4 o, vec2 u) {
+    vec3 c,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+
+    vec3  q,p = P(T),ro=p,
+          Z = normalize( P(T+5.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(mat2(cos((sin(T*.015)*sin(p.z*.02)*.3)+vec4(0,33,11,0)))*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    float s,m,i,t,e,
+          d=.1+2.*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+   for (; i++ < 1e2;)
+        q = p = ro + D *d,
+        p.xy -= P(p.z).xy,
+        e = max(length(
+            p - vec3(sin(p.z*.1)*1.25,
+                     sin(p.z*.2)*1.25,
+                     T+4.+cos(iTime*.4) )  ) - .05 , .01),
+        p.z *= .4,
+        r = abs(q-P(q.z)),
+        m=length(q), t = min(2.-r.x,2.-r.y),
+        q = fract(q)-.5,
+        r = abs(fract(q) - .5),
+        m = min(m, min(max(r.x, r.y),
+                      min(max(r.y, r.z),
+                      max(r.x, r.z))) - d/1e2),
+        m = min(e=.25*max(e,.01), max(dot(cos(p),sin(p.yzx)), max(t, m))),
+        d += s = .002+.6*abs(m),
+        c += s*d + .5*vec3(7,4,1)/e;
+    o.rgb = tanh(c/d/5e2 * exp(d/8.));
+    
+}

@@ -1,0 +1,47 @@
+// ID: wcjSR1
+// Name: Monday Bouncehouse
+// User: diatribes
+// Date: 1741613177
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) (vec3(tanh(cos((z) * .51) * .11) * 26., \
+                   tanh(cos((z) * .53) * .39) * 16., (z)))
+#define N normalize
+
+float M(vec3 p) {
+    float s,l,w = 1.;
+
+    float wave = sin(4.*iTime+p.z*3.1)*.23 +
+                 (cos(5.*iTime+p.z*1.3)*.20)*.34 +
+                 tanh(cos(6.5*iTime+p.z*1.7)*.26)*1.;
+ 
+    s = 6. - length(p.xy - P(p.z).xy);
+    p.xy -= P(p.z).xy;
+    p.y += wave + 1.5;
+    
+    for (float i; i++ < 8.; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    s = min(s, length(p)/w - .001);
+    return s; 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime * .8, d = 0., i, s=.02;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3((u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    while( s > .001)
+        p += s*D,
+        d += (s = M(p)),
+        o.rgb += d*sin(p*.1)*.001+.005;
+    o.rgb *= exp(-d/6.);
+}
+

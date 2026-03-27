@@ -1,0 +1,1680 @@
+[
+  {
+    "name": "01d-kabuto_Fixed.glsl",
+    "preview_image": "01d-kabuto_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive tunnel with spheres and planes. Bass frequencies control sphere size, audio modulates colors and textures throughout the raymarched scene.",
+    "audio_reactive": true
+  },
+  {
+    "name": "EdgeDetectionUsing_dFdx_dFdy.glsl",
+    "preview_image": "EdgeDetectionUsing_dFdx_dFdy.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: gam0022. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xtd3W7. Edge detection using dFdx/dFdy with video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EdgeDetectionUsing_dFdx_dFdy_c-base.glsl",
+    "preview_image": "EdgeDetectionUsing_dFdx_dFdy_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "c-base-full-loop-blue-green.mp4",
+    "description": "Original author: gam0022. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xtd3W7. Edge detection using dFdx/dFdy with c-base video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons.glsl",
+    "preview_image": "EverydaySkeletons.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "SpaceTravel1Min.mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. Everyday 022/100 with SpaceTravel video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: SpaceTravel1Min.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "charstiles_Fixed.glsl",
+    "preview_image": "charstiles_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sphere grid tunnel with plasma effects. Audio frequency data drives color intensity and visual brightness throughout the raymarched scene.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorflow orbV1_Fixed.glsl",
+    "preview_image": "Colorflow orbV1_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Highly audio-reactive orb with turbulent glow. Bass/mid/treble frequencies control sphere size, turbulence, glow intensity, and overall brightness dynamically.",
+    "audio_reactive": true
+  },
+  {
+    "name": "EVOKE 2019 Shader Showdown_Fixed.glsl",
+    "preview_image": "EVOKE 2019 Shader Showdown_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Complex fractal tunnel scene from EVOKE 2019. This shader is static with no audio reactivity, featuring intricate raymarched geometry and volumetric clouds.",
+    "audio_reactive": false
+  },
+  {
+    "name": "fragmentcompofix_skycolorspinner_300es_Fixed.glsl",
+    "preview_image": "fragmentcompofix_skycolorspinner_300es_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sky spinner with voronoi patterns. Audio controls spinner rotation, FOV, star field flicker, sky texture scrolling, and glow intensity.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Quasi Crystals2_Fixed.glsl",
+    "preview_image": "Quasi Crystals2_Fixed.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Quasi-crystal patterns using log-polar coordinates. This shader is static with no audio reactivity, displaying animated geometric wave interference patterns.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Quasi-crystals_Fixed.glsl",
+    "preview_image": "Quasi-crystals_Fixed.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Animated quasi-crystal with HSV coloring. This shader is static with no audio reactivity, showing plane wave interference in log-polar space.",
+    "audio_reactive": false
+  },
+  {
+    "name": "reflected structure by musk for TDF 2021_Optimized.glsl",
+    "preview_image": "reflected structure by musk for TDF 2021_Optimized.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive reflected structure with wave patterns. Audio modulates color transitions, wave intensity, camera rotation, and overall brightness with reflections.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Reflecting Crystals_Fixed.glsl",
+    "preview_image": "Reflecting Crystals_Fixed.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal crystals with gyroid sphere and reflections. This shader is static with no audio reactivity, featuring IFS fractals and multiple reflection passes.",
+    "audio_reactive": false
+  },
+  {
+    "name": "SIG15 EntryLevel.glsl",
+    "preview_image": "SIG15 EntryLevel.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "Abstract 1.jpg",
+      "iChannel2": "Uffizi Gallery Blurred.png"
+    },
+    "description": "Raymarched tunnel with fractal geometry, 3D texture mapping, and environment reflections. Features procedural domain repetition and dynamic camera movement through infinite tunnel.",
+    "audio_reactive": false
+  },
+  {
+    "name": "semifinal2-blueberry_Fixed.glsl",
+    "preview_image": "semifinal2-blueberry_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive 2D/3D hybrid with pulsing patterns. Audio controls sphere size, pattern colors, circle radii, brightness, and switches between 2D and 3D scenes.",
+    "audio_reactive": true
+  },
+  {
+    "name": "semifinal2-tapped_Fixed.glsl",
+    "preview_image": "semifinal2-tapped_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive circular pattern array with noise. Audio affects circle radius, movement offsets, and color intensity creating pulsing organic formations.",
+    "audio_reactive": true
+  },
+  {
+    "name": "tdf-16ms_glsl-graphics-compo_nunu-00_Fixed.glsl",
+    "preview_image": "tdf-16ms_glsl-graphics-compo_nunu-00_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Procedural noise patterns with domain warping. This shader is static with no audio reactivity, showcasing value, gradient, and Perlin noise techniques.",
+    "audio_reactive": false
+  },
+  {
+    "name": "the_fractal_Fixed.glsl",
+    "preview_image": "the_fractal_Fixed.JPG",
+    "stars": 2,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive Menger sponge fractal tunnel. Audio controls movement speed, rotation, time modulation, and color intensity throughout the animated fractal journey.",
+    "audio_reactive": true
+  },
+  {
+    "name": "the_grid_Fixed.glsl",
+    "preview_image": "the_grid_Fixed.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive grid tunnel with depth of field. Audio affects camera offset, DOF, BPM, rotation, grid thickness, pattern modulation, and background colors.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Waveform.glsl",
+    "preview_image": "WaveForm.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive 3D waveform visualization with reflections. Raymarched scene where audio data creates a flowing waveform surface with mirror reflections and color cycling.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 001.glsl",
+    "preview_image": "Xor Mashup 001.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive molten heart with speak overlay. Combines techno god background with dynamic overlay effects, bass controls radius and ring width, treble affects color shifts.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 003.glsl",
+    "preview_image": "Xor Mashup 003.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive volumetric glow with mosaic patterns. Features dynamic movement, frequency-based color modulation, and complex geometric transformations driven by audio data.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Base Vortex.glsl",
+    "preview_image": "Base Vortex.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive tunnel vortex effect with rotating geometry. Bass frequencies control tunnel depth and rotation speed, creating dynamic visual flow synchronized to music.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Gemmarium.glsl",
+    "preview_image": "Gemmarium.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Static raymarched gem and orb scene with mirrored floor and volumetric-style glow. Purely time-based animation with no audio reactivity or external textures.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Bubble Colors.glsl",
+    "preview_image": "Bubble Colors.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful bubble patterns with gentle pulsing. Bass and kick frequencies drive bubble size and color intensity for smooth, organic visual effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorful Columns.glsl",
+    "preview_image": "Colorful Columns.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful column visualization with frequency-based height mapping. Each column responds to specific frequency ranges creating a dynamic spectrum display.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Colorful Columns_V2.glsl",
+    "preview_image": "Colorful Columns_V2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Enhanced version of Colorful Columns with improved anti-flickering and smoother audio processing. Features averaged sampling for more stable visual response.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Combine and Conquer.glsl",
+    "preview_image": "Combine and Conquer.JPG",
+    "stars": 2,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive kaleidoscopic pattern with 5-fold symmetry and pastel color palettes. Bass, mid, and treble frequencies drive turbulence, spirals, and hue rotation for mesmerizing geometric visuals.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cosmic Energy Streams1.glsl",
+    "preview_image": "Cosmic Energy Streams1.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive cosmic energy streams with flowing tendrils and dynamic lighting. Bass, mid, and high frequencies control stream intensity and particle effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cosmic Nebula2.glsl",
+    "preview_image": "Cosmic Nebula2.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive deep space nebula with stellar formation effects. Features gas clouds and star brightness that respond to audio input for cosmic ambiance.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Flowing Mathematical Patterns2.glsl",
+    "preview_image": "Flowing Mathematical Patterns2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive mathematical flow patterns with advanced beat detection. Features multi-method beat analysis and bass-reactive color shifting for complex visual mathematics.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork Bass Vorte PAEz 125.1.glsl",
+    "preview_image": "Fork Bass Vorte PAEz 125.1.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive vortex tunnel variant with enhanced bass response. Features improved audio processing with smooth clamping to prevent extreme visual fluctuations.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Gyroid Art.glsl",
+    "preview_image": "Gyroid Art.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Mathematical gyroid surface visualization with smooth organic forms. This shader is static with no audio reactivity, showcasing pure geometric beauty and mathematical precision.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Iridescent Breathing Orbs.glsl",
+    "preview_image": "Iridescent Breathing Orbs.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive iridescent orbs with breathing animation. Bass and treble frequencies control orb size and color shifts, creating mesmerizing organic pulsing effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "late-night-colorful-2.glsl",
+    "preview_image": "late-night-colorful-2.JPG",
+    "stars": 2,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive colorful wave patterns with kick detection. Bass frequencies create wave perturbations while kick hits trigger brightness flashes for vibrant, pulsing visuals.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Luminous Nebulae.glsl",
+    "preview_image": "Luminous Nebulae.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive luminous nebula with color-changing effects. Treble and mid-treble frequencies drive color palette transitions and nebula brightness for cosmic ambiance.",
+    "audio_reactive": true
+  },
+  {
+    "name": "MoltenHeart.glsl",
+    "preview_image": "MoltenHeart.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive molten heart with dual-layer raymarching. Bass and treble frequencies control layered effects, ring width, and sphere radius for intense visual impact.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Petal Drift.glsl",
+    "preview_image": "Petal Drift.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive drifting Gaussian petals with gentle lighting. Multi-frequency analysis drives petal movement, color palette switching, and global rotation effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Perspex Web Lattice.glsl",
+    "preview_image": "Perspex Web Lattice.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": "London.jpg",
+    "description": "Raymarched 2nd-order Voronoi with perspex-like web lattice. Features tri-planar texture mapping, edge detection, environmental reflections, and dynamic camera rotation through crystalline structures.",
+    "audio_reactive": false
+  },
+  {
+    "name": "sleeplessV4.glsl",
+    "preview_image": "sleeplessV4.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive orb visualization with bass-driven brightness. Features configurable bass sampling and threshold controls for dynamic orb intensity and glow effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Sonic Nebula.glsl",
+    "preview_image": "Sonic Nebula.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive sonic nebula effect with multi-frequency response. Bass, mid, and treble frequencies control nebula density, color, and movement for dynamic space visuals.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Volumetric Glow2.glsl",
+    "preview_image": "Volumetric Glow2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive volumetric glow with subtle brightness pulsing. Bass and mid frequencies drive glow intensity and color modulation for atmospheric lighting effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Xor Mashup 002.glsl",
+    "preview_image": "Xor Mashup 002.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive XOR pattern mashup with gentle enhancement. Bass, mid, and kick frequencies control pattern intensity and brightness for rhythmic visual effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Funky Flight.GLSL",
+    "preview_image": "Funky Flight.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Funky flight path visualization with smooth camera movement through 3D space. This shader is static with no audio reactivity, featuring dynamic flight trajectory and perspective effects.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Tie Dye zoom.glsl",
+    "preview_image": "Tie Dye zoom.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Original PAEz creation. Mesmerizing psychedelic tie-dye pattern with smooth zoom animation. Features layered kaleidoscopic shapes with rotating tiles, petal-shaped elements, and hypnotic color palette cycling. Non-audio-reactive with pure time-based animation for consistent visual flow.",
+    "audio_reactive": false
+  },
+  {
+    "name": "The Four Trumpets 2.glsl",
+    "preview_image": "The Four Trumpets 2.JPG",
+    "stars": 5,
+    "buffer": true,
+    "texture": null,
+    "description": "Audio-reactive quasi-crystal with feedback trails using log-polar coordinates. Bass controls pinch/zoom, mids boost brightness, highs affect rotation. Features temporal accumulation for trailing effects.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shader Lesson 8 - cube maps.glsl",
+    "preview_image": "Shader Lesson 8 - cube maps.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "skybox"
+      }
+    },
+    "description": "Raytraced reflective sphere with cubemap environment mapping. Features a rotating metallic sphere that reflects the surrounding skybox environment using real-time ray tracing and cubemap sampling.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Magical Orb.glsl",
+    "preview_image": "Magical Orb.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "symmetrical_garden"
+      }
+    },
+    "description": "Magical volumetric orb with dynamic color cycling and Fresnel reflections. Features glowing volumetric rendering constrained to a sphere with environment reflections from a symmetrical garden cubemap. Colors cycle through purple-yellow, cyan-magenta, and warm-cool palettes.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Audio Reactive Magical Orb.glsl",
+    "preview_image": "Audio Reactive Magical Orb.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Audio-reactive magical volumetric orb with dynamic color cycling and Fresnel reflections. The orb pulses and reacts to bass, mid, and high frequencies - internal energy, density, glow, and colors all respond to the music. Features environment reflections from a cobblestone street night cubemap. Colors cycle through purple-yellow, cyan-magenta, and warm-cool palettes.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Waveform3d.glsl",
+    "preview_image": "Waveform3d.JPG",
+    "stars": 4,
+    "buffer": true,
+    "texture": null,
+    "description": "3D audio waveform visualization with raymarching and reflections. Features vertical scrolling feedback buffer that creates trailing effects. The waveform data drives the surface displacement creating dynamic audio-reactive geometry.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio Reactive Magical Orb-2.glsl",
+    "preview_image": "Audio Reactive Magical Orb-2.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Enhanced audio-reactive magical orb with edge-detected rainbow waves and object-aware lighting. Features beat-triggered expanding rainbow rings that follow cubemap edges, surface-responsive spotlight effects, and rim lighting. The orb's colorful glow intelligently sticks to surfaces and objects in the environment. Bass hits trigger multi-frequency rainbow waves with enhanced color bands.",
+    "audio_reactive": true
+  },
+  {
+    "name": "neural_image_shader.glsl",
+    "preview_image": "neural_image_shader.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "CrepyMe.jpg"
+    },
+    "description": "Neural network effect applied to input image texture. Creates organic displacement and distortion effects that respond to audio. The neural network layers generate complex patterns that warp and blend with the source image.",
+    "audio_reactive": true
+  },
+  {
+    "name": "neural_image_shader2.glsl",
+    "preview_image": "neural_image_shader2.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "CrepyMe.jpg"
+    },
+    "description": "Enhanced neural network shader with sophisticated edge detection, HSV color manipulation, and advanced audio-reactive morphing. Features multi-band audio analysis, luminance-based displacement scaling, and edge-reactive effects for professional-quality image distortion.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Bouncing Vectors.glsl",
+    "preview_image": "Bouncing Vectors.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive bouncing vector field with dynamic particle animation. Bass frequencies control depth offset and animation intensity, while treble frequencies modulate grid density, frequency scaling, and glow effects for responsive visual feedback.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Wavelights.glsl",
+    "preview_image": "Wavelights.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Procedural wave-based light patterns with rotating geometry and ripple effects. Creates dynamic, flowing light structures with mathematical precision and smooth color transitions.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Wavelights2.glsl",
+    "preview_image": "Wavelights2.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Variant of Wavelights with modified rotation parameters and color channels. Produces similar wave patterns with different visual characteristics and color emphasis.",
+    "audio_reactive": false
+  },
+  {
+    "name": "UV Mapping Truchet Tiles.glsl",
+    "preview_image": "UV Mapping Truchet Tiles.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Complex raymarched Truchet tile patterns with UV mapping and reflections. Features animated gears, intricate geometric patterns, and sophisticated lighting with multiple bounces for professional visual effects.",
+    "audio_reactive": false
+  },
+  {
+    "name": "3DAudioVisualizerNumber2.glsl",
+    "preview_image": "3DAudioVisualizerNumber2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dtj3zW. 3D Audio Visualizer #2. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AbstractMusic.glsl",
+    "preview_image": "AbstractMusic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: MatHack. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4stSRs. Abstract Music. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AcidBlossomvisualizerSound.glsl",
+    "preview_image": "AcidBlossomvisualizerSound.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Forthro. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/mlcfW2. Acid blossom visualizer (Sound!). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Anastasia.glsl",
+    "preview_image": "Anastasia.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dcSRj. Anastasia. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ASpaceFlower.glsl",
+    "preview_image": "ASpaceFlower.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DslfR7. Mind flowers. License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "AttemptAtVDJEffects.glsl",
+    "preview_image": "AttemptAtVDJEffects.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "pexels-eberhard-grossgasteiger-966927.jpg"
+    },
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XctGzf. Attempt at VDJ effects. License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio-reactive_scene_1st_attempt.glsl",
+    "preview_image": "Audio-reactive_scene_1st_attempt.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/cslSRr. Audio-reactive scene 1st attempt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BasicAudioVisualizer.glsl",
+    "preview_image": "BasicAudioVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: chronos. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/lsdGR8. Basic Audio Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioVisual.glsl",
+    "preview_image": "AudioVisual.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Passion. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MsBSzw. AudioVisual. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioVisualizerBars3_sidhu.glsl",
+    "preview_image": "AudioVisualizerBars3_sidhu.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ramansinghdhiman. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/lcBSWR. AudioVisualizer bars 3 (sidhu). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioVisualizerNumber5-Wipeout.glsl",
+    "preview_image": "AudioVisualizerNumber5-Wipeout.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ddXfzf. Audio Visualizer #5 - Wipeout. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Auroras.glsl",
+    "preview_image": "Auroras.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nimitz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGGRt. Auroras. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BINTANG_HITAM.glsl",
+    "preview_image": "BINTANG_HITAM.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: zhonkvision. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtlBW7. BINTANG HITAM. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BlueprintOfTheArchitekt.glsl",
+    "preview_image": "BlueprintOfTheArchitekt.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4tySDW. Blueprint of the Architekt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Blunderbuss.glsl",
+    "preview_image": "Blunderbuss.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3lBfzz. Blunderbuss. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "BubblesMusicVisualizer.glsl",
+    "preview_image": "BubblesMusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: liyouvane. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/llXBWB. Bubbles music visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BurningHeart.glsl",
+    "preview_image": "BurningHeart.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: dnnkeeper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/llXGRX. Burning Heart. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio-Visualizer.glsl",
+    "preview_image": "Audio-Visualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: CoolerZ. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wd3XzS. Audio-Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioFlightv2_strobes.glsl",
+    "preview_image": "AudioFlightv2_strobes.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: byt3_m3chanic. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7tfyRl. Audio Flight v2 (strobes). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioReactiveFractal.glsl",
+    "preview_image": "AudioReactiveFractal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: FaustianBargainForTop. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtSBR1. Audio Reactive Fractal. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CallOfThesiren.glsl",
+    "preview_image": "CallOfThesiren.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Quasimondo. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7sSSDd. Call of the Siren . License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CheshireCat_forked.glsl",
+    "preview_image": "CheshireCat_forked.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: teassy000 and julianlumia. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdtSWr. Cheshire Cat and cute little shader combined. https://www.shadertoy.com/view/wsf3RN. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Christmas_tree.glsl",
+    "preview_image": "Christmas_tree.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: vanshika. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MfGBWm. Christmas tree ::). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "cloned_RainbowSpectrum.glsl",
+    "preview_image": "cloned_RainbowSpectrum.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: hornet. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ldX3D8. cloned: rainbow spectrum. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cross_SDF_Fractal.glsl",
+    "preview_image": "Cross_SDF_Fractal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: bradjamesgrant. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tssfz7. Cross SDF fractal. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CubeMusicTransmitter.glsl",
+    "preview_image": "CubeMusicTransmitter.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    },
+    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4lBSRm. \u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u20ac\u017e\u00c2\u00a2\u00c3\u201a\u00c2\u00ab Low Frequency Flow. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "danagas-wingman.glsl",
+    "preview_image": "danagas-wingman.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdtXDf. danaga's wingman. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DancingColorRings.glsl",
+    "preview_image": "DancingColorRings.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/md3GDl. Dancing Color Rings. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DancingCubeField_Visualiser.glsl",
+    "preview_image": "DancingCubeField_Visualiser.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: Pelegefen. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/fl2XRm. Dancing Cube Field (Visualiser). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "Dancing_stick_figures.glsl",
+    "preview_image": "Dancing_stick_figures.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Eybor. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdByzy. Dancing stick figures. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DarkSideOfTheMoon.glsl",
+    "preview_image": "DarkSideOfTheMoon.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nyri0. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/sdSyz3. The Dark Side of the Moon. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Day30-XargantianPolyjupe.glsl",
+    "preview_image": "Day30-XargantianPolyjupe.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: jeyko. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tlG3RV. Day 30 - Xargantian Polyjupe. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DDDAudioVisualizer.glsl",
+    "preview_image": "DDDAudioVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtl3Dr. 3D Audio Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DiscoGoldrays.glsl",
+    "preview_image": "DiscoGoldrays.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dt33RS. Disco Godrays [411 chars]. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DnB_corridor.glsl",
+    "preview_image": "DnB_corridor.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NldSW7. DnB corridor. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "DodecaIcosaAndStellations.glsl",
+    "preview_image": "DodecaIcosaAndStellations.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ChunderFPV. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/McsXz8. Dodeca, icosa & stellations. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Domain_warped_FBM_noise.glsl",
+    "preview_image": "Domain_warped_FBM_noise.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: liamegan. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wttXz8. Domain warped FBM noise. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "echappatoire.glsl",
+    "preview_image": "echappatoire.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "echappatoire_with_heart.glsl",
+    "preview_image": "echappatoire_with_heart.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ElectricDream.glsl",
+    "preview_image": "ElectricDream.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: mu6k. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ld23Wd. Electric Dream. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EtherealPulsarMusicVisualizer.glsl",
+    "preview_image": "EtherealPulsarMusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Forthro. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtyfzD. Ethereal Pulsar Music Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Evacuation.glsl",
+    "preview_image": "Evacuation.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Xor. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4l2GW1. Evacuation. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverybodyDance.glsl",
+    "preview_image": "EverybodyDance.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XsySDW. Everybody Dance. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons_c-base.glsl",
+    "preview_image": "EverydaySkeletons_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "c-base-full-loop-blue-green.mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. everyday 022/100. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons_earth.glsl",
+    "preview_image": "EverydaySkeletons_earth.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. everyday 022/100. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ExclamationHeartNr.2.glsl",
+    "preview_image": "ExclamationHeartNr.2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ArthurTent. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/43dGDn. Exclamation Heart Nr.2 <3!. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "audio_reactive": true
+  },
+  {
+    "name": "ExitTheMatrix.glsl",
+    "preview_image": "ExitTheMatrix.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Kali. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NlsXDH. Exit the Matrix. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EyeOfHajiSauron.glsl",
+    "preview_image": "EyeOfHajiSauron.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: arminkz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/X3jcWR. Eye of Haji Sauron. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FFTDomainColoring.glsl",
+    "preview_image": "FFTDomainColoring.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: pixelbeast. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Mt2GWt. FFT Domain Coloring. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "fftexperiment.glsl",
+    "preview_image": "fftexperiment.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nshelton. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4tK3zG. fft experiment. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FlowerSpeaker.glsl",
+    "preview_image": "FlowerSpeaker.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: coposuke. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttXczX. Flower Speaker. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FluidicSpace.glsl",
+    "preview_image": "FluidicSpace.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: EnigmaCurry. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tdS3DD. Fluidic Space. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FontDemo.glsl",
+    "preview_image": "FontDemo.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "arthurtent.jpeg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel3": "38c3_visuals.png"
+    },
+    "description": "Original author: gigatron. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xt3XWf. Font demo. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkDancingGlowLights.glsl",
+    "preview_image": "ForkDancingGlowLights.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtsBWH. Fork: Dancing Glow Lights. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkNixieTubeClock.glsl",
+    "preview_image": "ForkNixieTubeClock.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: picoplanetdev. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dds3WB. Fork Nixie Tube Clock. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkPixelRickRadiantMusicVis.glsl",
+    "preview_image": "ForkPixelRickRadiantMusicVis.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ArthurTent. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MXdGz4. Fork Pixel Rick+Radiant MusicVis. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkRadarPanel.glsl",
+    "preview_image": "ForkRadarPanel.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: willis. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wtyfzV. Radar Panel. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_Complicating_things_even_further.glsl",
+    "preview_image": "Fork_Complicating_things_even_further.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pink. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/csfyzS. Fork Complicating things even.... License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_Complicating_things_even_further2.glsl",
+    "preview_image": "Fork_Complicating_things_even_further2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pink. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/csfyzS. Fork Complicating things even.... License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_DiveIntoMusic.glsl",
+    "preview_image": "Fork_DiveIntoMusic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/cst3zl. Fork: Dive Into Music. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Foxie.glsl",
+    "preview_image": "Foxie.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NdlGzs. Foxie. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fractal77MusicVisualizer.glsl",
+    "preview_image": "Fractal77MusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: orblivius. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XXBGzw. Fractal 77 Music Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "GalaxyOfUniverses.glsl",
+    "preview_image": "GalaxyOfUniverses.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdXSzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Gauges.glsl",
+    "preview_image": "Gauges.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Genizm-IdVisualizer.glsl",
+    "preview_image": "Genizm-IdVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "glxyEpilogue.glsl",
+    "preview_image": "glxyEpilogue.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Hexagone.glsl",
+    "preview_image": "Hexagone.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "IctalurusForest.glsl",
+    "preview_image": "IctalurusForest.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "InerciaRoyaliptic.glsl",
+    "preview_image": "InerciaRoyaliptic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Informer.glsl",
+    "preview_image": "Informer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "inFX.1b.glsl",
+    "preview_image": "inFX.1b.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "beton_3_pexels-photo-5622880.jpeg"
+    },
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "its-a-skurr.glsl",
+    "preview_image": "its-a-skurr.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "JamSession.glsl",
+    "preview_image": "JamSession.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "JetAnotherVisualizer.glsl",
+    "preview_image": "JetAnotherVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "LiveCoding_at_AirPortAnimeFes2023.glsl",
+    "preview_image": "LiveCoding_at_AirPortAnimeFes2023.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kaneta1992. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtfBzj. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "LogSphericalKIFSZoomer.glsl",
+    "preview_image": "LogSphericalKIFSZoomer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdXSzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "LowFrequencyFlow.glsl",
+    "preview_image": "LowFrequencyFlow.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ltt.glsl",
+    "preview_image": "ltt.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MandelKoch-MusicVisualiserVer.glsl",
+    "preview_image": "MandelKoch-MusicVisualiserVer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pelegefen. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/sslXzX. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MarakamiGalaxy.glsl",
+    "preview_image": "MarakamiGalaxy.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: PixelPhil. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3tyGRz. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MarakamiGalaxy_2.glsl",
+    "preview_image": "MarakamiGalaxy_2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: PixelPhil. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3tyGRz. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "March_12_2021.glsl",
+    "preview_image": "March_12_2021.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: TheNosiriN. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/fsl3z4. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave.glsl",
+    "preview_image": "Shaderwave.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ShatterFlake.glsl",
+    "preview_image": "ShatterFlake.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ctBSWt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ShitJustGotReal.glsl",
+    "preview_image": "ShitJustGotReal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: db0x90. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xdjczt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoapBubbleMusicVisualizerNumber1.glsl",
+    "preview_image": "SoapBubbleMusicVisualizerNumber1.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Ruzzyr. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtVSDt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SolumObject.glsl",
+    "preview_image": "SolumObject.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/mtKGRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SonicPulse.glsl",
+    "preview_image": "SonicPulse.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: WillKirkby. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dcyD2. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoundBlob.glsl",
+    "preview_image": "SoundBlob.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: seb0fh. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Ms3SWr. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoundOscilloscopeFromSpectrum.glsl",
+    "preview_image": "SoundOscilloscopeFromSpectrum.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: jaszunio15. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Ws2GWD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoundReactiveCircle.glsl",
+    "preview_image": "SoundReactiveCircle.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Friend. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NlsfDM. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SpaceshipConsole.glsl",
+    "preview_image": "SpaceshipConsole.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DlVXDc. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SuperNoise.glsl",
+    "preview_image": "SuperNoise.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtlfWX. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SynestheticRings.glsl",
+    "preview_image": "SynestheticRings.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: isaacchurchill. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Wt2cWR. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SynthwaveCanyon.glsl",
+    "preview_image": "SynthwaveCanyon.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/slcXW8. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TechnoCore.glsl",
+    "preview_image": "TechnoCore.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Kali. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wtdXzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TestMoney.glsl",
+    "preview_image": "TestMoney.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: uratowel12. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ds23zd. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ThePopularShader.glsl",
+    "preview_image": "ThePopularShader.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: fizzer. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdB3Dw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ThePopularShader_forward.glsl",
+    "preview_image": "ThePopularShader_forward.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: fizzer. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdB3Dw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TheRavenThatRefusedToSing.glsl",
+    "preview_image": "TheRavenThatRefusedToSing.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dSyDm. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave_vid.glsl",
+    "preview_image": "Shaderwave_vid.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "otaviogood_shader_fontgen.png",
+      "iChannel2": "pexels_videos_3931(1080p).mp4"
+    },
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave_vid_c-base.glsl",
+    "preview_image": "Shaderwave_vid_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "otaviogood_shader_fontgen.png",
+      "iChannel2": "c-base-full-loop-blue-green.mp4"
+    },
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "TheVoiceless.glsl",
+    "preview_image": "TheVoiceless.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/ls3cWM. The Voiceless"
+  },
+  {
+    "name": "ThirtyThousandWaves.glsl",
+    "preview_image": "ThirtyThousandWaves.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/7dl3Wn. Thirty-Thousand waves",
+    "texture": {
+      "iChannel1": "pierre-bamin-_EzTds6Fo44-unsplash.jpg"
+    }
+  },
+  {
+    "name": "ThunderEye.glsl",
+    "preview_image": "ThunderEye.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/Dsy3WD. Thunder Eye"
+  },
+  {
+    "name": "ToyDivision.glsl",
+    "preview_image": "ToyDivision.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/MlG3zm. ToyDivision"
+  },
+  {
+    "name": "TributeToMyOldAtari.glsl",
+    "preview_image": "TributeToMyOldAtari.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/3lyBRt. Tribute to my old Atari"
+  },
+  {
+    "name": "TruchetKaleidoscopeFTW.glsl",
+    "preview_image": "TruchetKaleidoscopeFTW.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/7lKSWW. Truchet + Kaleidoscope FTW"
+  },
+  {
+    "name": "Tycho-Awake-AlbumCover.glsl",
+    "preview_image": "Tycho-Awake-AlbumCover.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/MsGGzR. Tycho | Awake - Album Cover",
+    "texture": {
+      "iChannel1": "pierre-bamin-_EzTds6Fo44-unsplash.jpg"
+    }
+  },
+  {
+    "name": "VinylVisualizer.glsl",
+    "preview_image": "VinylVisualizer.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/XlcXDX. Vinyl Visualizer"
+  },
+  {
+    "name": "Warpspeed.glsl",
+    "preview_image": "Warpspeed.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/Msl3WH. Warp speed"
+  },
+  {
+    "name": "WavingGridTunnel.glsl",
+    "preview_image": "WavingGridTunnel.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/tlfGRN. Waving Grid Tunnel"
+  },
+  {
+    "name": "WeNeedAnExpertDaveHoskins.glsl",
+    "preview_image": "WeNeedAnExpertDaveHoskins.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/dsc3RS. We need an expert.. Dave Hoskins"
+  },
+  {
+    "name": "WindOfChange.glsl",
+    "preview_image": "WindOfChange.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/ldBSDd. Wind of change"
+  },
+  {
+    "name": "[SH16B]WIPWarpTunnel.glsl",
+    "preview_image": "[SH16B]WIPWarpTunnel.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/XtdGR7. [SH16B] WIP: Warp Tunnel",
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel3": "pexels-eberhard-grossgasteiger-966927.jpg"
+    }
+  },
+  {
+    "name": "[SH17A]FunkyDiscoBall.glsl",
+    "preview_image": "[SH17A]FunkyDiscoBall.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/wd3XzS. [SH17A] Funky Disco Ball",
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    }
+  },
+  {
+    "name": "[SH18]BabyToy.glsl",
+    "preview_image": "[SH18]BabyToy.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/lldyWn. [SH18] BabyToy"
+  },
+  {
+    "name": "nanoKontrol2.glsl",
+    "preview_image": "nanoKontrol2.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/NlsfDM. Created by byt3_m3chanic",
+    "audio_reactive": true
+  },
+  {
+    "name": "nn_c.glsl",
+    "preview_image": "nn_c.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/4fyfzK. Created by ArthurTent",
+    "audio_reactive": true
+  },
+  {
+    "name": "pantera_rosa_CRT.glsl",
+    "preview_image": "pantera_rosa_CRT.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/l3GGRW. Created by jorge2017a2",
+    "audio_reactive": true
+  },
+  {
+    "name": "sound_Everyones_Favorite_Song.glsl",
+    "preview_image": "sound_Everyones_Favorite_Song.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/fldcWf. Created by Tilmann",
+    "audio_reactive": true
+  },
+  {
+    "name": "totetmatt-QuickyNr058.glsl",
+    "preview_image": "totetmatt-QuickyNr058.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/fdcGRj. Created by totetmatt",
+    "audio_reactive": true
+  },
+  {
+    "name": "totetmatt-Vortex.glsl",
+    "preview_image": "totetmatt-Vortex.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/3tdfD2. Created by totetmatt",
+    "audio_reactive": true
+  },
+  {
+    "name": "FunkyDiscoBall2.glsl",
+    "preview_image": "FunkyDiscoBall2.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    },
+    "description": "Original author: knarkowicz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdySW3. Funky Disco Ball with reflective spheres. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Eagle.glsl",
+    "preview_image": "Eagle.JPG",
+    "stars": 5,
+    "buffer": true,
+    "texture": {
+      "iChannel1": "52d2a8f514c4fd2d9866587f4d7b2a5bfa1a11a0e772077d7682deb8b3b517e5.jpg",
+      "iChannel2": "fb918796edc3d2221218db0811e240e72e340350008338b0c07a52bd353666a6.jpg",
+      "iChannel3": "0c7bf5fe9462d5bffbd11126e82908e39be3ce56220d900f633d58fb432e56f5.png"
+    },
+    "description": "Homeward by David Hoskins - A crow flying over a procedural landscape. Multi-pass shader with data storage (Buffer A), landscape rendering (Buffer B), and main image with lens flare.",
+    "audio_reactive": false
+  }
+]

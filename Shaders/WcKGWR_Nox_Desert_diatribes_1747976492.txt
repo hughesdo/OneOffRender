@@ -1,0 +1,63 @@
+// ID: WcKGWR
+// Name: Nox Desert
+// User: diatribes
+// Date: 1747976492
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Took Nox and added a couple planes:
+        https://www.shadertoy.com/view/WfKGRD
+
+    -5 chars from FabriceNeyret2
+
+    Thanks :D !
+
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, t=iTime*2.;
+    vec3 q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        // march, save to q and p
+        q = p = vec3(u * d, d + t);
+        // start noise loop
+        for (s = .03; s < 2.;
+            // modify p, our ground plane, low detail, big scale
+            p += abs(dot(sin(p * s * 4.), vec3(.035))) / s,
+            // could modify q here as well (sky)
+            s += s);
+        // 2 planes, .2-q.y and 2.5+p.y
+        d += s = .04 + .6*abs( min( .2 - q - cos(p.x)*.2 , 2.5+p ).y );
+        o += 1./s;
+    }
+    o = tanh(vec4(4,2,1,1) * o  / 4e3 / length(u-.1));
+}
+
+
+
+/* Original:
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, n, t=iTime*2.;
+    vec3 q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        // march, save to q and p
+        q = p = vec3(u * d, d + t);
+        // start noise loop
+        for (n = .03; n < 2.;
+            // modify p, our ground plane, low detail, big scale
+            p += abs(dot(sin(p * n * 4.), vec3(.035))) / n,
+            // could modify q here as well (sky)
+            n += n);
+        // 2 planes, .2-q.y and 2.5+p.y
+        d += s = .04+abs(min(.2-q.y-(cos(p.x)*.2),2.5+p.y))*.6;
+        o += 1./s;
+    }
+    o = tanh(vec4(4,2,1,1) * o  / 4e3 / length(u-=.1));
+}
+
+*/

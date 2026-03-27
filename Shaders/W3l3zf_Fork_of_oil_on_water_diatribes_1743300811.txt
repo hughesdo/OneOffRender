@@ -1,0 +1,125 @@
+// ID: W3l3zf
+// Name: Fork of oil on water
+// User: diatribes
+// Date: 1743300811
+
+
+// ===== PASS 0: Image =====
+
+/*
+Forked from @pb's "oil on water"
+https://www.shadertoy.com/view/w3fGzB
+
+The original is cooler, check it out
+I just put it in a tunnel for fun
+
+*/
+
+#define rot(a) mat2(cos(a+vec4(0,11,33,0)))
+
+//formula for creating colors;
+#define H(h)  (  cos( h*3. + 7.*vec3(1,2,3) )*.7 + .4 )
+
+//formula for mapping scale factor 
+#define M(c)  log(1.+c)
+
+#define R iResolution
+
+// pentagonal fold from: https://www.shadertoy.com/view/wtsGzl
+vec3 pentaFold(vec3 p) {
+	vec3 nc = vec3(-.5, -.809017, .309017);
+	for (int i = 0; i < 3; i++) {
+		p.xy = abs(p.xy);
+		p -= 2.*min(0., dot(p, nc))*nc;
+	}
+	return p - vec3(0, 0, 1.275);
+}
+
+vec3 oil(vec3 ro, vec3 rd) {
+    vec3 c=vec3(0);  
+    vec4 rdx = normalize( vec4( rd,2.) );
+    float sc,dotp,totdist=0., t=iTime; 
+    
+    for (float i=0.; i<100.; i++) {
+        
+        vec4 p = vec4( rdx*totdist ) * 150.;
+        
+        p += vec4(ro,-2.5); 
+
+        float dd = 3., cc2=0.,dist;
+        p.z = mod(p.z,2.*dd)-dd;  
+        
+
+        sc = 1.;  
+       
+        for (float j=0.; j<7.+(mod(iTime,15.)<10.?0.:1.); j++) {
+        
+            p = abs( p )*.5;
+            p.xy *= rot(iTime*.25);
+            
+            p.xyz = pentaFold(p.xyz);
+            
+            dotp = clamp(1./dot(p,p),.1,6.);
+            sc *= dotp;
+            
+            p = p*dotp - .02*vec4(pentaFold(p.xyw),2.2) ;
+ 
+            dist = ( length(p.xw) - .3 )/(1.+sc);
+                       
+        }
+ 
+        dist = clamp( abs( length(p.xw) -.1)/(1.+sc),1e-4,.5) ;
+        
+        float stepsize = dist/2. + 2e-4  ;
+        totdist += stepsize;    
+
+        rdx.xyz += .05*cross(rdx.xyz,c);
+ 
+        if (i>10.)
+        c += .02*H(log(sc))*exp(-stepsize*stepsize*i*i*100.) ; 
+        ;
+            
+
+    }
+    
+    c = clamp(c,-100.,100.);
+
+    c = 1. - exp(-c*c);
+    
+    c.b *= 1.2;
+
+    return c;
+}
+
+void mainImage( out vec4 O, vec2 U) {
+  
+    float s = .002, // surface dist
+          d = 0.;   // total dist
+    O = vec4(0); 
+           
+#define T iTime*1.
+#define path(z) (vec3(tanh(cos((z) * .4) * .3) * 6., \
+                      tanh(cos((z) * .5) * .4) * 5., (z)))
+
+    vec3 q;
+    vec2 p  = (U+U-R.xy)/R.y;    
+
+    // path stuff by diatribes
+    vec3 ro = path(T); 
+    vec3 la = path(T+1.); // look ahead/where you're going     
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,1., 0))),
+         lay = cross(lax, laz),
+         rd = mat3(lax, lay, laz) * normalize( vec3(rot(T*.75)*p, 1.5) ) ;
+    // raymarch
+    for(int i = 0; i++<60 && s > .001;)
+        q = ro + rd * d,
+        // dist to tunnel
+        s = .2 - length(q.xy - path(q.z).xy),
+        d += s;
+    // get oil at q
+    O.rgb = oil(q, rd);
+    O.rgb *= exp(-d/16.);
+}  
+
+

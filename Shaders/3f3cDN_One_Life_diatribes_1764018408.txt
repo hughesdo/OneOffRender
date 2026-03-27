@@ -1,0 +1,36 @@
+// ID: 3f3cDN
+// Name: One Life
+// User: diatribes
+// Date: 1764018408
+
+
+// ===== PASS 0: Image =====
+
+// golf welcome
+// 32 steps so hope it runs well for you :)
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,d,s,t = iTime;
+    
+    vec3 p = iResolution;
+    
+    u = (u+u-p.xy)/p.y;
+    
+    u += vec2(cos(t*.4)*.1, cos(t*.3)*.05);
+        
+    for(o=vec4(0); i++<32.;) {
+        p = vec3(u * d, d + t * 4.);
+        
+        for(s = .01; s < 1.; s += s )
+            p.yz -= abs(dot(sin(t+.22*p / s ), vec3(s)));
+        
+        p *= vec3(.2, .6, 1),
+        d += s = .25+.4*abs(5. - length(p.xy)),
+        o += 1./s + .3*vec4(1,2,5,0)/length(u);
+    }
+    
+    o = tanh(mix(o=vec4(8,2,1,0)*o*o/4e4,
+                 o.yzxw, smoothstep(.2, 1., length(u))));
+}
+

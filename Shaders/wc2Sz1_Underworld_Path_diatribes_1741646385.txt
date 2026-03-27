@@ -1,0 +1,47 @@
+// ID: wc2Sz1
+// Name: Underworld Path
+// User: diatribes
+// Date: 1741646385
+
+
+// ===== PASS 0: Image =====
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))                //
+
+#define P(z) (vec3(tanh(cos((z) * .21) * .21) * 26., \
+                   tanh(cos((z) * .24) * .19) * 36., (z)))
+
+#define N normalize
+
+float M(vec3 p) {
+    float s,l,w = 1.;
+
+    s = 4. - length(p.xy - P(p.z).xy);
+    p.xy -= P(p.z).xy - s *.01;
+    p.x -= 1.5;
+    p.y += .25;
+    float f = sin(p.z)*.25+.8;
+    for (float i; i++ < 4.; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = f/dot(p-vec3(-.1,.6,-.2),p)+1.5;
+        
+    return min(s, length(p)/w-.001);
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime*1.25, d = 0., i, s=.02;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3( rot(sin(T*.5)*.2) *(u-r.xy/2.)/r.x, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    while( s > .001)
+        p += s*D,
+        d += (s = M(p)),
+        o.rgb += sin(p*.1)*.008+.008;
+    o.rgb *= exp(-d/4.);
+}
+

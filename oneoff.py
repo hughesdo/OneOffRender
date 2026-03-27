@@ -212,14 +212,14 @@ def main():
         render_time = end_time - start_time
 
         if success:
-            print(f"\n✓ Rendering completed successfully in {render_time:.1f} seconds")
-            print(f"✓ Output saved to: {output_path}")
+            print(f"\n[OK] Rendering completed successfully in {render_time:.1f} seconds")
+            print(f"[OK] Output saved to: {output_path}")
         else:
-            print(f"\n✗ Rendering failed")
+            print(f"\n[FAIL] Rendering failed")
             sys.exit(1)
 
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        print(f"\n[FAIL] Error: {e}")
         sys.exit(1)
     finally:
         # Clean up temporary config file

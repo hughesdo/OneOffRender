@@ -1,0 +1,173 @@
+// ID: W3fSDS
+// Name: Stereo Fractal Test
+// User: diatribes
+// Date: 1745459824
+
+
+// ===== PASS 0: Image =====
+
+//============================================================
+// Cross-eyed 3D
+// Sit as far back from the screen as possible
+// Slightly cross your eyes so that there is a third image in the middle.
+// Relax your gaze, and concentrate only on that middle image, which is in 3D.
+// Click mouse on right side of image for stereo, left side for normal viewing.
+//============================================================
+
+// Parallax effect
+#define PARALLAX .03
+
+// look around speed
+#define LOOK_SPEED 2.
+
+// delete if you don't want
+#define NOISE_ON_TEXTURE
+
+// rate at which noise moves on texture
+#define NOISE_ON_TEXTURE_SPEED 4.
+
+#define T (iTime * .1)
+#define LOOK_FREQ (tanh(cos((T*.3)*.125)*9.))
+
+#define P(z) (vec3(tanh(cos((z) * .1) * .7) * 12., \
+                   tanh(cos((z) * .15) * .4) * 12., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define TONEMAP(x) ((x) / ((x) + 0.155) * 1.019)
+
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+vec3 fog(vec3 rgb, float d) {
+    float fogTime = iTime * 1.;
+    float fogDistance = -.5 + sin(fogTime * 0.2) * 0.2; // set to 0.0 to disable fog
+    float fogAmount = 0.3 + sin(fogTime * 0.1) * 0.2;
+    float fogColor = 0.84 + sin(fogTime * 0.3) * 0.7;
+    if(fogDistance != 0.0) {
+        float f = d - fogDistance;
+        if(f > 0.0) {
+            f = min(1.0,f * fogAmount);
+            rgb = mix(rgb, vec3(0.2 + f * fogColor),f);
+        }
+    }
+    return rgb;
+}
+
+
+// @Shane's Menger function hacked up
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(in vec3 q){
+    float d, s = 32.;
+    q.xy -= P(q.z).xy;
+    vec3 p = q*2.;
+    p.y-=1.5;
+    
+    float l, w = 1.;
+    for (int i; i++ < 7; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.7/dot(p,p);
+        
+    d = length(p)/w;
+    MENGERLAYER(1.,max, 1.);
+    MENGERLAYER(3., max, 2.);
+    MENGERLAYER(5., max, 3.);
+    return d;
+}
+
+float map(vec3 p) {
+    return fractal(p);
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+vec3 orb(vec3 p) {
+    float t = T*LOOK_SPEED;
+    return (p - vec3(
+            P(p.z).x+tanh(cos(t * .5)*4.) * 8.5,
+            P(p.z).y+tanh(cos(t * .7)*5.) * 8.5,
+            2.+T+LOOK_FREQ*12.));
+}
+
+void mainImage(out vec4 o, in vec2 U) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    
+// --------------------------------------    
+    float xsize = r.x * 0.5;    
+    bool stereo = iMouse.x > xsize;
+    vec2 U2 = U;
+    
+    if(stereo) {
+        if(U2.x >= xsize)  // right side of stereo pair?
+            U2.x -= xsize;      // base 0  X coordinate
+    }
+    
+    vec2 u = rot(sin(T*.3)*.3)*(U2-r.xy/2.)/r.y;
+// --------------------------------------  
+    
+    vec3  e = vec3(.02,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - orb(p) -p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1) * mat3(-X,cross(X, Z), Z);
+      
+// --------------------------------------    
+    if(stereo) {
+        vec3 cameraOffset = -X * PARALLAX;
+
+        if(U.x < xsize) 
+            ro += cameraOffset; else ro -= cameraOffset;
+    }
+// --------------------------------------    
+
+    o -= o;
+    while(i++ < 200. && s > .001)
+        p = ro + D * d,
+        d += (s = map(p)*.55);
+        
+    // I may not need all these for a tunnel
+    r =  N(map(p) - vec3(map(p-e.xyy)-map(p+e.xyy), 
+                         map(p-e.yxy)-map(p+e.yxy), 
+                         map(p-e.yyx)-map(p+e.yyx)));
+    if (mod(p.z, 10.) > 5.) // do smoothstep+mix intead
+        o.rgb= pow(tex3D(iChannel1, p*.5, r), vec3(2.2));
+    else
+        o.rgb = pow(tex3D(iChannel2, p*.5, r), vec3(2.2)),
+        o *= 2.;
+        
+    #ifdef NOISE_ON_TEXTURE
+    for (i = .2; i < 1.2;
+        o.rgb += abs(dot(sin(NOISE_ON_TEXTURE_SPEED*T+o.rgb * i * 32.), vec3(.045))) / i,
+        i *= 1.4142);
+    o *= o * .35;
+    #endif
+ 
+    o *= AO(p, r);
+    o *= o *.35;
+    o.rgb = fog(TONEMAP(o.rgb), d);
+
+// --------------------------------------    
+    if(stereo && abs(U.x - xsize) < 1.0) o.xyz = vec3(1.); // center line
+// --------------------------------------   
+}

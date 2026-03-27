@@ -1,0 +1,111 @@
+// ID: MXcfWH
+// Name: There's a party in my head
+// User: diatribes
+// Date: 1737160504
+
+
+// ===== PASS 0: Image =====
+
+
+// Learning from this article:
+// https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+
+
+#define MAX_STEPS 50
+#define MAX_DIST 20.0
+#define SURFACE_DIST .001
+#define inf (MAX_DIST+1.0)
+
+vec3 repeat(vec3 p, float c) {
+  return mod(p,c)-0.5*c;
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float sdCross(in vec3 p, float s) {
+  float da = sdBox(p.xyz, vec3(1.0, s, s));
+  float db = sdBox(p.yzx, vec3(s, 1.0, s));
+  float dc = sdBox(p.zxy, vec3(s, s, 1.0));
+  return min(da, min(db, dc));
+}
+
+vec2 rotate(vec2 p, float a) {
+    float c = cos(a);
+    float s = sin(a);
+    return mat2(c, -s, s, c)*p;
+}
+
+float scene(vec3 p) {
+  vec3 s = p - vec3(0.0, 0.0, -3.5);
+  s.xy = rotate(s.xy,iTime);
+  s.xz = rotate(s.xz,iTime);
+  float box = sin(sdBox(s, vec3(.25,.25,.25))*.5+.5);
+  float cross = cos(sdCross(s, .125))*.5+.5;
+  float boxCross = (box-cross)+(sin(iTime)*.25+.25);
+  return min(cross,boxCross);
+}
+
+float raymarch(vec3 ro, vec3 rd) {
+  float dist = 0.0;
+  for(int i = 0; i < MAX_STEPS; i++) {
+
+    // Ray origin extended by dist in rd direction
+    vec3 p = ro + rd * dist;
+
+    // Calculate the distance from the current position
+    // to an object in the scene or infinity
+    float step = scene(p);
+
+    // Track the total distance of the ray
+    dist += step;
+
+    // If we've gone too far, or are very close to a surface
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+
+  // Infinity or the distance to a surface
+  return dist;
+}
+
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 n = scene(p) - vec3(
+    scene(p-e.xyy),
+    scene(p-e.yxy),
+    scene(p-e.yyx));
+
+  return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+  vec2 uv = fragCoord.xy/iResolution.xy-.5;
+  uv.x *= iResolution.x / iResolution.y;
+
+  vec3 ro = vec3(0.);
+  vec3 rd = normalize(vec3(uv, -1.0));
+
+  float d = raymarch(ro, rd);
+  vec3 color = vec3(.25);
+  
+  float t = iTime;
+  float r = distance(.01*d+uv, vec2(sin(t), sin(1.0/t)*.1));
+  float g = distance(.002+uv, vec2(uv.x, r*sin(t))); 
+  float b = distance(.01*d+uv, vec2(r, sin(t)));
+  float v = abs(sin(d*r+t) + sin(d*g+t) + sin(d*b+t))*16.0;
+  color *= vec3(r/v,g/v,b/v);  
+  if(d<MAX_DIST-1.0) {
+    vec3 p = ro + rd * d;
+    vec3 normal = getNormal(p);
+    vec3 lightDirection = normalize(ro - p);
+    float diffuse = max(dot(normal, lightDirection), .5);
+    color = vec3(color) + diffuse;
+  }
+  fragColor = vec4(color, 1.0);
+}
+

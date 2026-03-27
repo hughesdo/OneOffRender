@@ -1,0 +1,40 @@
+// ID: tct3zl
+// Name: Purple Moon Valley [385]
+// User: diatribes
+// Date: 1747492302
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Using some golf tricks from @FabriceNeyret2 and @AleDev
+    found in this shader:
+    https://www.shadertoy.com/view/WfdGRj
+    
+*/
+
+#define A(x,r) abs(dot(sin(x*p*a), r +p-p )) / a
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,a,s;
+    vec3  p = iResolution;  
+    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<90.; 
+        d += s = min(s, 32. + p.y) *.5,
+        o += vec4(3,1,3,0)/(.3+abs(s)),
+        p = vec3(u * d,d+iTime*2e1),
+        s = 20. + p.y,
+        p.y -=  (sin(4.75+p.x*.01)+sin(p.y*.002))*1e2+1e2+25.,
+        p += cos(p.yzx*.02)*8.)
+        
+        for (a = .03; a < .5;
+             s -= A(3., .03),
+             p.y += A(2., .1),
+             a *= 1.4);
+             
+    u.y -= .3;
+    o = tanh(o / 2e3 / dot(u,u));
+}
+
+

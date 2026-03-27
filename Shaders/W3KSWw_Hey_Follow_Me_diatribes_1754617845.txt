@@ -1,0 +1,56 @@
+// ID: W3KSWw
+// Name: Hey Follow Me
+// User: diatribes
+// Date: 1754617845
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(cos((z) * .09)* 8., cos((z) * .05)* 12., (z))
+#define N(f, i, s) abs(dot(sin(f*p*s), i +p-p )) / s
+void mainImage(out vec4 o, in vec2 u) {
+
+    float l,i,d,s=.002,T = iTime*6.;
+    
+    vec3  q = iResolution,
+          
+          // position, origin
+          p = P(T),ro=p,
+          
+          // Look-at
+          Z = normalize( P(T+4.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          // raydir
+          D = vec3((u-q.xy/2.)/q.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    for(o *= i; i++<1e2;o+=(1.+cos(.1*p.z+vec4(3,1,0,0)))/s)
+        // march
+        p = ro + D * d,
+        
+        // path
+        q = P(p.z),
+        
+        // orb/bubble
+        l = abs(length(p - vec3(
+                       q.x+sin( sin(p.z*.3) ), 
+                       q.y+sin( sin(p.z*.1) ),
+                       12.  +T +cos(T*.15) *7. )  ) - .5),
+ 
+        // tunnel with modulating radius
+        s = cos(p.z*.1)*3.+6. - 
+            min(length(p.xy - q.y- 4.),
+            min(length(p.xy - q.xy),
+                length(p.x - q.y - 12.))),
+      
+        // bring tha noize
+        s -= N(.1*p.z+2., .2, 1.),
+        s += N(.6*p.z+2., .2, 2.),
+        s += tanh(1.+dot(tanh(p*.3), cos(p+sin(p.zxy)))),
+        s *= .4, // clean up surface texture
+        
+        // accumulate distance
+        d += s = .01+.65*abs(min(s,l));
+    // tonemap
+    o = tanh(o/2e3);
+}
+

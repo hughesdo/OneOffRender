@@ -1,0 +1,25 @@
+// ID: WcccRl
+// Name: Dark Terrain [278]
+// User: diatribes
+// Date: 1764216424
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i, s, d, n;
+    vec3 Z,p=iResolution;
+    for(o*=i,u =(u+u-p.xy)/p.y;
+        i++< 64.; 
+        d += s =.4*min(2.9 - s, .01+.2*abs(s)),
+        o += s  + .01/length(u-.5)
+    )
+        for(p = vec3(u * d, d + iTime),
+            s = 2.2-p.y+cos(p.x*.3)*.3,
+            n = .01; n < .4; n += n
+        )
+            s -= abs(dot(sin(.23*p/n), Z+n));
+    o = tanh(o * .1 / exp(d/20.));
+}
+

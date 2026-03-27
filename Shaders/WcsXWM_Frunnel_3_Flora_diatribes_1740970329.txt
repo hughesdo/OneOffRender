@@ -1,0 +1,52 @@
+// ID: WcsXWM
+// Name: Frunnel 3: Flora
+// User: diatribes
+// Date: 1740970329
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime*1.25)
+#define DIST_MAX 25.
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define P1(z) (vec3(tanh(cos((z) * .21) * .25) * 35., \
+                    tanh(cos((z) * .29) * .14) * 16., (z)))
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.x;
+    vec4 q;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+4.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.5)*.2)*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s;
+    float steps = 0.;
+    do{
+        p = ro + rd * d;
+        s = 1. - length(p.xy - P1(p.z).xy);
+        p.xy -= P1(p.z).xy;
+        p.xy = mod(p.xy, 1.) - .5;
+        p.z = mod(p.z, 1.) - .5;
+        q = vec4(p, 1.0);
+        for(int i = 0; i < 11; i++) {
+            q.xyz = abs(q.xyz);
+            q = .65*q/clamp(pow(length(q.xyz),2.), .45, 1.) 
+                - vec4(.1, .085, .91, 0.0);
+        }
+        s = min(s,length(q.xyz)/q.w - .0275);
+        d += s;
+        steps++;
+    } while (steps < 100. && d < DIST_MAX && s > .01);
+    if (d < DIST_MAX && steps < 100.) {
+        o.rgb = vec3(sin(q.rgb)/d);
+        o.rgb *= exp(-d/3.);
+    } else {
+        o = vec4(0.);    
+    }
+    o.rgb = pow(o.rgb, vec3(.45));
+}

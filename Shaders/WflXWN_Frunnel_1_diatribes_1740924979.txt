@@ -1,0 +1,58 @@
+// ID: WflXWN
+// Name: Frunnel 1
+// User: diatribes
+// Date: 1740924979
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 3.)
+#define P(z) (vec3(tanh(cos((z) * .25) * .12) * 23., \
+                   tanh(cos((z) * .13) * .15) * 14., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define R 2.25
+
+float fractal(vec3 p) {
+    p.xy -= P(p.z).xy;
+    p.x -= 1.;
+    p.xy = mod(p.xy+1., 8.) - 4.;
+    p.z = mod(p.z, 2.) - 1.;
+    vec4 q = vec4(p, 1.);
+    for (float i = 0.; i < 8.; i++) {
+        q.xyz  = abs(sin(q.xyz)) - 1.;
+        q = q/pow(length(q.xyz),2.) -
+            vec4(.0, .0, .0, 0.);
+    } 
+    return length(q.xyz)/q.w - .001;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = P(T),
+         la = P(T+2.);
+    vec3 laz = normalize(la - ro),
+         lax = cross(laz, vec3(0.,-1., 0)),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.13)*1.5)*u, 1.) * mat3(-lax, lay, laz);
+	if (iMouse.z > 40.) {
+        float a = atan(.0, -1.);
+        rd.yz *= rot(-a * .5 + iMouse.y/r.y * a);
+        rd.zx *= rot(a - iMouse.x/r.x * a * 2.);
+    }
+    float d = 0.,s,steps = 0.;
+    do {
+        p = ro + rd * d;
+        s = R - length(p.xy - P(p.z).xy);
+        s = min(s, fractal(p));
+        d += s;
+        steps++;
+    } while(d < 100. && s > .01 && steps < 70.);
+    p = ro + rd * d;
+    p.z = sin(p.z); // z is large, z is blue, not so much blue plz, ty
+    o.rgb = abs(.1*p / dot(sin(p*4.),vec3(2./d)));
+    o.rgb *= exp(-d/2.);
+    o = vec4(pow(o.rgb, vec3(.45)), 1);
+}
+

@@ -1,0 +1,80 @@
+// ID: 3XlfWX
+// Name: Parasitic End
+// User: diatribes
+// Date: 1761950657
+
+
+// ===== PASS 0: Image =====
+
+// messy tinkering, trying to keep with the
+// Halloween spirit :D
+
+/*
+    https://www.shadertoy.com/view/W3lGz8
+    https://www.shadertoy.com/view/WXXGRH
+    https://www.shadertoy.com/view/t3XGW8
+    https://www.shadertoy.com/view/3XlyDf
+*/
+
+
+#define T iTime
+
+vec3 rgb = vec3(0);
+
+
+float M(vec3 p) {
+
+    float t = T,
+          g = dot(sin(1.35*p*.3)+sin(p),cos(t+p))+
+              dot(sin(1.6*p*1.3),cos(p*2.4)),
+    s = (sin(t)*1.)+4. - length(p)-g*.2;
+    
+    p.z += T * .2;
+    for (float a = .01; a < 1.;
+        s -= abs(dot(sin(p/a), vec3(.3))) * a,
+        a += a);
+    
+    vec3 q = p;
+    float qs = 0.;
+    
+    q.xy *= mat2(cos(.3*t+q.z*.6+vec4(0,33,11,0)));
+    
+    q.y += sin(p.z)*g*.25 + sin(12.*t+p.z*6.)*.1;
+        + sin(p.z)*g*.15 + sin(4.*t+p.z*2.)*.1;
+    for (float a = .5; a < 4.;
+        qs -= abs(dot(sin(t+t+p * a *16.), vec3(.01))) / a,
+        a += a);
+    s = min(s, qs+length(
+        (mod(q,1.) - .5).xy
+    ) - .1);
+
+    rgb += 1./s;
+    return s;
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,d=0.,i=0.;
+    vec3  r = iResolution;
+    u = (u+u-r.xy)/r.y;
+    if (abs(u.x) > 1.25) { o = vec4(0); return; } 
+    
+    
+    vec3  e = vec3(.01,0,0),
+          p,
+          D = vec3(u, 1);
+    for(o = vec4(0); i++ < 90.;)
+        p += (s = .5*M(p)) * D,
+        d += s;
+
+    r =  normalize(M(p) - vec3(M(p-e.xyy), 
+                               M(p-e.yxy), 
+                               M(p-e.yyx)));
+                         
+    o.rgb = tanh(vec3(dot(rgb,rgb))/1e2);
+    o.r += d*.1;
+    o *= exp(-d/6.);
+    o -= max(tanh(cos(T+d+sin(T+T))), .001);
+    o *= max(dot(r, normalize(vec3(0)-p)), .0);
+    o = tanh(o);
+}

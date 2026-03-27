@@ -1,0 +1,58 @@
+// ID: tflXWN
+// Name: The Projector 2
+// User: diatribes
+// Date: 1740931353
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * .5)
+#define P(z) (vec3(0., 0., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define R 3.
+
+float fractal(vec3 p) {
+    const float mscale = .75;
+    p = mod(p + 1.0, 3.0) - 1.5;
+    p.xy += .5;
+    vec4 q = vec4(p, 1.0);
+    for(int i = 0; i < 16; i++) {
+        q.xyz = abs(q.xyz);
+        q = mscale*q/clamp(pow(length(q.xyz),2.), .5, 1.) 
+            - vec4(.35, .9, 0.6, 0.0);
+    }
+    return length(q.xyz)/q.w * 2.5 - .002;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = P(T),
+         la = P(T+2.);
+    vec3 laz = normalize(la - ro),
+         lax = cross(laz, vec3(0.,-1., 0)),
+         lay = cross(lax, laz),
+         rd = vec3(u, 1.) * mat3(-lax, lay, laz);
+	if (iMouse.z > 40.) {
+        float a = atan(.0, -1.);
+        rd.yz *= rot(-a * .5 + iMouse.y/r.y * a);
+        rd.zx *= rot(a - iMouse.x/r.x * a * 2.);
+    }
+    float d = 0.,s,steps = 0.;
+    do {
+        p = ro + rd * d;
+        s = fractal(p);
+        d += s*1.5;
+        steps++;
+    } while(d < 100. && s > .001 && steps < 70.);
+    if (d < 100. && steps  < 70.) {
+        p = ro + rd * d;
+        p.z = sin(p.z);
+        o.rgb = abs(p / dot(sin(p),vec3(1.)));
+    } else {
+        o.rgb = vec3(0.);
+    }
+    o = vec4(pow(o.rgb,vec3(.45)), 1);
+}
+

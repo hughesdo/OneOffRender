@@ -1,0 +1,66 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Wicked Woods Flight
+// Created by diatribes
+// Shadertoy ID: 3cBXzw
+// https://www.shadertoy.com/view/3cBXzw
+
+#define N normalize
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define T (iTime * 2.5)
+
+vec3 P(float z) {
+    return vec3(
+         tanh(cos(z * .19) * .25) * 23.75 - 1.,
+         .075,
+         z
+    );
+}
+
+float orb(vec3 p) {
+    float t = T * 1.8;
+    return length(p - vec3(
+            P(p.z).x+sin(sin(p.z*.21)+t*.44) * 3.22,
+            P(p.z).y+sin(sin(p.z*1.33)+t*.15) *.5-.25,
+            4.5+T+tan(cos(t*.36)*.3)*8.));
+}
+
+float M(vec3 p) {
+    float s = 2. - p.y, l, w = 1.;
+    for (float a = .4; a < 8.;
+        s -=  abs(dot(sin(p * a * 4.)*.25, vec3(1.))) / a * .125,
+        a += a); 
+    p.xy -= P(p.z).xy;
+    p.x -= 1.;
+    p.y *= .35;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.1/dot(p,p);
+    s = min(s,length(p)/w - .001);
+    return s;
+}
+
+void main()
+{
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    float i, s=.02;
+    vec3  p = P(T),
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(iTime*.3)*.4)*(u-iResolution.xy/2.)/iResolution.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    for(i = 0.; i++ < 80. && s > .001;)
+        p += s*D,
+        o.rgb += (s = M(p))*.01+.02;
+    o.rgb /= orb(p);
+    
+    fragColor = o;
+}
+

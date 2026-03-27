@@ -1,0 +1,129 @@
+// ID: WcGczD
+// Name: Hyper Glitch Turbo Run
+// User: diatribes
+// Date: 1764511676
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Mouse down and use mouse x to go hyperspeed :)
+
+    Glitch Stuff:
+
+    make noise or any other waves and use sign, round, ceil,
+    floor, or step() on the wave to make it square
+    
+    basically make world geometry from square waves and send a tunnel
+    through it (or fly over it)
+
+    i was trying to get away from abusing noise all the time,
+    but now i've unlocked hyper tunnel land :D
+    makes me think of the 90s, graffiti, rad stuff, neon
+
+    the weird dither is intentional, it's created by setting 'd'
+    to a random distance. I used a pattern that is NOT good randomness
+    because i wanted it to be retro pixelly and generally glitchy
+    it's most noticeable as the orb nears the camera (the green glow gets pixelated)
+
+
+
+/*
+
+/*
+    @FabriceNeyret2 motion blur by redefining iTime
+    See @GregRostami's shader for blur here:
+    https://www.shadertoy.com/view/Ns3fDf
+    
+    
+    I liiked Fabrice's all-in-one solution and the imperfect noise
+    adds to the glitch retro effect
+*/
+
+#define iTim ( iTime + fract(1e4*sin(dot(gl_FragCoord.xy,vec2(137,-13))))* iTimeDelta )
+#define T (sin(iTim*.6)*32.+iTim*1e2  + (iMouse.z > 70. ? iTime*iMouse.x/iResolution.x/1e2 : 0.))
+
+
+#define P(z) (vec3(cos((z)*.003)*256.+cos((z) * .005)  *512., \
+                   cos((z)*.006)*64., (z)))
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float lights;
+
+float map(vec3 p) {
+    vec3 q = P(p.z);
+
+    // entity (flying light orb)
+    // just a sphere with z coord offset by time
+    float e = length(p - vec3(
+               q.x+sin(T*.05),
+               q.y,
+               48.+T+sin(.005*T)*64.))-.001;
+               
+    // accumulate orb light
+    lights += 4./e;
+    
+    
+    // move p space by path
+    p.xy -= q.xy;
+    
+    // sample road plane
+    float r = 4e1-p.y;
+    
+    // mirror for square tunnel
+    p = abs(p);
+    
+    // sample square tunnel
+    float t = min(5e1-p.x, 32.-p.y);
+    // n noise iterator, s noise value
+    float n,s =-p.y-26.;
+
+    for(n = .21; n < 1.9; n += n+n)
+        s -= abs(dot(round(sin(.1*p/n+.1*p.yzx/n)), vec3(n * 4.)));     
+    
+    // min(orb, max(tunnel + noise/2., road + noise)
+    return min(e, max(t + s/2., r + s));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float i,s,d=.4+.5*dot(fract(sin(u)), sin(u));
+    vec3  r = iResolution;
+    
+    // scale coorods
+    u = (u-r.xy/2.)/r.y;
+    
+    u /= (iMouse.z > 70. ? iMouse.x / r.x : 1.);
+    
+    // head down to go faster :D
+    // SPEEEEEEEEEEEEED
+    u.y -=.2;    
+    
+    // remember to clear o :)
+    o = vec4(0);
+
+    // raymarch origin, ray direction, look-at
+    vec3  p = P(T),ro=p,
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(R(sin(T*.005)*.4)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    
+    // 100 iterations or until d is bigly
+    for(; i++ < 1e2 &&  d < 2e3;)
+        // raymarch position
+        p = ro + D * d,
+        // sample and understep
+        d += s = map(p) * .4,
+        // accumulate color for orb and geometry
+        o += .3*vec4(1,2,5,0)*lights + (1.+cos(p.y*.4+s*3e1+vec4(6,4,2,0)))/max(d/s, .01);
+
+    // brightness and distance inverse fade (brighter further away)
+    o = (o / d / 4e2 * exp(d / 64.));
+    
+    // @Shane tip :D
+    // mix o and o.swizzle based on whatever you like,
+    // distance, length(u) for radial, etc...
+    o = mix(o*=o, o.yzxw, smoothstep(.2, 1., length(u)));
+    o = tanh(mix(o, o.yzxw, smoothstep(.2, 1.,d)));
+}

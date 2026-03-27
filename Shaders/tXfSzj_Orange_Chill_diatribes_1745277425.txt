@@ -1,0 +1,92 @@
+// ID: tXfSzj
+// Name: Orange Chill
+// User: diatribes
+// Date: 1745277425
+
+
+// ===== PASS 0: Image =====
+
+
+
+#define T ((sin(iTime*.3)+iTime*.7)) * 1.5
+
+
+#define W .75
+#define H .35
+#define L 180.
+
+#define P(z) (vec3(tanh(cos((z) * .13) * .65) * 8., \
+                   tanh(cos((z) * .15) * .4) * 16., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define inf 9e9
+
+// @Shane's Menger function hacked up
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(in vec3 q){
+    vec3 p;
+    float d=inf, s = 2.;
+    q = mod(q, 5.) - 2.5;
+    MENGERLAYER(1., min, 3.);
+    MENGERLAYER(3., max, 3.);
+    MENGERLAYER(20., max, 3.);
+    MENGERLAYER(6., max, 3.);
+    return d;
+}
+
+float tunnel(vec3 p) {
+    vec3 tun = abs(p - P(p.z));
+    return max(W - tun.y - tun.x,
+           min(W -tun.x, H-tun.y));
+}
+
+float map(vec3 p) {
+    return fractal(p);
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+
+
+    u = (u-r.xy/2.)/r.y;
+     
+    vec3  p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(tanh(sin(p.z*.1)*1.5)*2.)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+
+    o -= o;
+    float l = tanh(cos(p.z*.15)*8.)*L+L+5.;
+    for(i = 0.; i++ < (l) && s > .001;)
+        p = ro + D * d,
+        d += s = tunnel(p)*.5,
+        o.rgb += sin(p*.1)*.01+.01;
+
+    ro = p, s=.002, d = 0.;
+    while(i++ < L && s > .001)
+        p = ro + D * d,
+        d += (s = map(p)*.75);
+        
+
+    if (mod(p.z, 10.) > 5.)
+        o.rgb = vec3(.5, .3, .1);
+    else
+        o.rgb = vec3(.1, .3, .5);
+
+ 
+    vec3 lights = abs((vec3(1.6, 1.2, .8)) /
+                  dot(cos(.6*iTime+p*.3),vec3(.01)))*.1;
+ 
+    o *= o*.125;
+    o *= 4.;
+    o.rgb *= lights;
+    o.rgb = pow(tanh(o.rgb*vec3(1.5,1.,.7)*exp(-i/42.-d*1.4))
+                - dot(u,u)*.1, vec3(.45));
+}

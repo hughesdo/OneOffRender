@@ -1,0 +1,81 @@
+// ID: tfcyRS
+// Name: Gibson Tunnel
+// User: diatribes
+// Date: 1763736375
+
+
+// ===== PASS 0: Image =====
+
+// HACK THE PLANET
+// i *think* most moderate gpus will be smoooooth
+// will use "lowtechtunnel" tag for this kind of thing
+
+#define T (iTime*2.+sin(.6*iTime))
+#define N normalize
+#define P(z) vec3(cos(.7*cos((z)*.2)+(z) *  .15) * 8., \
+                 cos((z) *  .13) * 16., (z))
+
+float lights;
+
+float light(vec3 p) {
+    float sz = sin(p.z*.3)*.6;
+    return length(p - vec3(
+            p.x+sz,
+            p.y,
+            T+sz+2.));
+}
+
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float fractal(vec3 q){
+    vec3 p;
+    
+    // *** Play with scale (s)
+    // 2 - 8 works'ish
+    float s = 6., d = 9e9;
+    MENGERLAYER(3., min, (cos(q.z*.2)*4.+6.5));
+    MENGERLAYER(4., max, 3.);
+    
+    return d;
+}
+
+float map(vec3 p) {
+    float s, l;
+    l = light(p) - .01;
+    s = fractal(p);
+    lights += .1/max(l,.001);
+    return s;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+   
+    float s,d,i;
+
+    vec3  c,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+ 
+     // cinema bars
+    if (abs(u.x) > .75) { o = vec4(0); return;}
+    
+    vec3 
+          p = P(T),ro=p,
+          Z = N( P(T+4.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    for(;i++ < 28. && d < 16.;
+        c +=1./s
+          + 1e1*vec3(5,1,5)*lights
+    )
+        p = ro + D * d,
+        p.xy -= P(p.z).xy,
+        d += s = .005+.85*abs(map(p));
+
+    c = mix(c=c*c/1e7+.3*length(u*u), c.yzx, length(u)*2.1); 
+    o.rgb = tanh(c);
+
+}

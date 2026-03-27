@@ -2,11 +2,11 @@
   "output": {
     "video_file": "Output_Video/multi_shader_render.mp4",
     "directory": "Output_Video",
-    "resolution": {
-      "width": 2560,
-      "height": 1440
-    },
-    "frame_rate": 30
+	"resolution": {
+		"width": 1920,
+		"height": 1080
+	},
+	"frame_rate": 30
   },
   "duration_override": {
     "enabled": false,

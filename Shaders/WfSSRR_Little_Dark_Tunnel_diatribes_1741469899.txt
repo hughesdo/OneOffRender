@@ -1,0 +1,40 @@
+// ID: WfSSRR
+// Name: Little Dark Tunnel
+// User: diatribes
+// Date: 1741469899
+
+
+// ===== PASS 0: Image =====
+
+// I'm playing around with golfing using the techniques I see in
+// the golf @FabriceNeyret2 did here https://www.shadertoy.com/view/3fsXWM
+
+#define P(z) vec3(tanh(cos((z) * .31) * .4) * 16., \
+                  tanh(cos((z) * .28) * .3) * 18., (z))
+
+float M(vec3 p) {
+    float s,l,w = 1.;
+    p.xy -= P(p.z).xy;
+    s = 2. - length(p.xy);
+    p.x -= 2.;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return s*length(p)/w; 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime*2., s=.002;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3((u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    while( s > .001)
+        p += s*D,
+        o.rgb += (s = M(p))*.1;
+}
+

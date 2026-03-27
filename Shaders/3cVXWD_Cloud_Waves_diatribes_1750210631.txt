@@ -1,0 +1,30 @@
+// ID: 3cVXWD
+// Name: Cloud Waves
+// User: diatribes
+// Date: 1750210631
+
+
+// ===== PASS 0: Image =====
+
+/*
+        @FabriceNeyret2 -4
+        
+        Thanks :D !
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        d += s = .04 + abs(s)*.1,
+        o += 1./s)
+        for (p = vec3(u * d, d + t),
+            s = 4.+p.y,
+            a = .05; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(.5*t+p * a * 6.), .05+p-p)) / a;
+    u -= vec2(-.5, .4);
+    o = tanh(o*o / 3e6 / dot(u,u));
+}
+

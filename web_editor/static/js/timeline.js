@@ -93,13 +93,21 @@ class Timeline {
     }
 
     /**
-     * Add a new element to the timeline with auto-placement
+     * Add a new element to the timeline with auto-placement or gap insertion
      */
-    addElement(type, data, targetLayer = null) {
+    addElement(type, data, targetLayer = null, dropTime = null) {
         const duration = this.calculateDefaultDuration(type, data, 0);
 
-        // Find the best placement using auto-concatenation logic
-        const placement = this.findAutoConcatenationPlacement(type, duration, targetLayer);
+        // Try gap placement first if dropTime is specified
+        let placement = null;
+        if (dropTime !== null) {
+            placement = this.findGapPlacement(type, duration, targetLayer, dropTime);
+        }
+
+        // Fallback to auto-concatenation if no gap placement found
+        if (!placement) {
+            placement = this.findAutoConcatenationPlacement(type, duration, targetLayer);
+        }
 
         const element = {
             id: this.generateId(),
@@ -120,76 +128,22 @@ class Timeline {
 
     /**
      * Find optimal placement for auto-concatenation
-     * Places elements at the end of existing content on the same layer
+     * Places elements at the end of existing content on the CORRECT layer
+     * STRICT: Videos → Layer 0, Shaders/Transitions → Layer 1
      */
     findAutoConcatenationPlacement(elementType, duration, targetLayer = null) {
-        // Get all unique layer numbers, sorted
-        const existingLayers = [...new Set(this.layers.map(el => el.layer))].sort((a, b) => a - b);
+        // STRICT layer assignment - determine the correct layer for this element type
+        const correctLayer = this.resolveTargetLayer(elementType, null);
 
-        // Check layer restrictions (Layer 0 = Videos, Layer 1 = Shaders/Transitions)
-        const canUseLayer0 = elementType === 'video';
-        const canUseLayer1 = elementType === 'shader' || elementType === 'transition';
-
-        // If no layers exist, start at appropriate layer
-        if (existingLayers.length === 0) {
-            if (canUseLayer0) {
-                return { layer: 0, startTime: 0, duration: Math.min(duration, this.duration) };
-            } else if (canUseLayer1) {
-                return { layer: 1, startTime: 0, duration: Math.min(duration, this.duration) };
-            } else {
-                return { layer: 2, startTime: 0, duration: Math.min(duration, this.duration) };
-            }
+        // Try to place at the end of the correct layer
+        const placement = this.findEndOfLayer(correctLayer, duration);
+        if (placement) {
+            return placement;
         }
 
-        // If target layer is specified, try that first (respecting layer restrictions)
-        if (targetLayer !== null && existingLayers.includes(targetLayer)) {
-            // Check if element type is allowed on target layer
-            const isAllowed = (targetLayer === 0 && canUseLayer0) ||
-                            (targetLayer === 1 && canUseLayer1) ||
-                            (targetLayer >= 2);
-
-            if (isAllowed) {
-                const placement = this.findEndOfLayer(targetLayer, duration);
-                if (placement) {
-                    return placement;
-                }
-            }
-        }
-
-        // Try each existing layer in order (left-to-right filling)
-        for (const layerNum of existingLayers) {
-            // Skip layer 0 if element type is not allowed
-            if (layerNum === 0 && !canUseLayer0) {
-                continue;
-            }
-            // Skip layer 1 if element type is not allowed
-            if (layerNum === 1 && !canUseLayer1) {
-                continue;
-            }
-
-            const placement = this.findEndOfLayer(layerNum, duration);
-            if (placement) {
-                return placement;
-            }
-        }
-
-        // All existing layers are full or skipped, create a new layer starting at time 0
-        // First, check if we can use the dedicated layers (0 or 1) if they don't exist yet
-        let newLayerNum;
-
-        if (canUseLayer0 && !existingLayers.includes(0)) {
-            // Videos should use Layer 0 if it doesn't exist yet
-            newLayerNum = 0;
-        } else if (canUseLayer1 && !existingLayers.includes(1)) {
-            // Shaders/transitions should use Layer 1 if it doesn't exist yet
-            newLayerNum = 1;
-        } else {
-            // Both dedicated layers exist or are not applicable, use next available layer
-            newLayerNum = existingLayers.length > 0 ? Math.max(...existingLayers) + 1 : 2;
-        }
-
+        // If the correct layer is full or doesn't exist, start at time 0 on that layer
         return {
-            layer: newLayerNum,
+            layer: correctLayer,
             startTime: 0,
             duration: Math.min(duration, this.duration)
         };
@@ -236,6 +190,142 @@ class Timeline {
             startTime: startTime,
             duration: finalDuration
         };
+    }
+
+    /**
+     * Find all gaps (empty regions) in a layer
+     * Returns array of {start, end} objects representing empty regions
+     */
+    findGapsInLayer(elementsInLayer) {
+        if (elementsInLayer.length === 0) {
+            return [{ start: 0, end: this.duration }];
+        }
+
+        // Sort by start time
+        const sorted = [...elementsInLayer].sort((a, b) => a.startTime - b.startTime);
+        const gaps = [];
+
+        // Gap at beginning?
+        if (sorted[0].startTime > 0) {
+            gaps.push({ start: 0, end: sorted[0].startTime });
+        }
+
+        // Gaps between elements
+        for (let i = 0; i < sorted.length - 1; i++) {
+            const currentEnd = sorted[i].startTime + sorted[i].duration;
+            const nextStart = sorted[i + 1].startTime;
+            if (nextStart > currentEnd) {
+                gaps.push({ start: currentEnd, end: nextStart });
+            }
+        }
+
+        // Gap at end?
+        const lastEnd = sorted[sorted.length - 1].startTime + sorted[sorted.length - 1].duration;
+        if (lastEnd < this.duration) {
+            gaps.push({ start: lastEnd, end: this.duration });
+        }
+
+        return gaps;
+    }
+
+    /**
+     * Resolve target layer based on element type (STRICT enforcement)
+     * Videos ALWAYS go to Layer 0, Shaders/Transitions ALWAYS go to Layer 1
+     */
+    resolveTargetLayer(elementType, targetLayer) {
+        // Strict layer assignment - ignore targetLayer parameter
+        // Videos ALWAYS go to Layer 0 (Green Screen Videos)
+        if (elementType === 'video') return 0;
+
+        // Shaders and Transitions ALWAYS go to Layer 1
+        if (elementType === 'shader' || elementType === 'transition') return 1;
+
+        // Fallback (shouldn't happen with current system)
+        return 2;
+    }
+
+    /**
+     * Shift elements left to make room for a new element
+     * Used for transitions with fixed minimum duration
+     * Returns true if enough room was made, false otherwise
+     */
+    shiftItemsLeft(layer, gapStart, amountNeeded) {
+        const elementsInLayer = this.layers.filter(el => el.layer === layer);
+
+        // Find elements that end at or before the gap start (to the left of the gap)
+        const leftElements = elementsInLayer
+            .filter(el => el.startTime + el.duration <= gapStart)
+            .sort((a, b) => b.startTime - a.startTime); // rightmost first
+
+        // Shift each left element leftward
+        let remainingShift = amountNeeded;
+        for (const el of leftElements) {
+            const maxShiftable = el.startTime; // can't go past 0
+            const shift = Math.min(remainingShift, maxShiftable);
+            el.startTime -= shift;
+            remainingShift -= shift;
+            if (remainingShift <= 0) break;
+        }
+
+        return remainingShift <= 0; // true if we made enough room
+    }
+
+    /**
+     * Find a gap in the timeline at or near the drop position
+     * Returns placement if gap found, null otherwise
+     */
+    findGapPlacement(elementType, requestedDuration, targetLayer, dropTime) {
+        // Determine which layer to check
+        const layer = this.resolveTargetLayer(elementType, targetLayer);
+        const elementsInLayer = this.layers.filter(el => el.layer === layer);
+
+        // Find all gaps in this layer
+        const gaps = this.findGapsInLayer(elementsInLayer);
+
+        // Find the gap that contains dropTime
+        const targetGap = gaps.find(g => dropTime >= g.start && dropTime < g.end);
+        if (!targetGap) return null;
+
+        const gapSize = targetGap.end - targetGap.start;
+
+        if (elementType === 'shader' || elementType === 'video') {
+            // Shaders/videos: shrink duration to fit gap if needed
+            const fitDuration = Math.min(requestedDuration, gapSize);
+            if (fitDuration > 0) {
+                return {
+                    layer: layer,
+                    startTime: targetGap.start,
+                    duration: fitDuration
+                };
+            }
+        } else if (elementType === 'transition') {
+            // Transitions: fixed minimum duration (1.6s)
+            const minDuration = 1.6;
+
+            if (gapSize >= minDuration) {
+                // Gap is big enough
+                return {
+                    layer: layer,
+                    startTime: targetGap.start,
+                    duration: minDuration
+                };
+            } else {
+                // Gap too small - shift items left to make room
+                const shortage = minDuration - gapSize;
+                const shifted = this.shiftItemsLeft(layer, targetGap.start, shortage);
+                if (shifted) {
+                    // After shifting, the gap start moves left by 'shortage'
+                    const newGapStart = targetGap.start - shortage;
+                    return {
+                        layer: layer,
+                        startTime: newGapStart,
+                        duration: minDuration
+                    };
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

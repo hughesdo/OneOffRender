@@ -1,0 +1,40 @@
+// ID: W3SXWy
+// Name: Clouds [266]
+// User: diatribes
+// Date: 1746491048
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s;
+    for(o*=i; i++<1e2; ) {
+        vec3 p = d * normalize(vec3(u+u,0) - iResolution.xyx );
+        for (s = .15; s < 1.;
+            p += abs(dot(.2*p.x+sin(p.z+iTime+p * s * 32.), vec3(.01))) / s,
+            s += s);
+        d += s = .03 + abs(.3-abs(p.y))*.3+ abs(p.x*.05);
+        // vec4(1) for goth mode :D
+        o += vec4(4,3,2,0) / s;
+    }
+    
+    // suggestion from Xor that I think looks nicer
+    // replace below with o = tanh(o*o / 4e6);
+    o = tanh(o / 2e3);
+}
+
+
+/*
+some similar stuff that uses the same noise:
+
+3d stuff:
+https://www.shadertoy.com/view/Wc2Szy
+https://www.shadertoy.com/view/tXX3zB
+https://www.shadertoy.com/view/tfXGWs
+
+2d texture:
+https://www.shadertoy.com/view/wcfGW7
+
+Just look for the little for-loop with s += abs(dot()) or similar.
+
+*/

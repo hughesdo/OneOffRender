@@ -1,0 +1,173 @@
+// ID: wcc3DN
+// Name: Stereo Color Ultra
+// User: diatribes
+// Date: 1747094553
+
+
+// ===== PASS 0: Image =====
+
+//============================================================
+// Cross-eyed 3D
+// Sit as far back from the screen as possible
+// Slightly cross your eyes so that there is a third image in the middle.
+// Relax your gaze, and concentrate only on that middle image, which is in 3D.
+// Click mouse on right side of image for stereo, left side for normal viewing.
+// Stereo code from kosalos
+//============================================================
+
+//============================================================
+
+// parallax effect
+#define PARALLAX .032
+
+// look around speed
+#define LOOK_SPEED 1.2
+
+// max iterations (steps)
+#define MARCH_ITERS 99.
+
+// delete if you don't want
+#define LIGHT_GLIMMER
+
+// speed
+#define T (iTime * .08)
+
+//============================================================
+
+#define P(z) (vec3(0,0, (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+#define TONEMAP(x) ((x) / ((x) + 0.155) * 1.019)
+
+bool fractalHit = false;
+
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+vec3 fog(vec3 rgb, float d) {
+    float fogDistance = .35 + sin(iTime * 0.2) * 0.5;
+    float fogAmount = 0.6 + sin(iTime * 0.1) * 0.1;
+    float fogColor = 0.84 + sin(iTime * 0.3) * 0.7;
+
+    if(fogDistance != 0.0) {
+        float f = d - fogDistance;
+        if(f > 0.0) {
+            f = min(1.0,f * fogAmount);
+            rgb = mix(rgb, (1.+cos(T+vec3(1,2,3)))*vec3(0.2 + f * fogColor),f);
+        }
+    }
+    return rgb;
+}
+
+float fractal(vec3 p) {
+    float s,w = 2.5, l;
+    p *= vec3(4., 3.5, 4.);
+    p.xy += .5;
+    for (s=0.,w=4.; s++ < 6.; p *= l, w *= l )
+        p  = cos(p-.5),
+        l = 2.5/dot(p,p);
+        
+    return length(p)/w;
+}
+
+float map(in vec3 q){
+    vec3 p = q;
+    float i, s, f, t, w = 1.2, l;
+
+    //p.xy -= P(p.z).xy;
+    t = 4. - length(p.xy);
+    
+    f = fractal(p);
+    fractalHit = f < t;
+    return min(f, t);
+}
+
+vec3 look(vec3 p) {
+    float t = T*LOOK_SPEED;
+    return (p - vec3(
+            P(p.z).x+tanh(cos(t * .5)*2.) * 6.5,
+            P(p.z).y+tanh(cos(t * .7)*3.) * 2.5,
+            5.+T));
+}
+
+float AO(in vec3 pos, in vec3 nor) {
+	float sca = 2.0, occ = 0.0;
+    for( int i=0; i<5; i++ ){
+    
+        float hr = 0.01 + float(i)*0.5/4.0;        
+        float dd = map(nor * hr + pos);
+        occ += (hr - dd)*sca;
+        sca *= 0.7;
+    }
+    return clamp( 1.0 - occ, 0.0, 1.0 );    
+}
+
+
+void mainImage(out vec4 o, in vec2 U) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    
+// --------------------------------------    
+    float xsize = r.x * 0.5;    
+    bool stereo = iMouse.x > xsize;
+    vec2 U2 = U;
+    
+    if(stereo) {
+        if(U2.x >= xsize)  // right side of stereo pair?
+            U2.x -= xsize;      // base 0  X coordinate
+    }
+    
+    vec2 u = (U2-r.xy/2.)/r.y;
+// --------------------------------------  
+    
+    vec3  e = vec3(.01,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+3.) -  look(p) -  p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1)* mat3(-X, cross(X, Z), Z);
+// --------------------------------------    
+    if(stereo) {
+        vec3 cameraOffset = -X * PARALLAX;
+
+        if(U.x < xsize) 
+            ro += cameraOffset; else ro -= cameraOffset;
+    }
+// --------------------------------------    
+
+    o -= o;
+    while(i++ < MARCH_ITERS && s > .001)
+        p = ro + D * d,
+        d += (s = map(p)*.55);
+        
+    r =  N(map(p) - vec3(map(p-e.xyy), 
+                         map(p-e.yxy), 
+                         map(p-e.yyx)));
+    
+    vec4 lights = vec4(1);
+    if (fractalHit)
+        o.rgb  = pow(tex3D(iChannel0, p, r*.25), vec3(2.2)),
+        o.rgb *= (1.+cos(p.z+vec3(6,2,1)));
+     else
+         // bakground noise for tunnel
+         o -= .2 - abs(dot(sin(p * 1. * 32.), vec3( .15))),
+         o -= .3 - abs(dot(sin(p * 1. * 64.), vec3( .15)));
+
+    #ifdef LIGHT_GLIMMER
+    if (fractalHit)
+        lights = vec4(abs((vec3(1.6, 1.2, .8)) /
+            dot(cos(.3*iTime+p),vec3(.3)))*.2,0);
+    #else
+    
+    #endif
+    o *= AO(p, r)*vec4(3,2,1,0)*lights;
+    o.rgb = TONEMAP(fog(o.rgb*exp(-d/4.), d));
+
+// --------------------------------------    
+    if(stereo && abs(U.x - xsize) < 1.0) o.xyz = vec3(1.); // center line
+// --------------------------------------   
+}

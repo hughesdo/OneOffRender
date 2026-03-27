@@ -1,0 +1,45 @@
+// ID: wc23DW
+// Name: Coral Cave
+// User: diatribes
+// Date: 1740105457
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 4.3)
+#define path1(z) (vec3(tanh(cos((z) * .11) * .25) * 15., \
+                      tanh(cos((z) * .09) * .24) * 16., (z)))
+
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = path1(T),
+         la = path1(T+5.);
+    vec3 laz = normalize(la - ro) *.6,
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz);
+    vec3 rd = vec3(rot(sin(T*.03))*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s, od;
+    do {
+        p = ro + rd * d;
+        vec3 p1 = path1(p.z);
+        s = min(length(p.xy - p1.xy),
+                length(p.y - p1.y));
+        s = min(s, length(p.x - p1.y+8.));
+        s = min(s, length(p.x- p1.x));
+        s = 2. - min(s, length(p.x - p1.x));
+        for (float a = .2; a < 8.;
+            s -=  abs(dot(sin(p * a * 8.), vec3(.045))) / a,
+            a += a);
+        d += s;
+    } while(d < 100. && s > .01);
+    p = ro + rd * d;
+    od = length(p - vec3(path1(p.z).xy,
+        20.+T+tan(cos(T*.13)*1.)*10.))-.5;
+    s = abs(sin(p.x)+sin(p.y)+sin(p.z*.5));
+    o.rgb = vec3(s+sin(p.z*.2), s*cos(p.z*.1), s)*1./pow(od,.75);
+    o *= texture(iChannel0, p.xz);
+    o = vec4(pow(o.rgb/od*5., vec3(.45)), 1.) - dot(u,u)*.2;    
+}

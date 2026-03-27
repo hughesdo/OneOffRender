@@ -1,0 +1,31 @@
+// ID: WfdXDl
+// Name: Waterfall Cascade
+// User: diatribes
+// Date: 1749677830
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, s1, s2, n, t=iTime*.65;
+    vec3 p = iResolution, q;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<128.; ) {
+        q = p = vec3(u * d, d);
+        q.z += t*14.;
+        p.z += 95.;
+        p.y -= 24.;
+        s2 = 50. + p.y - abs(cos(p.x*.1)*p.x*1.);
+        p.xy -= cos(vec2(.1,.2)*p.z*.09)*14.;
+        p += cos(p.yzx)*.5;
+        s1 = 47. + p.y - length(p.y);
+        for (n = .09; n < 4.; n += n )
+            s2 += abs(dot(sin(p*n*1.), vec3(.23))) / n,
+            s1 += abs(dot(sin(t+q*n*4.), vec3(.13))) / n;
+        d += s = .001+abs(min(s1,s2))*.1;
+        o += s/d;
+    }
+    u -= vec2(.1, .3);
+    o = tanh(vec4(s1 > s2?6:4,5, s1 > s2?5:8,1)*o/d/length(u)*exp(-d/512.));
+}
+

@@ -1,0 +1,171 @@
+{
+  "audio": {
+    "duration": 73.65369614512471,
+    "name": "Rave Jan2026-Track1.wav",
+    "path": "/api/audio/file/Rave Jan2026-Track1.wav",
+    "size": 12992556
+  },
+  "settings": {
+    "resolution": "1280x720",
+    "frameRate": 30
+  },
+  "timeline": {
+    "duration": 73.65369614512471,
+    "layers": [
+      {
+        "data": {
+          "audio_reactive": true,
+          "buffer": null,
+          "description": "Raymarched Neon Tunnel Shader V2 - Audio reactive shader",
+          "name": "Raymarched Neon Tunnel Shader V2.glsl",
+          "preview_image": "Raymarched Neon Tunnel Shader V2.JPG",
+          "preview_path": "/api/shaders/preview/Raymarched Neon Tunnel Shader V2.JPG",
+          "stars": 3,
+          "texture": null
+        },
+        "duration": 22.184726000783343,
+        "id": "element_1769212950895_sb9exr3gt",
+        "layer": 1,
+        "name": "Raymarched Neon Tunnel Shader V2.glsl",
+        "startTime": 0,
+        "type": "shader"
+      },
+      {
+        "data": {
+          "audio_reactive": true,
+          "buffer": null,
+          "description": "Lava Tunnel Shader - Audio reactive shader",
+          "name": "Lava Tunnel Shader.glsl",
+          "preview_image": "Lava Tunnel Shader.JPG",
+          "preview_path": "/api/shaders/preview/Lava Tunnel Shader.JPG",
+          "stars": 3,
+          "texture": null
+        },
+        "duration": 9.395041510101649,
+        "id": "element_1769213430869_w2xubz8zw",
+        "layer": 1,
+        "name": "Lava Tunnel Shader.glsl",
+        "startTime": 23.784726000783344,
+        "type": "shader"
+      },
+      {
+        "data": {
+          "audio_reactive": true,
+          "buffer": null,
+          "description": "The Serpent's Cathedral v3 - Audio reactive shader",
+          "name": "The Serpent's Cathedral v3.glsl",
+          "preview_image": "The Serpent's Cathedral v3.JPG",
+          "preview_path": "/api/shaders/preview/The Serpent's Cathedral v3.JPG",
+          "stars": 3,
+          "texture": null
+        },
+        "duration": 11.966115092169652,
+        "id": "element_1769213547604_pgmotp8g9",
+        "layer": 1,
+        "name": "The Serpent's Cathedral v3.glsl",
+        "startTime": 51.38895629246444,
+        "type": "shader"
+      },
+      {
+        "data": {
+          "filename": "EdgeTransition.glsl",
+          "name": "EdgeTransition",
+          "path": "Transitions\\EdgeTransition.glsl",
+          "preference": "Highly Desired",
+          "status": "Fully Working"
+        },
+        "duration": 1.6,
+        "id": "element_1769213553165_mi6jfdgwj",
+        "layer": 1,
+        "name": "EdgeTransition",
+        "startTime": 63.355071384634094,
+        "type": "transition"
+      },
+      {
+        "data": {
+          "audio_reactive": true,
+          "buffer": null,
+          "description": "Kinetic Rings v4 - Audio reactive shader",
+          "name": "Kinetic Rings v4.glsl",
+          "preview_image": "Kinetic Rings v4.JPG",
+          "preview_path": "/api/shaders/preview/Kinetic Rings v4.JPG",
+          "stars": 3,
+          "texture": null
+        },
+        "duration": 8.698624760490617,
+        "id": "element_1769213569251_6hk1n6rma",
+        "layer": 1,
+        "name": "Kinetic Rings v4.glsl",
+        "startTime": 64.9550713846341,
+        "type": "shader"
+      },
+      {
+        "data": {
+          "audio_reactive": true,
+          "buffer": null,
+          "description": "Frequency Cathedral - Audio reactive shader",
+          "name": "Frequency Cathedral.glsl",
+          "preview_image": "Frequency Cathedral.JPG",
+          "preview_path": "/api/shaders/preview/Frequency Cathedral.JPG",
+          "stars": 3,
+          "texture": null
+        },
+        "duration": 15.009188781579446,
+        "id": "element_1769215461982_142cljhdh",
+        "layer": 1,
+        "name": "Frequency Cathedral.glsl",
+        "startTime": 34.779767510884994,
+        "type": "shader"
+      },
+      {
+        "data": {
+          "filename": "Colorphase.glsl",
+          "name": "Colorphase",
+          "path": "Transitions\\Colorphase.glsl",
+          "preference": "Highly Desired",
+          "status": "Fully Working"
+        },
+        "duration": 1.6,
+        "id": "element_1769219184974_nyl72szzp",
+        "layer": 1,
+        "name": "Colorphase",
+        "startTime": 49.78895629246444,
+        "type": "transition"
+      },
+      {
+        "id": "element_1769220204690_5mntcxdu8",
+        "type": "transition",
+        "name": "LinearBlur",
+        "data": {
+          "filename": "LinearBlur.glsl",
+          "name": "LinearBlur",
+          "path": "Transitions\\LinearBlur.glsl",
+          "preference": "Highly Desired",
+          "status": "Minor Adjustments"
+        },
+        "startTime": 33.17976751088499,
+        "duration": 1.6,
+        "layer": 1
+      },
+      {
+        "id": "element_1769220215905_g6vm51png",
+        "type": "transition",
+        "name": "PowerKaleido",
+        "data": {
+          "filename": "PowerKaleido.glsl",
+          "name": "PowerKaleido",
+          "path": "Transitions\\PowerKaleido.glsl",
+          "preference": "Highly Desired",
+          "status": "Fully Working"
+        },
+        "startTime": 22.184726000783343,
+        "duration": 1.6,
+        "layer": 1
+      }
+    ]
+  },
+  "name": "Rave-01-23-2016",
+  "version": "1.0",
+  "modified": "2026-01-23T21:04:02.394404",
+  "created": "2026-01-23T21:04:02.394404"
+}

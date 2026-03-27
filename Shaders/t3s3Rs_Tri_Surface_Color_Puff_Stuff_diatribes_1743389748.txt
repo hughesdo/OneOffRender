@@ -1,0 +1,81 @@
+// ID: t3s3Rs
+// Name: Tri Surface Color Puff Stuff
+// User: diatribes
+// Date: 1743389748
+
+
+// ===== PASS 0: Image =====
+
+/* 
+    I was reading Shane's "Abstract Corridor" and wanted
+    to try a tunnel modified by tri() geometry...
+    https://www.shadertoy.com/view/MlXSWX
+    
+    A couple things I noticed:
+    
+    1) Pass time through the tri surface
+       and you get a pretty good pulse
+       effect.
+    2) Blend some 2d noise in to a surface that
+       already has 3d noise and has obvious
+       seams; it blends them in. At least I
+       think it does after staring at this
+       screen for several hours. who knows
+       what I'll think of it tomorrow.
+*/
+
+#define T (iTime*3.5)
+#define P(z) (vec3(tanh(cos((z) * .2) * .4) * 12., \
+                5.+tanh(cos((z) * .14) * .5) * 24., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+
+// See "Xyptonjtroz" by nimitz
+// https://www.shadertoy.com/view/4ts3z2
+vec3 tri(in vec3 x){return abs(x-floor(x)-.5);}
+
+vec3 rgb = vec3(0);
+
+float triSurface(vec3 p) {
+    return (1. -  dot(tri(.15*T+p*.25+tri(.05*T+p*.2))+
+                      tri(p)*.2,
+                      vec3(2.5)));
+}
+
+float map(vec3 p) {
+    float ps,a;
+    float s =  1.5 - min(length(p.xy - P(p.z).xy),
+                               (p.y - P(p.z).x));
+    s = min(6.5 + p.y, s);
+    s -= triSurface(p);
+    
+    if (iMouse.z < 1.) {
+        for (a = .05; a < 1.;
+            s -= abs(dot(sin(T+p * a * 40.), vec3(.01))) / a,
+            a += a);
+        rgb += sin(p)*.15+.175;
+    }
+        
+    rgb += sin(p)*.15+.175;
+    return s;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution,
+          p = P(T),ro=p,
+          Z = N( P(T+3.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.2)*.3) *
+                   (u-r.xy/2.)/r.y, 1) *
+                   mat3(-X, cross(X, Z), Z);
+    o -= o;
+    while(i++ < 90. && s > .001)
+        p = ro + D * d,
+        d += s = map(p)*.3;
+    for (a = .4; a < 4.;
+        rgb +=  abs(dot(sin(p* a * 8.),
+        vec3(.07))) / a, a *= 1.4142);
+    rgb *= vec3(.3,.6,1);
+    o = vec4(pow(rgb*exp(-d/2.), vec3(.45)), 1.);
+}

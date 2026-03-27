@@ -1,0 +1,28 @@
+// ID: WXXyDX
+// Name: Visual Meditation
+// User: diatribes
+// Date: 1760240895
+
+
+// ===== PASS 0: Image =====
+
+// some ambient soundscapes are cool with this one :D
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float i,d, s,c,w,n,t = iTime*.1;
+    vec3 q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o=vec4(0); i++<64.;
+        w = .5*max(q.y, .001),
+        c = .1+.3*abs(abs(p.y)-16.),
+        d += s = min(c,w),
+        o += (w < c ? .01/s : 3./s)+.05*vec4(7,2,1,0)/length(u-.35)*d)
+        for (q = p = vec3(u * d, d + t), p.x += t * 2., q.x += t * 4.,
+             n = .01; n < 3.; n += n )
+             p -= abs(dot(cos(t + .3*p / n * .5 ), vec3(1))) * n,
+             q.yz += abs(dot(cos(q.z*.01 + .07*q / n ), vec3(3))) * n,
+             p.xz *= R(p.y*.005);
+    o = tanh(o/1e2/d);
+}
+

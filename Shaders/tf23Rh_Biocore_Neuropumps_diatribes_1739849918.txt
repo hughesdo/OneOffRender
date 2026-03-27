@@ -1,0 +1,69 @@
+// ID: tf23Rh
+// Name: Biocore Neuropumps
+// User: diatribes
+// Date: 1739849918
+
+
+// ===== PASS 0: Image =====
+
+
+#define T (iTime * 5.)
+#define path(z) (vec3(tanh(cos((z) * .09) * .15) * 21., \
+                      tanh(cos((z) * .07) * .35) * 22., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+vec3 plasma(vec3 p) {
+    float t = p.z + sin(T*.1)+tanh(sin(T*.005));
+    p *= 10.;
+    float r = distance(p.xz, vec2(sin(t), sin(t)));
+    float g = distance(p.xz, vec2(0, tanh(cos(t)*.33)*.3));
+    float b = distance(p.xz, vec2(r, sin(t)*25.));
+    float value = abs(sin(r) + sin(g) + sin(b));
+    return vec3(r,g,b)/value;
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = path(T),
+         la = path(T+.1);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,- 1., 0))),
+         lay = cross(lax, laz),
+         rgb, disc;
+    vec3 rd = vec3(rot(sin(T*.04)*1.5)*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s, tx, ty, rails, c, ld;
+    do {
+        p = ro + rd * d;
+
+        // rotated for tubes
+        vec3 rp = p;
+        rp.xy *= rot(sin(p.y*.1*p.x*.2)+sin(p.z*.1)*.2);
+        p.xy -= rp.xy*.5;
+        
+        // tubes
+        rails = length(
+           (mod(vec3(rp.xy - path(rp.z).xy,rp.z),3.5) - .5*3.5).xy
+        ) - (sin(T)*.1+.3+sin(T+p.z)*.2+.2);
+        tx = 5.5-length(p.x- path(p.z).x);
+        // hit
+        s = min(rails,tx);
+        d += s;
+    } while(d < 100. && s > .001);
+    
+    // light
+    ld = length(p - vec3(path(p.z).xy,
+                    10.+T+tan(cos(T*.1)*1.)*15.));       
+    p = sin(ro + rd * d)*(s==rails?.5:1.);
+
+    for (float i = 0.; i < 4.; i++) {
+        float n = abs(p.x*p.y*p.z*c);
+        p  = abs(p)/clamp(n,.4,.9)-1.75;
+        c += dot(sin(p.xy), vec2(1.));
+    }  
+    c = abs(sin(p.x)+sin(p.y)+sin(c));
+    rgb = vec3((s==rails?2.:0.)+c+sin(p.z*.2),c*cos(p.z*.1),c/ld);
+    rgb *= plasma(p*.015);
+    o = d>150.?vec4(.02):vec4(pow(rgb/pow(ld,1.5), vec3(.45)), 1.);
+}

@@ -1,0 +1,42 @@
+// ID: tf2XRK
+// Name: House of Color
+// User: diatribes
+// Date: 1742154415
+
+
+// ===== PASS 0: Image =====
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+#define P(z) (vec3(tanh(cos((z) * .3) * .4) * 12., \
+                   tanh(cos((z) * .4) * .3) * 12., (z)))
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime*1.2, d = 0., i, s=.004, l, w;
+    vec3  r = iResolution,
+          p = P(T),ro=p,
+          Z = normalize( P(T+2.) - p)+sin(T)*.1,
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3( rot(sin(T*.2)) *(u-r.xy/2.)/r.x, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    for(int i = 0; i++<120 && s > .003;) {
+        p = ro + D * d;
+        s = 4. - length(p.xy - P(p.z).xy);
+        p.xy -= P(p.z).xy - s *.005;
+        p.x -= 2.;
+        p.y += .25;
+        float f = sin(p.z)*.25+.6;
+        w = .8;
+        p = clamp(p, -2.0, 2.0) * 2.0 - p;
+        for (float i; i++ < 4.; p *= l, w *= l )
+            p  = abs(sin(p)) - 1.,
+            l = f/dot(p-vec3(-.05,.25,-.2),p)+1.5;
+        s = min(s, length(p)/w);
+        d += s;
+        o.rgb += sin(p)*.01+.01;
+    }
+    o.rgb = 1. - o.rgb;
+}
+

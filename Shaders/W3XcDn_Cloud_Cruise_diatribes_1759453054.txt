@@ -1,0 +1,23 @@
+// ID: W3XcDn
+// Name: Cloud Cruise
+// User: diatribes
+// Date: 1759453054
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t = iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        p *= vec3(.3, .6, 1),
+        d += s = max(p.y, .3+.3*abs(8. - length(p.xy))),
+        o += 1e1/s + 1./length(vec2(u.y-.3,  u.x)))
+        for(p = vec3(u * d, d + t*1e1),
+            s = .01; s < 4.; s += s )
+            p.yz += cos(p.zx*.01),
+            p.yz -= abs(dot(sin(.02*p.z*s+.03*p.x+t + .25*p / s ), p-p+s));
+    o = tanh(o/2e3);
+}
+

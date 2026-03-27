@@ -1,0 +1,26 @@
+// ID: 332XRK
+// Name: Color Swirl [265]->[253]
+// User: diatribes
+// Date: 1746320579
+
+
+// ===== PASS 0: Image =====
+
+// -10 chars from SnoopethDuckDuck :D
+
+// and -2 because of an unused assignment i missed :)
+
+void mainImage(out vec4 O, vec2 I) {
+    float i, z, s;
+    for(O *= i; i++<1e2;) {
+        vec3 p = z * normalize(vec3(I+I,0) - iResolution.xyx);
+        p.yx *= mat2(cos(z*.4 + vec4(0,11,33,0)));
+        for(s = 2.; s < 6.; s += s)
+            p += cos(iTime+p.yzx*s) / s;
+        z += abs(5.-abs(p.x))*.1+.007;
+        O += cos(p.yzxx)/z;
+    }
+    O = tanh(O/z);
+}
+
+

@@ -1,0 +1,78 @@
+// ID: wfVczW
+// Name: Chill Runes Cave
+// User: diatribes
+// Date: 1764558948
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime*7.
+#define P(z) (vec3(cos((z)*.02)*32.+cos((z) * .005)  * 32., \
+                   cos((z)*.01)*64., (z)))
+#define N normalize
+
+float lights;
+
+float map(vec3 p) {
+    vec3 q = P(p.z);
+
+    // entity (flying light orb)
+    // just a sphere with z coord offset by time
+    float e = length(p - vec3(
+               q.x+sin(T*.2),
+               q.y,
+               16.+T+sin(.1*T)*6.))-.001;
+               
+    // accumulate orb light
+    lights += 1./e;
+    
+    // move p space by path
+    p.xy -= q.xy;
+    
+    // mirror for square tunnel
+    p = abs(p);
+    
+    // sample square tunnel
+    float t = min(12.-p.x, 16.-p.y);
+    
+    // plane
+    float n,s =2e1-p.y-16. ;
+    
+    // noise on plane
+    for(n = .01; n < .4; n += n+n)
+        s -= abs(dot(round(sin(.1*p/n+.2*p.yzx/n)/n)*n, vec3(n+n)));     
+    
+    // min(orb, max(tunnel + noise / 2., noise))
+    return min(e, max(t + s,s));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float i,s,d=.4+.5*dot(fract(sin(u)), sin(u));
+    vec3  r = iResolution;
+    
+    // scale coords
+    u = (u-r.xy/2.)/r.y;
+    
+    // remember to clear o :)
+    o = vec4(0);
+
+    // raymarch origin, ray direction, look-at
+    vec3  p = P(T),ro=p,
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    
+    // 64 iterations or until d is bigly
+    for(; i++ < 42. &&  d < 2e3;)
+        // raymarch position
+        p = ro + D * d,
+        // sample and understep
+        d += s = map(p) * .35,
+        // accumulate color for orb and geometry
+        o += 2.*vec4(3,2,5,0)*lights + 1./max(d/s, .01);
+
+    // brightness and tanh tonemap
+    o = tanh(o / 2e3 );
+
+}

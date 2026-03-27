@@ -1,0 +1,40 @@
+// ID: wfScWt
+// Name: Deep Cloud Mix
+// User: diatribes
+// Date: 1757252851
+
+
+// ===== PASS 0: Image =====
+
+/*
+    @bug provided me with a different way to
+    do the fractal noise, thanks :D
+
+    The rolling of the clouds came from a suggestion
+    by @pyBlob on this one:
+        https://www.shadertoy.com/view/W3GSzG
+        
+    Similar vibe to @Xor's "Sunset":
+        https://www.shadertoy.com/view/wXjSRt
+
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime*.3;
+    vec3  p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2;
+        d += s = .02 + abs(s)*.5,
+        o += 12.*vec4(3,2,7,0)/s
+          +  6.*vec4(19,2,1,0)/max(abs(u.y), .001))
+        for (p = vec3(u * d, d + t),
+            p.x -= t,
+            p.z *= .7,
+            s = min(2. + p.y+cos(p.y+2.*t+p.x*.4)*.6, 2.-p.y),
+            a = .08; a < 2.; a *= 1.6)
+                p.xz*=mat2(cos(.1+vec4(0,33,11,0))),
+                s-=abs(dot(sin(2.*p/a+t),vec3(.12)))*a;
+    u.x += .3;
+    o = tanh(o / 3e5 / max(length(u), .001));
+}
+

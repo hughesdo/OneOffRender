@@ -1,0 +1,41 @@
+// ID: WXdGzn
+// Name: Dawn Flight
+// User: diatribes
+// Date: 1750861320
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime*3.;
+    vec3  q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    
+    // sway camera side-to-side and up-and-down
+    u += vec2(cos(t*.2)*.3, cos(t*.2)*.1);
+    // 64 steps
+    for(o*=i; i++<64.;
+        // min of cloud plane (8.-q.y) and terrain plane (2. + p.y)
+        d += s = min(.05+abs(8.-q.y)*.25, 2. + p.y) * .7,
+        // grayscale color, with minimum amount
+        o += max(s,.01))
+        // we're now in the above for-loop body
+        // march, vec3(u*d,d+t),p.x+=t*2. is equivalent to
+        // p = ro + rd * d, p.x += t * 2., p.z += t;
+        // or march a step, move to the right, and move forward
+        for (q = p = vec3(u*d,d+t),p.x+=t*2.,s = .04; s < 1.;
+             // we're in the noise loop now
+             // apply noise to the terrain plane
+             p += abs(dot(sin(p * s * 4.), p-p+.05)) / s,
+             // apply noise to the cloud plane
+             q += abs(dot(sin(t+q * s * 16.), p-p+.008)) / s,
+             // shift x because the noise has a directional bias,
+             // this just "un-does" the bias a bit
+             p.x++,
+             // grow noise by s += s
+             s += s);
+    // tanh is good easy tone mapping, multiply by color vec4,
+    // divide down the brightness, add the sun ( / length(u))
+    o = tanh(vec4(4,2,1,1)*o*o / 1e4 / pow(length(u-.02),.5));
+}
+

@@ -1,0 +1,19 @@
+// ID: tXdGDf
+// Name: Ultra Stare-matic
+// User: diatribes
+// Date: 1751932645
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime*.5;
+    vec3  p, r = iResolution;    
+    for(o*=i; i++<1e2;
+        d += s = .007 + abs(s)*.4,
+        o += (1.+cos(d+vec4(6,1,4,1)))/s)
+            p = mod(vec3((u-r.xy/2.)/r.y * d, d+t),4.)-2.,
+            s += abs(dot(min(cos(p*p*p*p),cos(p)), .2+p-p));
+    o = tanh(o / 3e3);
+}
+

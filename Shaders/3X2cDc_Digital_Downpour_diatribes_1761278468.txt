@@ -1,0 +1,24 @@
+// ID: 3X2cDc
+// Name: Digital Downpour
+// User: diatribes
+// Date: 1761278468
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d=1e1,s,r,t = iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<32.;
+        p *= vec3(.3, .6, 1),
+        d += s = .05+.6*abs(4. - length(p.xy)),
+        o += vec4(2,9,1,0)/s + 1.5*vec4(1,2,3,0)/length(vec2(u.y-.3,  u.x))/s)
+        for(p = vec3(u * d, d - 1e1),
+            p.yz *= mat2(cos(1.57+vec4(0,33,11,0))),
+            p.z += t*6.,
+            s = .1; s < 3.; s += s )
+            p.yz += abs(dot(round(sin(p.x+p.y+t + .3*p / s )), vec3(4))) * s;
+    o = tanh(.5*o*o/5e5);
+}
+

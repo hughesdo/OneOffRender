@@ -1,0 +1,49 @@
+// ID: wXSfzt
+// Name: Drum & Bass Cruise
+// User: diatribes
+// Date: 1762826397
+
+
+// ===== PASS 0: Image =====
+
+// i was cruising to some dnb and thought others might like to, too :D
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 q,p = iResolution;
+    
+    float i, s,
+          // start the ray at a small random distance,
+          // this will reduce banding
+          d = .125*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          t = iTime, st = sin(t);
+          
+    // scale coords
+    u =(u+u-p.xy)/p.y;
+    
+    for(o*=i; i++<64.; ) {
+        
+        // shorthand for standard raymarch sample, then move forward:
+        // p = ro + rd * d, p.z + t*1e1
+        q = p = vec3(u * d, d + t*1e1);
+        
+        q.z = fract(q.z*.7)-.5;
+        p.z = cos(p.z*.3);
+
+        // turbulence
+        for (s = 1.; s++ <8.;
+            q += sin(.6*t+p.zxy*s*.3)*.4,
+            p += sin(t+p.yzx*s)*.25);
+
+        // distance to spheres
+        d += s = .01 + abs(min(length(p+1.)-2., length(q-1.)-3.))*.2;
+        
+        // color: 1.+cos so we don't go negative, cos(d+vec4(6,4,2,0)) samples from the palette
+        // divide by s for form and distance
+        o += (1.+cos(p.z+vec4(6,4,2,0))) / s;
+        
+    }
+    
+    // tonemap and divide brightness
+    o = tanh(o / 3e3 / max(length(u), .1));
+}

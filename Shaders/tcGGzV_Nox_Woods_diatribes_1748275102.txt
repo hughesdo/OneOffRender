@@ -1,0 +1,80 @@
+// ID: tcGGzV
+// Name: Nox Woods
+// User: diatribes
+// Date: 1748275102
+
+
+// ===== PASS 0: Image =====
+
+/*
+    The golf style of nox is fun, but for learning, you can't beat
+    having a map(p) function that can be replaced, so I added one.
+    
+    Nox Woods is based on https://www.shadertoy.com/view/tc2SzW
+*/
+
+float map(vec3 p) {
+
+    float
+    // our floor is .5 + p.y, but will be affected by the noise we add
+    s = .5+p.y,
+    // l is used to store our fractal data scaled during the fractal loop
+    l,
+    // w is the fractal weight, high the more "solid" it is, but less detailed
+    w = 1.;
+    
+    // noise loop, start at .02, go up to 2.
+    // we increase a by a *= 1.4 instead of a += a
+    // it's just preference, try both
+    for (float a = .02; a < 2.;a *= 1.4)
+        s +=  abs(dot(sin(p * a * 16.), vec3(.003))) / a;
+    
+    // DECAREASE the size of the fractal x, make the tree thinner
+    p.x *= 2.;
+    
+    // move to a position where we won't be hit by the fractal
+    // found by experimenting
+    p.x -= 1.5;
+    
+    // INCREASE the height of our trees
+    p.y *= .4;
+    
+    // fractal loop
+    for (int i; i++ < 7; p *= l, w *= l )
+        // base geometry for an apollonian fractal of some sort
+        // there are others, cos(p-.5) and i think just sin(p)
+        p  = abs(sin(p)) - 1.,
+        // 1.1 is the scale, try other values
+        // the balance of the scale and the weight (w) is important
+        // it's a balance of detail and fragility of the fractal mostly
+        // when you're going straight-on like in this shader it's pretty
+        // easy to dial in, but if you distort the fractal with a path,
+        // it gets to be a bit tougher
+        l = 1.1/dot(p,p);
+    // our distance is the length of p divided by w
+    // or the distance to the noise plane (ground)
+    s = min(s,length(p)/w);
+    return s;
+}
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<80.; ) {
+        // march
+        p = vec3(u* d,d+t);
+        // accumulate distance, sample our scene
+        d += s = .003 + abs(map(p))*.75;
+        // blue divided by signed distance, abs()'d
+        // and attenuated
+        o += vec4(1,2,4,0) / s;
+    }
+    // move our light up a smidge
+    u -=  vec2(-.002, .075);
+    
+    // color divided down, and our light
+    o = tanh(o / 1e4 / length(u*6.));
+}
+

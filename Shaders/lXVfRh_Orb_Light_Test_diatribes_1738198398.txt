@@ -1,0 +1,143 @@
+// ID: lXVfRh
+// Name: Orb Light Test
+// User: diatribes
+// Date: 1738198398
+
+
+// ===== PASS 0: Image =====
+
+
+#define MAX_STEPS 40
+#define MAX_DIST 20.0
+#define SURFACE_DIST .01
+#define inf (MAX_DIST+1.0)
+
+
+
+// Orb 1
+#define orb01Loc()(\
+  vec3(0.)\
+)
+#define orb01Color()(\
+  vec3(1.,.0,.0)\
+)
+
+// Orb 2
+#define orb02Loc()(\
+  vec3(sin(iTime*2.),sin(iTime),sin(iTime*3.8))\
+)
+#define orb02Color()(\
+  vec3(.0,1.,.0)\
+)
+
+// Orb 3
+#define orb03Loc()(\
+  vec3(tanh(cos(iTime*.4)*3.2), 1.,\
+       tanh(cos(iTime*3.5)*3.))\
+)
+#define orb03Color()(\
+  vec3(.0,.0,1.)\
+)
+
+
+
+vec3 orbLocs(vec3 p, vec3 i) {
+  vec3 r = p-vec3(
+    sin(sin(iTime))*.7,
+    cos(1.5+cos(iTime*.5))*.75,
+    -4.25+sin(iTime*.5)*3.);
+  return r+i;
+}
+
+float sdOrb(vec3 p, vec3 i, float e) {
+  return length(orbLocs(p,i))-e;
+}
+
+float sdOrbs(vec3 p, float e, out vec3 rgb) {
+  vec3 i;
+  float a,b,c;
+  i = orb01Loc(),   a = sdOrb(p,i,e);
+  i = orb02Loc(),   b = sdOrb(p,i,e);
+  i = orb03Loc(),   c = sdOrb(p,i,e);
+  if(a<b&&a<c)      rgb = orb01Color();
+  else if(b<c&&b<a) rgb = orb02Color();
+  else if(c<a&&c<b) rgb = orb03Color();
+  return min(a,min(b,c));
+}
+
+float scene(vec3 p, out vec3 rgb) {
+  float o = sdOrbs(p,.1,rgb);
+  float w = 2.0-abs(p.y);
+  float fc= 2.0-abs(p.x);
+  float m = min(min(o,w),fc);
+  if (o <= m) {
+    return o;
+  } else if(w<fc) {
+    rgb = texture(iChannel1,p.xz).xyz;
+    return w;
+  } else {
+    rgb = texture(iChannel0,p.yz).xyz;
+    return fc;
+  }
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+  float dist = 0.0;
+  for(int i = 0; i < MAX_STEPS; i++) {
+    vec3 p = ro + rd * dist;
+    float step = scene(p, rgb);
+    dist += step;
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+
+  return dist;
+}
+
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 rgb;
+
+  vec3 n = scene(p,rgb) - vec3(
+    scene(p-e.xyy,rgb),
+    scene(p-e.yxy,rgb),
+    scene(p-e.yyx,rgb));
+
+  return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+  vec2 uv = fragCoord.xy/iResolution.xy-.5;
+  uv.x *= iResolution.x / iResolution.y;
+
+  vec3 ro = vec3(0.,0.,0.);
+  vec3 rd = normalize(vec3(uv, -1.0));
+
+  vec3 rgb;
+  float d = raymarch(ro, rd, rgb);
+  vec3 p = ro + rd * d;
+
+  vec3 normal = getNormal(p);
+  vec3 lightDirection = normalize(ro - p);
+  float diffuse = max(dot(normal, lightDirection), .0);
+ 
+  float orb01Len = length(orbLocs(p,orb01Loc()));
+  float orb02Len = length(orbLocs(p,orb02Loc()));
+  float orb03Len = length(orbLocs(p,orb03Loc()));
+  
+  // I don't know how to do lighting,
+  // don't learn from this :D
+  // but it sort of seems to work... I think...
+  float len = orb01Len+orb02Len+orb03Len;
+  vec3 lightColor = orb01Color()/orb01Len
+                  + orb02Color()/orb02Len
+                  + orb03Color()/orb03Len;
+  rgb *= 15.0/pow(len*1.75,len*.1)*diffuse;
+  
+  rgb *= lightColor;
+  fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+
+}
+

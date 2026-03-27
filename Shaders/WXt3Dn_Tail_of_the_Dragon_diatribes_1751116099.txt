@@ -1,0 +1,24 @@
+// ID: WXt3Dn
+// Name: Tail of the Dragon
+// User: diatribes
+// Date: 1751116099
+
+
+// ===== PASS 0: Image =====
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=30.+iTime*.2;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<64.;o += 1. / max(s,.01))
+        d += s = .6 * abs(s) + .03,
+        p = vec3(u * d, d + t),
+        p.xy *= rot(p.z*.1),
+        p.xy *= rot(t),
+        p += cos(t+p.yzx*(.7+sin(t)*.7)),
+        s = cos(cos(p.x)-cos(p.y)),
+        s += abs(dot(sin(p * 8.), .1+p-p));
+    o = tanh(o*o / 1e7);
+}
+

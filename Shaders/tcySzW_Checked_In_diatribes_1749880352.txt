@@ -1,0 +1,23 @@
+// ID: tcySzW
+// Name: Checked In
+// User: diatribes
+// Date: 1749880352
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, s, n, t=iTime*.5,
+          d = .2*fract(dot(u,sin(u)));
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<128.;
+        d += s = .008 + abs(3.-length(p.yx))*.15,
+        o += (1.+cos(d+vec4(4,2,1,0))) / s)
+        for (p = vec3(u * d, d+t),
+             p += cos(t+p.yzx*1.8)*1.4,
+             n = .3; n < 2.; n += n )
+             p += cos(p.yzx*.9)*.6;
+    o = tanh(o  / 3e3);
+}
+

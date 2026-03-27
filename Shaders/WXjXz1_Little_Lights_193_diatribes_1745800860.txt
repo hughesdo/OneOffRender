@@ -1,0 +1,23 @@
+// ID: WXjXz1
+// Name: Little Lights [193]
+// User: diatribes
+// Date: 1745800860
+
+
+// ===== PASS 0: Image =====
+
+/*
+    inspired by Xor's little raymarch shaders with comments:
+    https://www.shadertoy.com/view/tXlXDX
+*/
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime,i,z,d;
+    for(O *= i; i++ < 80.;
+        O += vec4(p,0) / d / 1e4)
+        p = z * normalize(vec3(I,0)+iResolution.xzy),
+        p += cos(t-p.yyx),
+        z += d = dot(abs(p-floor(p)-.5), vec3(.3));
+}
+

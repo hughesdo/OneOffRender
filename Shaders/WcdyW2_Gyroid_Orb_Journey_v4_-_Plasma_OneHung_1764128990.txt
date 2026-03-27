@@ -1,0 +1,336 @@
+// ID: WcdyW2
+// Name: Gyroid Orb Journey v4 - Plasma
+// User: OneHung
+// Date: 1764128990
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Gyroid Orb Journey v4 - Plasma Orb Edition
+    ==========================================
+    
+    Inspired by BigWings' "Math Zoo - Alien Orb"
+    
+    The orb is now a gyroid-cage structure with a glowing plasma core
+    Audio reactivity drives the plasma intensity and color
+    
+    iChannel0 = Audio input (set to music or microphone in ShaderToy)
+    
+    For ShaderToy - paste into new shader
+*/
+
+// ============================================
+// AUDIO REACTIVITY PARAMETERS
+// ============================================
+#define BASS_FREQ           0.05      // Frequency to sample (lower = deeper bass)
+#define BASS_SMOOTHING      0.2      // Response smoothness
+#define PLASMA_BASE         0.8       // Base plasma intensity
+#define PLASMA_PULSE        2.0       // How much bass boosts plasma
+#define ORB_COLOR_SHIFT     0.5      // Bass color shift amount
+#define CAGE_GLOW_MULT      1.0      // Gyroid cage glow multiplier
+
+// ============================================
+// ORB PARAMETERS
+// ============================================
+#define ORB_RADIUS          0.4       // Outer cage radius
+#define ORB_SHELL_THICK     0.03      // Cage shell thickness
+#define ORB_GYROID_SCALE    12.0      // Gyroid pattern density on orb
+#define ORB_GYROID_THICK    0.25      // Gyroid pattern thickness
+#define PLASMA_CORE_SIZE    0.15      // Inner plasma core radius
+
+// ============================================
+// MOVEMENT PARAMETERS
+// ============================================
+#define SPEED               1.5       // Overall movement speed
+#define ORB_LEAD_DISTANCE   5.0       // How far ahead the orb floats
+#define ORB_WEAVE_AMOUNT    0.5       // Side-to-side motion
+#define ORB_BOB_AMOUNT      0.3       // Up-down motion
+#define ORB_SPIN_SPEED      0.3       // How fast the orb's gyroid rotates
+
+// ============================================
+// TUNNEL PARAMETERS
+// ============================================
+#define TUNNEL_RADIUS       2.5
+#define GYROID_FREQ         2.5
+#define GYROID_THICKNESS    0.08
+
+#define T (iTime * SPEED)
+#define N normalize
+
+// Rotation matrix
+mat2 Rot(float a) {
+    float s = sin(a), c = cos(a);
+    return mat2(c, -s, s, c);
+}
+
+// Smooth min for blending
+float smin(float a, float b, float k) {
+    float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
+    return mix(b, a, h) - k*h*(1.0-h);
+}
+
+// Audio sampling
+float getFFT(float freq) {
+    return texture(iChannel0, vec2(freq, 0.0)).x;
+}
+
+float getFFTSmoothed(float freq) {
+    float sum = 0.0;
+    for (float i = -2.0; i <= 2.0; i++) {
+        sum += texture(iChannel0, vec2(freq + i * BASS_SMOOTHING * 0.1, 0.0)).x;
+    }
+    return sum / 5.0;
+}
+
+// Path function
+vec3 P(float z) {
+    return vec3(
+        cos(z * 0.15) * 5.0,
+        cos(z * 0.12) * 3.0,
+        z
+    );
+}
+
+// Globals
+float orbLight;
+float plasmaLight;
+float bassLevel;
+vec3 currentOrbPos;
+
+// Get orb world position
+vec3 getOrbPos() {
+    float orbZ = T * 1.5 + ORB_LEAD_DISTANCE + cos(T * 0.5) * 2.0;
+    vec3 q = P(orbZ);
+    return vec3(
+        q.x + sin(orbZ * 0.4) * ORB_WEAVE_AMOUNT,
+        q.y + sin(orbZ * 0.3 + T) * ORB_BOB_AMOUNT,
+        orbZ
+    );
+}
+
+// Gyroid function for orb cage (BigWings style)
+float orbGyroid(vec3 p) {
+    float scale = ORB_GYROID_SCALE;
+    vec3 p2 = p * scale;
+    
+    // Rotate the gyroid pattern on the orb
+    p2.xy *= Rot(T * ORB_SPIN_SPEED);
+    p2.yz *= Rot(T * ORB_SPIN_SPEED * 0.7);
+    
+    return (abs(dot(sin(p2), cos(p2.zxy))) - ORB_GYROID_THICK) / scale;
+}
+
+// The alien orb - gyroid cage with plasma core
+float alienOrb(vec3 p) {
+    vec3 orbPos = getOrbPos();
+    vec3 localP = p - orbPos;
+    
+    float distFromCenter = length(localP);
+    
+    // Outer spherical shell
+    float sphere = abs(distFromCenter - ORB_RADIUS) - ORB_SHELL_THICK;
+    
+    // Gyroid cage pattern on the sphere
+    float cage = smin(sphere, orbGyroid(localP) * 0.7, -0.03);
+    
+    // Inner plasma core (just for lighting, very small)
+    float core = distFromCenter - PLASMA_CORE_SIZE;
+    
+    // Plasma light accumulation (inverse square, boosted by bass)
+    float plasmaIntensity = PLASMA_BASE + bassLevel * PLASMA_PULSE;
+    plasmaLight += plasmaIntensity / max(core * core, 0.001);
+    
+    // Cage glow accumulation
+    float cageGlow = CAGE_GLOW_MULT / max(abs(cage), 0.01);
+    orbLight += cageGlow * (1.0 + bassLevel * 2.0);
+    
+    return cage;
+}
+
+// Tunnel gyroid with carved path
+float gyroid(vec3 p) {
+    p.xy -= P(p.z).xy;
+    vec3 q = p * GYROID_FREQ;
+    float g = (sin(q.x)*cos(q.y) + 
+               sin(q.y)*cos(q.z) + 
+               sin(q.z)*cos(q.x)) / GYROID_FREQ;
+    float tunnel = TUNNEL_RADIUS - length(p.xy);
+    return max(abs(g) - GYROID_THICKNESS, tunnel);
+}
+
+// Scene
+float map(vec3 p) {
+    float orb = alienOrb(p);
+    float g = gyroid(p);
+    return min(g, orb);
+}
+
+// Normal calculation
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0);
+    return normalize(vec3(
+        map(p + e.xyy) - map(p - e.xyy),
+        map(p + e.yxy) - map(p - e.yxy),
+        map(p + e.yyx) - map(p - e.yyx)
+    ));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    // Sample audio
+    bassLevel = clamp(getFFTSmoothed(BASS_FREQ) * 1.5, 0.0, 1.0);
+    
+    // Reset accumulators
+    orbLight = 0.0;
+    plasmaLight = 0.0;
+    
+    // Camera
+    vec3 ro = P(T * 1.5);
+    vec3 lookAt = P(T * 1.5 + 4.0);
+    currentOrbPos = getOrbPos();
+    
+    vec3 Z = N(lookAt - ro);
+    vec3 X = N(vec3(Z.z, 0, -Z.x));
+    vec3 Y = cross(Z, X);
+    
+    float roll = sin(T * 0.3) * 0.2;
+    uv *= Rot(roll);
+    
+    vec3 rd = N(uv.x * X + uv.y * Y + Z);
+    
+    // Raymarch
+    float d = 0.0;
+    vec3 col = vec3(0);
+    vec3 hitPos;
+    bool hit = false;
+    
+    for (float i = 0.0; i < 100.0; i++) {
+        vec3 p = ro + rd * d;
+        float s = map(p);
+        
+        // Volumetric tunnel glow
+        float glow = 0.015 / (abs(s) + 0.01);
+        vec3 glowCol = 0.5 + 0.5 * cos(p * 0.3 + vec3(0, 2, 4) + T * 0.2);
+        col += glowCol * glow * exp(-d * 0.03);
+        
+        if (s < 0.005) {
+            hit = true;
+            hitPos = p;
+            break;
+        }
+        
+        d += s * 0.8;
+        if (d > 60.0) break;
+    }
+    
+    // Surface shading
+    if (hit) {
+        vec3 n = getNormal(hitPos);
+        vec3 localP = hitPos - currentOrbPos;
+        float distToOrbCenter = length(localP);
+        
+        // Check if we hit the orb or the tunnel
+        bool hitOrb = distToOrbCenter < ORB_RADIUS + 0.1;
+        
+        if (hitOrb) {
+            // ========== ALIEN ORB SHADING ==========
+            
+            // Light from plasma core
+            vec3 toCore = N(currentOrbPos - hitPos);
+            float coreDiff = max(dot(n, toCore), 0.0);
+            
+            // Fresnel rim glow
+            float fresnel = pow(1.0 - abs(dot(n, -rd)), 3.0);
+            
+            // Audio-reactive colors (warm -> hot pink with bass)
+            vec3 cageColor = mix(
+                vec3(0.8, 0.6, 0.4),      // Warm gold (quiet)
+                vec3(1.0, 0.3, 0.5),      // Hot pink (loud)
+                bassLevel * ORB_COLOR_SHIFT
+            );
+            
+            vec3 plasmaColor = mix(
+                vec3(1.0, 0.9, 0.8),      // Warm white (quiet)
+                vec3(1.0, 0.5, 0.8),      // Pink plasma (loud)
+                bassLevel * ORB_COLOR_SHIFT
+            );
+            
+            // Cage structure color
+            col += cageColor * (coreDiff * 0.5 + 0.2);
+            
+            // Fresnel rim with plasma color
+            col += fresnel * plasmaColor * (1.0 + bassLevel * 2.0);
+            
+            // Subsurface scattering approximation (BigWings style)
+            float sss = pow(max(0.0, dot(rd, toCore)), 2.0) * 0.5;
+            col += sss * plasmaColor * (1.0 + bassLevel * PLASMA_PULSE);
+            
+            // Vein-like pulsing pattern
+            float veinPattern = abs(dot(sin(localP * 30.0 + iTime * 2.0), cos(localP.zxy * 30.0)));
+            veinPattern = smoothstep(0.3, 0.5, veinPattern);
+            col += plasmaColor * veinPattern * 0.3 * (1.0 + bassLevel * 3.0);
+            
+        } else {
+            // ========== TUNNEL SHADING ==========
+            vec3 toOrb = N(currentOrbPos - hitPos);
+            float orbDist = length(currentOrbPos - hitPos);
+            float orbLight = max(dot(n, toOrb), 0.0) / (1.0 + orbDist * orbDist * 0.05);
+            
+            // Tunnel surface color
+            vec3 surfCol = 0.5 + 0.5 * cos(hitPos * 0.4 + vec3(0, 2, 4));
+            col += surfCol * 0.3 / (1.0 + d * 0.1);
+            
+            // Light cast from orb onto tunnel walls
+            vec3 orbCastColor = mix(
+                vec3(1.0, 0.7, 0.4),
+                vec3(1.0, 0.4, 0.6),
+                bassLevel
+            );
+            col += orbCastColor * orbLight * (1.0 + bassLevel * 2.0);
+        }
+    }
+    
+    // ========== PLASMA CORE GLOW ==========
+    // This creates the bright center light visible through the cage
+    vec3 plasmaGlowColor = mix(
+        vec3(1.0, 0.9, 0.85),     // Warm white
+        vec3(1.0, 0.6, 0.8),      // Pink
+        bassLevel * ORB_COLOR_SHIFT
+    );
+    col += plasmaGlowColor * plasmaLight * 0.00003 * (1.0 + bassLevel * 2.0);
+    
+    // ========== CAGE ATMOSPHERIC GLOW ==========
+    vec3 cageGlowColor = mix(
+        vec3(1.0, 0.7, 0.3),
+        vec3(1.0, 0.4, 0.7),
+        bassLevel * ORB_COLOR_SHIFT
+    );
+    col += cageGlowColor * orbLight * 0.0003;
+    
+    // ========== STARBURST EFFECT ==========
+    // Light rays emanating from orb (BigWings inspired)
+    vec3 toOrbScreen = currentOrbPos - ro;
+    float orbScreenDist = length(toOrbScreen.xy / toOrbScreen.z - uv);
+    float starburst = 0.02 / max(orbScreenDist, 0.01);
+    starburst *= smoothstep(60.0, 10.0, length(currentOrbPos - ro));
+    col += plasmaGlowColor * starburst * 0.1 * (1.0 + bassLevel * 3.0);
+    
+    // ========== PULSE EFFECT ==========
+    // Screen-wide pulse on bass hits
+    float pulse = pow(bassLevel, 3.0);
+    col *= 1.0 + pulse * 0.3;
+    
+    // Tone mapping
+    col = tanh(col * 0.5);
+    
+    // Vignette
+    col *= 1.0 - 0.15 * length(uv);
+    
+    // Edge glow on bass
+    col += cageGlowColor * bassLevel * 0.03 * pow(length(uv), 2.0);
+    
+    fragColor = vec4(col, 1.0);
+}
+

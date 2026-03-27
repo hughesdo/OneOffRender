@@ -1,0 +1,44 @@
+// ID: WX33D2
+// Name: Behind the Veil
+// User: diatribes
+// Date: 1751754492
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+
+float orb(vec3 p, float f, float zoffs) {
+    vec3 q = vec3(0);
+    return length(p - vec3(
+            q.x+sin(sin(f*.2)+T*.4) * 3.2,
+            q.y+sin(sin(f*1.3)+T*.2) *1.5,
+            zoffs+10.+T*4.+cos(T*.5)*6.));
+}
+
+void mainImage(out vec4 o, vec2 u )
+{
+    float g,i,n,s=.002,d;
+    vec3  w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    vec2 l = vec2(u.x, u.y-.3);
+    for (o*=i;i++<72. && s > .001;
+         d += s = min(.001+.7*abs(g),
+                  min(s/length(cos(l*d)+2.),
+                      .01+.9*abs(.3-abs(2.+w.y)))),
+         o += 2./d)
+        for(p = w = vec3(u * d, d + T*4.),
+            n = .9,
+            g = orb(p, p.z*.6, 8.)-1.,
+            w.z -= T*3.99,
+            w.y += cos(T+(.005*w.z*(w.x*w.x*.25))+w.z*.1),
+            s = max(p.y-14., 16. - length(p.xy-u.xy));
+            n < 8.;
+            w.y += N(2.*T+w, .14),
+            s += N(p, .1),
+            n *= 1.4);
+    o = tanh(vec4(4,2,1,0)*o/6e1/(.01+length(l)));
+}
+
+

@@ -143,9 +143,13 @@ class ShaderRenderer:
                         (1.0 - smoothing_factor) * magnitude_spectrum[:, frame_idx]
                     )
 
-            # Normalize to [0.0, 1.0] range
-            if smoothed_spectrum.max() > 0:
-                smoothed_spectrum = smoothed_spectrum / smoothed_spectrum.max()
+            # Per-bin normalization: each frequency bin is scaled to its own peak across time.
+            # This ensures treble bins reach 1.0 even when bass is much louder,
+            # giving all frequency bands equal dynamic range in the texture.
+            bin_peaks = smoothed_spectrum.max(axis=1, keepdims=True)  # shape (512, 1)
+            # Avoid divide-by-zero for silent bins; floor at a small epsilon
+            bin_peaks = np.maximum(bin_peaks, 1e-6)
+            smoothed_spectrum = smoothed_spectrum / bin_peaks
 
             # Extract legacy bass/treble for backward compatibility
             bass_power = np.mean(smoothed_spectrum[:32, :], axis=0)  # 0-32 bins (low frequencies)
@@ -472,7 +476,7 @@ class ShaderRenderer:
             if mipmap:
                 texture.build_mipmaps()
 
-            self.logger.info(f"✓ Loaded texture: {texture_path.name} ({img.size[0]}x{img.size[1]})")
+            self.logger.info(f"[OK] Loaded texture: {texture_path.name} ({img.size[0]}x{img.size[1]})")
             return texture
 
         except Exception as e:
@@ -565,7 +569,7 @@ class ShaderRenderer:
             if mipmap:
                 cubemap.build_mipmaps()
 
-            self.logger.info(f"✓ Loaded cubemap: {basename} ({face_size}x{face_size}, 6 faces)")
+            self.logger.info(f"[OK] Loaded cubemap: {basename} ({face_size}x{face_size}, 6 faces)")
             return cubemap
 
         except Exception as e:
@@ -655,11 +659,46 @@ class ShaderRenderer:
 
         return textures
 
-    def load_shader_from_file(self, shader_path):
-        """Load and compile a specific GLSL shader file."""
+    def detect_common_shader(self, shader_path):
+        """Detect and load .common.glsl file for a shader."""
+        shader_path = Path(shader_path)
+        common_file = shader_path.parent / f"{shader_path.stem}.common.glsl"
+        
+        if common_file.exists():
+            self.logger.info(f"  Found common shader: {common_file.name}")
+            try:
+                with open(common_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                self.logger.error(f"  Failed to load common shader: {e}")
+                return ""
+        return ""
+
+    def load_shader_from_file(self, shader_path, common_source=None):
+        """
+        Load and compile a specific GLSL shader file.
+
+        Args:
+            shader_path: Path to the shader file
+            common_source: Optional common code to prepend after #version directive
+
+        Returns:
+            Compiled shader program or None on failure
+        """
         try:
-            with open(shader_path, 'r') as f:
+            with open(shader_path, 'r', encoding='utf-8') as f:
                 fragment_source = f.read()
+
+            # If common source is provided, inject it after #version directive
+            if common_source:
+                if fragment_source.strip().startswith('#version'):
+                    version_end = fragment_source.find('\n')
+                    if version_end != -1:
+                        version_line = fragment_source[:version_end + 1]
+                        rest_of_shader = fragment_source[version_end + 1:]
+                        fragment_source = version_line + "\n// === COMMON CODE ===\n" + common_source + "\n// === END COMMON CODE ===\n\n" + rest_of_shader
+                else:
+                    fragment_source = "// === COMMON CODE ===\n" + common_source + "\n// === END COMMON CODE ===\n\n" + fragment_source
 
             # Vertex shader for full-screen quad
             vertex_source = """
@@ -704,7 +743,7 @@ class ShaderRenderer:
             # Compile main shader
             program = self.load_shader_from_file(shader_file)
             if program is None:
-                self.logger.warning(f"✗ Failed to compile {shader_file.name}")
+                self.logger.warning(f"[FAIL] Failed to compile {shader_file.name}")
                 continue
 
             # Get metadata for this shader
@@ -719,7 +758,7 @@ class ShaderRenderer:
                 for buffer_id in buffer_ids:
                     buffer_file = shader_file.parent / f"{shader_file.stem}.buffer.{buffer_id}.glsl"
                     self.logger.info(f"  Compiling buffer {buffer_id}...")
-                    buffer_program = self.load_shader_from_file(buffer_file)
+                    buffer_program = self.load_shader_from_file(buffer_file, common_source)
 
                     if buffer_program is not None:
                         buffers[buffer_id] = {
@@ -730,9 +769,9 @@ class ShaderRenderer:
                             'fbo_current': None,
                             'fbo_previous': None
                         }
-                        self.logger.info(f"  ✓ Buffer {buffer_id} compiled successfully")
+                        self.logger.info(f"  [OK] Buffer {buffer_id} compiled successfully")
                     else:
-                        self.logger.warning(f"  ✗ Failed to compile buffer {buffer_id}")
+                        self.logger.warning(f"  [FAIL] Failed to compile buffer {buffer_id}")
 
             # Detect and load custom textures
             textures = self.detect_and_load_textures(shader_file, shader_metadata)
@@ -743,7 +782,7 @@ class ShaderRenderer:
                 'buffers': buffers,
                 'textures': textures
             }
-            self.logger.info(f"✓ {shader_file.name} compiled successfully")
+            self.logger.info(f"[OK] {shader_file.name} compiled successfully")
 
         if not compiled_shaders:
             self.logger.error("No shaders compiled successfully")
@@ -922,7 +961,7 @@ class ShaderRenderer:
     def load_transition_shader(self, transition_file, config_data):
         """Load and compile a transition shader with its configuration."""
         try:
-            with open(transition_file, 'r') as f:
+            with open(transition_file, 'r', encoding='utf-8') as f:
                 fragment_source = f.read()
 
             # Basic vertex shader for full-screen quad
@@ -973,7 +1012,7 @@ class ShaderRenderer:
         self.logger.info(f"Loading shader: {self.shader_path}")
 
         try:
-            with open(self.shader_path, 'r') as f:
+            with open(self.shader_path, 'r', encoding='utf-8') as f:
                 fragment_source = f.read()
 
             # Vertex shader for full-screen quad
@@ -1313,6 +1352,7 @@ class ShaderRenderer:
                 '-r', str(frame_rate),
                 '-i', str(raw_video_file),  # Raw video input
                 '-i', str(self.audio_path),  # Audio input
+                '-vf', 'vflip',  # Flip video vertically (OpenGL to video coords)
                 '-c:v', 'libx264',
                 '-crf', str(self.config['rendering']['quality']['crf']),
                 '-preset', self.config['rendering']['quality']['preset'],
@@ -1376,9 +1416,9 @@ class ShaderRenderer:
                 transition_data = self.load_transition_shader(transition_file, transition_config_data)
                 if transition_data:
                     compiled_transitions[transition_file.name] = transition_data
-                    self.logger.info(f"✓ {transition_file.name} compiled successfully")
+                    self.logger.info(f"[OK] {transition_file.name} compiled successfully")
                 else:
-                    self.logger.warning(f"✗ Failed to compile {transition_file.name}")
+                    self.logger.warning(f"[FAIL] Failed to compile {transition_file.name}")
 
         if not compiled_transitions:
             self.logger.warning("No transitions available, falling back to standard multi-shader mode")
@@ -1609,15 +1649,31 @@ class ShaderRenderer:
             return False
 
     def initialize_buffer_textures(self, shader_data, resolution):
-        """Initialize ping-pong textures and framebuffers for all buffers."""
+        """Initialize ping-pong textures and framebuffers for all buffers.
+        
+        Uses RGBA float textures with NEAREST filtering for Shadertoy compatibility:
+        - 4 components (RGBA) required for texelFetch data storage
+        - NEAREST filtering preserves exact pixel values
+        - Float format (dtype='f2') for precision in data storage
+        - Both textures cleared to zero to prevent garbage data on first frames
+        """
+        import numpy as np
+        
         for buffer_id, buffer_data in shader_data.get('buffers', {}).items():
-            # Create two textures for ping-pong rendering
-            buffer_data['texture_current'] = self.ctx.texture(resolution, 3)
-            buffer_data['texture_previous'] = self.ctx.texture(resolution, 3)
+            # Create two RGBA float textures for ping-pong rendering
+            # Using 4 components and half-float (f2) for Shadertoy compatibility
+            buffer_data['texture_current'] = self.ctx.texture(resolution, 4, dtype='f2')
+            buffer_data['texture_previous'] = self.ctx.texture(resolution, 4, dtype='f2')
+            
+            # Initialize both textures to zero (black) to prevent garbage data
+            # This is critical for Buffer A which uses self-feedback
+            zero_data = np.zeros((resolution[1], resolution[0], 4), dtype=np.float16).tobytes()
+            buffer_data['texture_current'].write(zero_data)
+            buffer_data['texture_previous'].write(zero_data)
 
-            # Set texture parameters
+            # Set texture parameters - NEAREST for data storage, LINEAR causes interpolation issues
             for tex in [buffer_data['texture_current'], buffer_data['texture_previous']]:
-                tex.filter = (self.ctx.LINEAR, self.ctx.LINEAR)
+                tex.filter = (self.ctx.NEAREST, self.ctx.NEAREST)
                 tex.repeat_x = False
                 tex.repeat_y = False
 
@@ -1629,7 +1685,7 @@ class ShaderRenderer:
                 color_attachments=[buffer_data['texture_previous']]
             )
 
-            self.logger.debug(f"Initialized buffer {buffer_id} textures: {resolution}")
+            self.logger.debug(f"Initialized buffer {buffer_id} textures: {resolution} (RGBA float, zeroed)")
 
     def swap_buffer_textures(self, buffer_data):
         """Swap current and previous textures for ping-pong rendering."""
@@ -1638,33 +1694,89 @@ class ShaderRenderer:
         buffer_data['fbo_current'], buffer_data['fbo_previous'] = \
             buffer_data['fbo_previous'], buffer_data['fbo_current']
 
-    def render_buffer_pass(self, buffer_data, vbo, audio_texture, time_seconds, resolution):
-        """Render a single buffer pass with feedback support."""
+    def render_buffer_pass(self, buffer_id, buffer_data, all_buffers, textures, vbo, audio_texture, time_seconds, resolution):
+        """Render a single buffer pass matching Shadertoy channel conventions.
+        
+        Shadertoy convention:
+        - Buffer A: iChannel0 = self-feedback
+        - Buffer B: iChannel0 = Buffer A, iChannel1-3 = textures
+        - Buffer C: iChannel0 = Buffer A, iChannel1 = Buffer B, iChannel2-3 = textures
+        - etc.
+        """
         buffer_data['fbo_current'].use()
 
         program = buffer_data['program']
         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
-        # Bind audio to iChannel0
-        audio_texture.use(location=0)
-        if 'iChannel0' in program:
-            program['iChannel0'].value = 0
+        channel = 0
 
-        # Bind previous frame to iChannel1 (feedback)
-        if buffer_data['texture_previous']:
-            buffer_data['texture_previous'].use(location=1)
-            if 'iChannel1' in program:
+        # For Buffer A: iChannel0 = self-feedback
+        # For other buffers: iChannel0 = Buffer A (if exists)
+        if buffer_id == 'A':
+            # Self-feedback on iChannel0
+            if buffer_data['texture_previous']:
+                buffer_data['texture_previous'].use(location=0)
+                if 'iChannel0' in program:
+                    program['iChannel0'].value = 0
+            channel = 1
+
+            # Bind audio texture to iChannel1 if the buffer expects it
+            # This is critical for audio-reactive buffer shaders like Waveform3d
+            if audio_texture and 'iChannel1' in program:
+                audio_texture.use(location=1)
                 program['iChannel1'].value = 1
+                channel = 2
+        else:
+            # Bind earlier buffers starting at iChannel0
+            for other_id in ['A', 'B', 'C', 'D']:
+                if other_id >= buffer_id:
+                    break  # Only bind buffers that come before this one
+                if other_id in all_buffers:
+                    # Use texture_current (just rendered this frame)
+                    all_buffers[other_id]['texture_current'].use(location=channel)
+                    if f'iChannel{channel}' in program:
+                        program[f'iChannel{channel}'].value = channel
+                    channel += 1
+
+            # Bind audio texture to the next available channel if the buffer expects it
+            if audio_texture and f'iChannel{channel}' in program:
+                audio_texture.use(location=channel)
+                program[f'iChannel{channel}'].value = channel
+                channel += 1
+
+        # Bind custom textures to remaining channels
+        if textures:
+            for tex_channel in sorted(textures.keys()):
+                if tex_channel.startswith('iChannel'):
+                    try:
+                        req_ch = int(tex_channel.replace('iChannel', ''))
+                        textures[tex_channel].use(location=req_ch)
+                        if tex_channel in program:
+                            program[tex_channel].value = req_ch
+                    except ValueError:
+                        pass
 
         # Set uniforms
         if 'iTime' in program:
             program['iTime'].value = time_seconds
         if 'iResolution' in program:
             program['iResolution'].value = resolution
+        # Match buffer passes: ensure iMouse is a stable zero vector when present
+        if 'iMouse' in program:
+            program['iMouse'].value = (0.0, 0.0, 0.0, 0.0)
+        # Some shaders (like Eagle.buffer.A) use iMouse.x in their time helper.
+        # Explicitly zero it so behavior matches Shadertoy's default stationary mouse.
+        if 'iMouse' in program:
+            program['iMouse'].value = (0.0, 0.0, 0.0, 0.0)
+        if 'iFrame' in program:
+            program['iFrame'].value = int(time_seconds * 30)  # Approximate frame number
 
         # Clear and render
         self.ctx.clear(0.0, 0.0, 0.0, 1.0)
         vao.render()
+        
+        # Ensure GPU completes this buffer before next pass reads from it
+        self.ctx.finish()
 
     def render_shader_frame_with_buffers(self, shader_data, vbo, fbo, audio_data, frame_idx, frame_rate, raw_file):
         """Render a frame with multi-pass buffer support."""
@@ -1683,25 +1795,24 @@ class ShaderRenderer:
         for buffer_id in ['A', 'B', 'C', 'D']:
             if buffer_id in shader_data.get('buffers', {}):
                 self.render_buffer_pass(
+                    buffer_id,
                     shader_data['buffers'][buffer_id],
+                    shader_data.get('buffers', {}),
+                    shader_data.get('textures', {}),
                     vbo,
                     audio_texture,
                     time_seconds,
                     resolution
                 )
 
-        # Render main image using buffer outputs
+        # Render main image using buffer outputs (Shadertoy convention)
+        # iChannel0 = Buffer A, iChannel1 = Buffer B, etc.
         fbo.use()
         program = shader_data['program']
         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
-        # Bind audio to iChannel0
-        audio_texture.use(location=0)
-        if 'iChannel0' in program:
-            program['iChannel0'].value = 0
-
-        # Bind buffer outputs to iChannel1, iChannel2, etc.
-        channel = 1
+        # Bind buffer outputs starting at iChannel0 (Shadertoy convention)
+        channel = 0
         for buffer_id in ['A', 'B', 'C', 'D']:
             if buffer_id in shader_data.get('buffers', {}):
                 shader_data['buffers'][buffer_id]['texture_current'].use(location=channel)
@@ -1722,10 +1833,7 @@ class ShaderRenderer:
                             textures[texture_channel].use(location=requested_channel)
                             if texture_channel in program:
                                 program[texture_channel].value = requested_channel
-                        else:
-                            self.logger.warning(
-                                f"Channel conflict: {texture_channel} already used by buffer"
-                            )
+
                     except ValueError:
                         self.logger.error(f"Invalid channel name: {texture_channel}")
 
@@ -1765,6 +1873,9 @@ class ShaderRenderer:
         time_seconds = frame_idx / frame_rate
         program['iTime'].value = time_seconds
         program['iResolution'].value = (fbo.width, fbo.height)
+        # Ensure iMouse is stable for single-pass shaders that expect it
+        if 'iMouse' in program:
+            program['iMouse'].value = (0.0, 0.0, 0.0, 0.0)
 
         # Create and bind audio texture
         audio_frame_idx = min(frame_idx, len(audio_data['bass']) - 1)
@@ -2210,10 +2321,10 @@ class ShaderRenderer:
                 self.cleanup_temp_files(frames_dir)
 
             if success:
-                self.logger.info(f"✓ Successfully rendered: {self.output_path}")
+                self.logger.info(f"[OK] Successfully rendered: {self.output_path}")
                 return True
             else:
-                self.logger.error(f"✗ Failed to render: {audio_file.name}")
+                self.logger.error(f"[FAIL] Failed to render: {audio_file.name}")
                 return False
 
         except Exception as e:
@@ -2357,13 +2468,18 @@ class ShaderRenderer:
 
             shader_path = Path(shader_path)
 
-            # Load and compile the main shader
-            program = self.load_shader_from_file(shader_path)
+            # Detect common shader code (shared between main and buffers)
+            common_source = self.detect_common_shader(shader_path)
+            if common_source:
+                self.logger.info(f"Loaded common shader code: {len(common_source)} chars")
+
+            # Load and compile the main shader (with common code if available)
+            program = self.load_shader_from_file(shader_path, common_source)
             if program is None:
                 self.logger.error(f"Failed to compile shader: {shader_path}")
                 return False
 
-            self.logger.info(f"✓ Shader compiled successfully: {shader_path.name}")
+            self.logger.info(f"[OK] Shader compiled successfully: {shader_path.name}")
 
             # Load metadata for this shader
             metadata_file = Path("Shaders/metadata.json")
@@ -2386,7 +2502,7 @@ class ShaderRenderer:
                 for buffer_id in buffer_ids:
                     buffer_file = shader_path.parent / f"{shader_path.stem}.buffer.{buffer_id}.glsl"
                     self.logger.info(f"Compiling buffer {buffer_id}...")
-                    buffer_program = self.load_shader_from_file(buffer_file)
+                    buffer_program = self.load_shader_from_file(buffer_file, common_source)
 
                     if buffer_program is not None:
                         buffers[buffer_id] = {
@@ -2397,9 +2513,9 @@ class ShaderRenderer:
                             'fbo_current': None,
                             'fbo_previous': None
                         }
-                        self.logger.info(f"✓ Buffer {buffer_id} compiled successfully")
+                        self.logger.info(f"[OK] Buffer {buffer_id} compiled successfully")
                     else:
-                        self.logger.warning(f"✗ Failed to compile buffer {buffer_id}")
+                        self.logger.warning(f"[FAIL] Failed to compile buffer {buffer_id}")
 
             # Detect and load custom textures
             textures = self.detect_and_load_textures(shader_path, shader_metadata)
@@ -2462,24 +2578,23 @@ class ShaderRenderer:
                         for buffer_id in ['A', 'B', 'C', 'D']:
                             if buffer_id in buffers:
                                 self.render_buffer_pass(
+                                    buffer_id,
                                     buffers[buffer_id],
+                                    buffers,
+                                    textures,
                                     vbo,
                                     audio_texture,
                                     time_seconds,
                                     resolution
                                 )
 
-                        # Render main image using buffer outputs
+                        # Render main image using buffer outputs (Shadertoy convention)
+                        # iChannel0 = Buffer A, iChannel1 = Buffer B, etc.
                         fbo.use()
                         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
-                        # Bind audio to iChannel0
-                        audio_texture.use(location=0)
-                        if 'iChannel0' in program:
-                            program['iChannel0'].value = 0
-
-                        # Bind buffer outputs to iChannel1, iChannel2, etc.
-                        channel = 1
+                        # Bind buffer outputs starting at iChannel0 (Shadertoy convention)
+                        channel = 0
                         for buffer_id in ['A', 'B', 'C', 'D']:
                             if buffer_id in buffers:
                                 buffers[buffer_id]['texture_current'].use(location=channel)
@@ -2499,10 +2614,7 @@ class ShaderRenderer:
                                             textures[texture_channel].use(location=requested_channel)
                                             if texture_channel in program:
                                                 program[texture_channel].value = requested_channel
-                                        else:
-                                            self.logger.warning(
-                                                f"Channel conflict: {texture_channel} already used by buffer"
-                                            )
+
                                     except ValueError:
                                         self.logger.error(f"Invalid channel name: {texture_channel}")
 
@@ -2515,10 +2627,7 @@ class ShaderRenderer:
                         # Clear and render
                         self.ctx.clear(0.0, 0.0, 0.0, 1.0)
                         vao.render()
-
-                        # Swap ping-pong buffers for next frame
-                        for buffer_id, buffer_data in buffers.items():
-                            self.swap_buffer_textures(buffer_data)
+                        self.ctx.finish()  # Ensure main image is fully rendered before reading
                     else:
                         # Standard single-pass rendering (no buffers)
                         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
@@ -2548,10 +2657,18 @@ class ShaderRenderer:
                         fbo.use()
                         self.ctx.clear(0.0, 0.0, 0.0, 1.0)
                         vao.render()
+                        self.ctx.finish()  # Ensure frame is fully rendered before reading
 
-                    # Read frame data
+                    # Read frame data and flip vertically (OpenGL is bottom-up, video is top-down)
                     data = fbo.read(components=3)
-                    raw_file.write(data)
+                    frame_array = np.frombuffer(data, dtype=np.uint8).reshape((height, width, 3))
+                    frame_array = np.flipud(frame_array)
+                    raw_file.write(frame_array.tobytes())
+
+                    # Swap ping-pong buffers for next frame (AFTER reading frame data)
+                    if buffers:
+                        for buffer_id, buffer_data in buffers.items():
+                            self.swap_buffer_textures(buffer_data)
 
                     # Cleanup audio texture
                     audio_texture.release()
@@ -2560,9 +2677,6 @@ class ShaderRenderer:
                     if (frame_idx + 1) % 30 == 0 or frame_idx == total_frames - 1:
                         progress = (frame_idx + 1) / total_frames * 100
                         self.logger.info(f"Rendered frame {frame_idx + 1}/{total_frames} ({progress:.1f}%)")
-
-                    # Cleanup
-                    audio_texture.release()
 
             # Cleanup rendering resources
             vao.release()

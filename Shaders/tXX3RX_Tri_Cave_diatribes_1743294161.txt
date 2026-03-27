@@ -1,0 +1,71 @@
+// ID: tXX3RX
+// Name: Tri Cave
+// User: diatribes
+// Date: 1743294161
+
+
+// ===== PASS 0: Image =====
+
+/* 
+    I was reading Shane's "Abstract Corridor" and wanted
+    to try a tunnel modified by tri() geometry...
+    https://www.shadertoy.com/view/MlXSWX
+*/
+#define T (iTime * 2.5)
+#define P(z) (vec3(tanh(cos((z) * .3) * .3) * 6., \
+                   tanh(cos((z) * .2) * .4) * 6., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+#define N normalize
+
+// See "Xyptonjtroz" by nimitz
+// https://www.shadertoy.com/view/4ts3z2
+vec3 tri(in vec3 x){return abs(x-floor(x)-.5);}
+
+float triSurface(vec3 p) {
+    return (1. -  dot(tri(p*.125+tri(p*.4))+
+                      tri(p)*.2,
+                      vec3(1.)));
+}
+
+float orb(vec3 p) {
+    float t = T*.3;
+    return length(p - vec3(
+            P(p.z).x+tanh(sin(p.z*.1+t) * .75)*.6,
+            P(p.z).y+sin(sin(p.z*.5)+t*2.5) *.125,
+            2.5+T+tan(cos(t*.45)*1.1)*2.));
+}
+
+float map(vec3 p) {
+    float s = 1. - min(length(p.xy - P(p.z).x + 1.),
+                   min(length(p.xy - P(p.z).xy),
+                       length(p.xy - P(p.z).y + 1.)));
+    s -= triSurface(p);
+    s = min(s, orb(p)-.05);
+    p.y += (.1*(sin(p.x+T*.4)+
+                sin(p.z+T*.6)+
+                sin(p.z+T*.8)));
+    for (float a = .25; a < 2.;
+        p.y +=  abs(dot(sin(T+T+p * a * 32.), vec3(.005))) / a,
+        a *= 1.4142);
+    return min(s, 2.65 - p.y);
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.,a;
+    vec3  r = iResolution,
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.3)*.3)*(u-r.xy/2.)/r.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    while(i++ < 90. && s > .001)
+        p = ro + D * d,
+        d += s = map(p)*.4,
+        o.rgb += sin(p)*.025+.025;
+    for (a = .4; a < 4.;
+        o.rgb +=  abs(dot(sin(p* a * 16.),
+        vec3(.05))) / a, a *= 1.4142);
+    o.rgb /= orb(p);
+    o = vec4(pow(o.rgb*exp(-d/3.), vec3(.45)), 1.);
+}

@@ -1,0 +1,54 @@
+// ID: t3cGW4
+// Name: super sugar drops
+// User: diatribes
+// Date: 1751248998
+
+
+// ===== PASS 0: Image =====
+
+/*
+    I was playing with super sphere geometry seen in recent @mrange
+    shaders, they're fun and easy to get on the screen, see here
+    for an example that I used as a reference:
+        https://www.shadertoy.com/view/3cGXDh
+        
+    I was trying to avoid a spiral thing but it just happened...
+*/
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void mainImage(out vec4 o, vec2 u) {
+    // init
+    float i,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    
+    // clear o, 100 steps, accumulate and cycle color
+    for(o*=i; i++<1e2;o += (1.+cos(.05*t+d+vec4(3,1,0,1)))/s)
+        // march, i.e., p = ro + rd * d, d -= t,
+        p = vec3(u * d, d - t),
+        // slight @Xor style turbulence
+        p += cos(.3*p.z+t+p.yzx*2.)*.1,
+        // twist
+        p.xy *= rot(p.z*.1),
+        // rotate
+        p.xy *= rot(-t*.2),
+        // don't get hit
+        p--,
+        // min of: repeat p with sin,, repeat p with cos
+        p = min(sin(p), cos(p)),
+        // super sphere power
+        p = p*p*p*p,
+        // .001 + abs for translucency
+        s = .001 + abs(
+            // the pow(dot,scale)-radius is the super sphere
+            pow(dot(p,p), .3)-.2),
+        // accumulate distance
+        d += s * .75;
+        
+    // tanh to tone map, divide down brightness,
+    // add an off screen light to the upper-right for fun :)
+    o = tanh(o  / 1e4 / length(--u));
+}
+
+

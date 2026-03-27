@@ -1176,7 +1176,7 @@ class TimelineRenderer:
     def load_shader_from_file(self, shader_path):
         """Load and compile a GLSL shader."""
         try:
-            with open(shader_path, 'r') as f:
+            with open(shader_path, 'r', encoding='utf-8', errors='replace') as f:
                 fragment_source = f.read()
 
             # Vertex shader for full-screen quad
@@ -1437,23 +1437,59 @@ class TimelineRenderer:
         buffer_data['fbo_current'], buffer_data['fbo_previous'] = \
             buffer_data['fbo_previous'], buffer_data['fbo_current']
 
-    def render_buffer_pass(self, buffer_data, vbo, audio_texture, time_seconds, resolution):
-        """Render a single buffer pass with feedback support."""
+    def render_buffer_pass(self, buffer_id, buffer_data, all_buffers, textures, vbo, audio_texture, time_seconds, resolution):
+        """Render a single buffer pass with feedback support (matching render_shader.py)."""
         buffer_data['fbo_current'].use()
 
         program = buffer_data['program']
         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
-        # Bind audio to iChannel0
-        audio_texture.use(location=0)
-        if 'iChannel0' in program:
-            program['iChannel0'].value = 0
+        channel = 0
 
-        # Bind previous frame to iChannel1 (feedback)
-        if buffer_data['texture_previous']:
-            buffer_data['texture_previous'].use(location=1)
-            if 'iChannel1' in program:
+        # For Buffer A: iChannel0 = self-feedback
+        # For other buffers: iChannel0 = Buffer A (if exists)
+        if buffer_id == 'A':
+            # Self-feedback on iChannel0
+            if buffer_data['texture_previous']:
+                buffer_data['texture_previous'].use(location=0)
+                if 'iChannel0' in program:
+                    program['iChannel0'].value = 0
+            channel = 1
+
+            # Bind audio texture to iChannel1 if the buffer expects it
+            if audio_texture and 'iChannel1' in program:
+                audio_texture.use(location=1)
                 program['iChannel1'].value = 1
+                channel = 2
+        else:
+            # Bind earlier buffers starting at iChannel0
+            for other_id in ['A', 'B', 'C', 'D']:
+                if other_id >= buffer_id:
+                    break  # Only bind buffers that come before this one
+                if other_id in all_buffers:
+                    # Use texture_current (just rendered this frame)
+                    all_buffers[other_id]['texture_current'].use(location=channel)
+                    if f'iChannel{channel}' in program:
+                        program[f'iChannel{channel}'].value = channel
+                    channel += 1
+
+            # Bind audio texture to the next available channel if the buffer expects it
+            if audio_texture and f'iChannel{channel}' in program:
+                audio_texture.use(location=channel)
+                program[f'iChannel{channel}'].value = channel
+                channel += 1
+
+        # Bind custom textures to remaining channels
+        if textures:
+            for tex_channel in sorted(textures.keys()):
+                if tex_channel.startswith('iChannel'):
+                    try:
+                        req_ch = int(tex_channel.replace('iChannel', ''))
+                        textures[tex_channel].use(location=req_ch)
+                        if tex_channel in program:
+                            program[tex_channel].value = req_ch
+                    except ValueError:
+                        pass
 
         # Set uniforms
         if 'iTime' in program:
@@ -1481,36 +1517,52 @@ class TimelineRenderer:
             audio_texture = self.create_audio_texture(bass_value, treble_value, waveform_data, fft_spectrum)
 
         # Render all buffer passes in order (A, B, C, D)
-        if audio_texture:
-            for buffer_id in ['A', 'B', 'C', 'D']:
-                if buffer_id in shader_data.get('buffers', {}):
-                    self.render_buffer_pass(
-                        shader_data['buffers'][buffer_id],
-                        vbo,
-                        audio_texture,
-                        time_seconds,
-                        resolution
-                    )
+        all_buffers = shader_data.get('buffers', {})
+        textures = shader_data.get('textures', {})
+        for buffer_id in ['A', 'B', 'C', 'D']:
+            if buffer_id in all_buffers:
+                self.render_buffer_pass(
+                    buffer_id,
+                    all_buffers[buffer_id],
+                    all_buffers,
+                    textures,
+                    vbo,
+                    audio_texture,
+                    time_seconds,
+                    resolution
+                )
 
         # Render main image using buffer outputs
         fbo.use()
         program = shader_data['program']
         vao = self.ctx.simple_vertex_array(program, vbo, 'in_vert')
 
-        # Bind audio to iChannel0
-        if audio_texture:
-            audio_texture.use(location=0)
-            if 'iChannel0' in program:
-                program['iChannel0'].value = 0
-
-        # Bind buffer outputs to iChannel1, iChannel2, etc.
-        channel = 1
+        # Bind buffer outputs starting at iChannel0 (Shadertoy convention)
+        # Buffers take priority over audio for multi-buffer shaders
+        channel = 0
         for buffer_id in ['A', 'B', 'C', 'D']:
             if buffer_id in shader_data.get('buffers', {}):
                 shader_data['buffers'][buffer_id]['texture_current'].use(location=channel)
                 if f'iChannel{channel}' in program:
                     program[f'iChannel{channel}'].value = channel
                 channel += 1
+
+        # Bind custom textures to remaining channels
+        textures = shader_data.get('textures', {})
+        if textures:
+            for texture_channel in sorted(textures.keys()):
+                if texture_channel.startswith('iChannel'):
+                    try:
+                        requested_channel = int(texture_channel.replace('iChannel', ''))
+
+                        # Only bind if channel isn't already used by buffers
+                        if requested_channel >= channel:
+                            textures[texture_channel].use(location=requested_channel)
+                            if texture_channel in program:
+                                program[texture_channel].value = requested_channel
+
+                    except ValueError:
+                        self.logger.error(f"Invalid channel name: {texture_channel}")
 
         # Set uniforms
         if 'iTime' in program:

@@ -1,0 +1,41 @@
+// ID: w3GGz1
+// Name: nop sled
+// User: diatribes
+// Date: 1752019211
+
+
+// ===== PASS 0: Image =====
+
+/*
+    https://en.wikipedia.org/wiki/NOP_slide
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, n, t=-iTime;
+    vec3 p,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    // stolen from @Shane :)
+    // make cinema bars at top and bottom
+    if(abs(u.y)>.4){ o = vec4(0); return; }
+    
+    // clear o, 100 steps, accumulate distance, accumulate brightness
+    for(o*=i; i++<1e2;d += s = (.006+abs(s)*.8), o += 1. / s)
+        // march and move forward
+        for (p = vec3(u * d, d - t * 4.),
+             // twist (p.z) and spin (t)
+             p.xy *= mat2(cos(.3*t+p.z*.08+vec4(0,33,11,0))),
+             // sin/cos waves to make some geometry
+             // remove the above rotation to see what it
+             // looks like not twisted
+             s = max(abs(sin(t+p.y*.3)) - 1., cos(p.x)),
+             // noise starts at 2., up to 8., grow by n
+             n = 2.; n < 8.; n += n )
+                 // apply rounded noise, the rounding creates
+                 // the large pixel effect
+                 s -= abs(dot(.25*round(sin(p*n)), vec3(1))) / n;
+    // tanh tone map, green color, and divide down brightness
+    o = tanh(vec4(2,7,1,1)*o*o/3e7);
+}
+

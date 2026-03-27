@@ -1,0 +1,55 @@
+// ID: WffczH
+// Name: Another Spiral
+// User: diatribes
+// Date: 1755282943
+
+
+// ===== PASS 0: Image =====
+
+/*
+        happy friday :)
+
+        -24 chars from FabriceNeyret2
+        thanks :D
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, t=iTime;
+    vec3 p = iResolution;
+    
+    u = (u+u-p.xy)/p.y+cos(t*.4)*vec2(.3,.2);
+    
+    for(o*=i; i++<128.;d += s = .001+abs(s)*.6, o += d/s)
+        p = vec3(u * d, d + t + t),
+        p.xy *= mat2(cos(.1*t+p.z/8.+vec4(0,33,11,0))),
+        s = 1. + cos(p.y) - abs(dot(sin(p*24.), 1.+p-p)) / 480.;
+    
+    o = tanh( mix(o*=vec4(32,6,2,0) / 1e7 ,
+                  o.zyxw, smoothstep(0.,2.,i=length(u)))
+                  / max(i, .001));
+}
+
+
+
+
+/* original
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, t=iTime;
+    vec3 p = iResolution;
+    
+    u = (u+u-p.xy)/p.y;
+    u += cos(t*.4)*vec2(.3,.2);
+    for(o*=i; i++<128.;d += s = .001+abs(s)*.6, o += 1./s*d)
+        p = vec3(u * d, d + t * 2.),
+        p.xy *= mat2(cos(.1*t+p.z*.125+vec4(0,33,11,0))),
+        s = 1. + cos(p.y),
+        s -= abs(dot(sin(p*24.), vec3(.05))) / 24.;
+    
+    o = tanh( mix(o=vec4(32,6,2,0)*o / 1e7 ,
+                 o.zyxw, smoothstep(0.,1.,length(u)/2.))
+                 / max(length(u), .001));
+}
+
+*/

@@ -1,0 +1,44 @@
+// ID: wf3SD4
+// Name: Gyroid Journey
+// User: diatribes
+// Date: 1749144199
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime*2.)
+#define P(z) (vec3((cos((z) * .35) * .3) * 16., \
+                   (cos((z) * .3) * .4) * 16., (z)))
+#define N normalize
+
+float planes (vec3 p, float r) {
+    p.xy -= P(p.z).xy;
+    return r - max(p.x,p.y);
+}
+
+float gyroid(vec3 p) {
+    return 1.5-dot(tanh(p*.3), sin(p*.3+cos(p.yzx)));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.02,d=0.,i=0.,a;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+             
+    o = vec4(.5);
+    while(i++ < 128. && s > .01)
+        p = ro + D * d * .4,
+        d += max(planes(p, .5), gyroid(p)),
+        o.rgb += sin(p*.3)*.01+.01;
+
+    for (a = .1; a < 2.; a += a)
+        o += abs(dot(sin(p * a * 8.), vec3( .1))) / a;
+
+    o = tanh(o/max(d,10.)*4.*exp(-d/64.));
+}

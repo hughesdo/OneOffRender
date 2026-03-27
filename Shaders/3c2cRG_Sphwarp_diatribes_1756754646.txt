@@ -1,0 +1,45 @@
+// ID: 3c2cRG
+// Name: Sphwarp
+// User: diatribes
+// Date: 1756754646
+
+
+// ===== PASS 0: Image =====
+
+// sounds from @JennySchub, ty :D !!
+
+// sphere warp... sphwarp
+// p.z is modulated
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s;
+    vec3  p,r = iResolution;
+    for(o*=i; i++<1e2;
+        d += s = .001+abs(s) * .3,
+        o += 1./s)
+        for (p = vec3((u+u-r.xy)/r.y * d, (d - 60.) * tanh(sin(.4*iTime)*.2)*.4),
+            s = length(p) - 4.,
+            a = 4.; a < 16.; a += a)
+            s += abs(dot(sin(p * a*a), .1+p-p)) / a;
+    o = tanh(vec4(3,2,6,0)*o/4e4);
+}
+
+
+// ===== PASS 1: Sound =====
+
+float fr(float time, float freq){
+    return sin(6.2831*freq*time);
+}
+float cha(float time){
+    float res = 0.;
+    float tim=tanh(sin(.4*time)*.2);
+    for(float i=20.; i<10000.; i+=189.){
+        res+=fr(tim, i+tan(tim*9.5));
+    }
+    return clamp(res * tim,-.1,.1);
+}
+
+vec2 mainSound( int samp, float time )
+{
+    return vec2(cha(time));
+}

@@ -1,0 +1,30 @@
+// ID: wfVXzD
+// Name: Purple Moon Bluff [362]
+// User: diatribes
+// Date: 1749930362
+
+
+// ===== PASS 0: Image =====
+
+#define A(x,r) abs(dot(sin(x*p*n), r +p-p )) / n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float i,r,s=.02,d,n,t=iTime*6.;
+    vec3  p = iResolution; 
+    
+    u = (u-p.xy/2.)/p.y;
+    
+    for (o*=i;i++<80.; 
+         d += s = .01 + abs(min(s,r))*.5,
+         o += vec4(r < s ? 1 : 7,2,8,0) / s)
+        for(p = vec3(u * d, d + t),
+            r = 4.+p.y,
+            s = r -  p.x,
+            n = .08;
+            n < .8;
+            n *= 1.4)
+            r += A(p.z + .6*t + 10., .017),
+            s += A(.4,.5);
+    u -= vec2(-.4, .3);
+    o = tanh(o / 1e4 / dot((1.+sin(t*.1)*.4)*u,u));
+}

@@ -1,0 +1,86 @@
+// ID: tX2GRz
+// Name: Fractal Bore
+// User: diatribes
+// Date: 1743728164
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Put a tunnel through stuff. I figured this
+    out when trying to put a @pb shader in a tunnel
+    and just thought I'd share.
+
+    Raymarch to a tunnel, square or cylindrical,
+    doesn't matter. Raymarch again starting at the
+    point hit on the tunnel. You now have a tunnel
+    through whatever you marched on the second march.
+    
+    Play with the tunnel size (W, H, and L).
+    If you set L to around 2. to 3., the fractal
+    will not exist directly in front of the camera;
+    it sort of slices away or dissovles.
+
+*/
+
+
+#define W .75
+#define H .75
+#define L 120.
+
+#define T (iTime*.5)
+#define N normalize
+#define P(z) (vec3(tanh(cos((z) * .35) * .5) * 8., \
+                     tanh(cos((z) * .42) * .65) * 8., (z)))
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+float tunnel(vec3 p) {
+    vec3 tun = abs(p - P(p.z));
+    return min(W-tun.x, H-tun.y);
+}
+
+float fractal(vec3 p) {
+    float s,w = 1., l;
+    
+    p *= 2.;
+    
+    p.xy += .25;
+    
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return length(p)/w; 
+}
+
+void mainImage(out vec4 o,vec2 u) {
+    float i,s=.002,d=0.;
+    vec3  r = iResolution,
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.2)*.2)*(u-r.xy/2.)/r.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    o -= o;
+
+    //tunnel
+    for(i = 0.; i++ < L && s > .001;)
+        p = ro + D * d,
+        d += s = tunnel(p)*.5;
+    
+    // reset
+    ro = p, s=.002,d=0.;
+    for(i = 0.; i++ < 140. && s > .001;)
+        p = ro + D * d,
+        d += s = fractal(p),
+        o.rgb += sin(p*.5)*.008+.0125; 
+    
+    // texture
+    for (i = .4; i < 4.;
+        o.rgb +=  abs(dot(sin(p* i * 512.),
+        vec3(.05))) / i, i *= 1.4142);
+    o.rgb = 1. - o.rgb;
+    
+    // fade
+    o.rgb *= exp(-d);
+}
+

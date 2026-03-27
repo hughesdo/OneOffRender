@@ -1,0 +1,44 @@
+// ID: Wc2SzR
+// Name: Little Forest Flight
+// User: diatribes
+// Date: 1741527288
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) (vec3(tanh(cos((z) * .32) * .20) * 26., \
+                   tanh(cos((z) * .21) * .25) * 22., (z)))
+#define N normalize
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float M(vec3 p) {
+    float s,l,w = 1.;
+    s = 8. - length(p.xy - P(p.z).xy);
+    p.xy -= P(p.z).xy;
+    p.y *= .125;
+    p.x -= 1.5;
+    p = mod(p, 6.) - 3.;
+
+    for (int i; i++ < 6; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+
+    s = min(s, length(p)/w);
+    return s; 
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float T = iTime*1.5, d, i, s=.02;
+    vec3  r = iResolution,
+          p = P(T),
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(T*.2)*.5*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o-=o;
+    while( s > .001)
+        p += s*D,
+        o.rgb += (s = M(p))*sin(p)*.1+.005;
+}
+

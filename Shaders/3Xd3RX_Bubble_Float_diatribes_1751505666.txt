@@ -1,0 +1,61 @@
+// ID: 3Xd3RX
+// Name: Bubble Float
+// User: diatribes
+// Date: 1751505666
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -55 chars by @FabriceNeyret2
+    -12 chars by me yay
+    
+    Thanks! :D
+    
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,s,t = iTime,
+          d = .5*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    vec3  p = iResolution; 
+    u = ( u - p.xy/2. ) / p.y
+      +  cos(t*.4)*vec2(.3,.2);
+    
+    for(o*=i ; i++<1e2 ; o += (1.+cos(d+vec4(3,1,0,0))) /s )
+        p = vec3(u*d, d+t) -1.5,
+        p.xy *= mat2(cos(p.z*.02 +vec4(0,33,11,0))),
+        p += cos(p.z+t+p.yzx*.5) *.2,
+        p.y += sin(t+p.z*.3),
+        p = abs(sin(p)) -sin(t)*.07 -.1,
+        d += s = .001 + .7*abs(dot(p,p)-.5);  
+    
+    o = tanh(o/1e4);
+}
+
+
+
+/*
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,s,t=iTime,d=.5*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    vec3  p = iResolution;
+   
+    u = (u-p.xy/2.)/p.y;
+    u += vec2(cos(t*.4)*.3, cos(t*.4)*.2);
+
+    vec3 ro = p = vec3(u, 1);
+    
+    for(o*=i; i++<1e2;o += (1.+cos(d+vec4(3,1,0,0)))/s) {
+        p = vec3(u*d, d+t),
+        p-=1.5,
+        p.xy *=mat2(cos(p.z*.02+vec4(0,33,11,0))),
+        p += cos(p.z+t+p.yzx*.5)*.2,
+        p.y += sin(t+p.z*.3),
+        p = abs(sin(p))-sin(t)*.07-.1,
+        p = pow(p*p, vec3(.5)),
+        s = .001+.7*abs(abs(dot(p,p)-.5));
+        d += s;
+    }
+    o = tanh(o/1e4);
+}
+*/
+

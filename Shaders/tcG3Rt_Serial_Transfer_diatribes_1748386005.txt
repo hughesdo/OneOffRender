@@ -1,0 +1,33 @@
+// ID: tcG3Rt
+// Name: Serial Transfer
+// User: diatribes
+// Date: 1748386005
+
+
+// ===== PASS 0: Image =====
+
+
+#define P(z) vec3(cos(vec2(.05,.09)*(z))*15.,z)          
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s = .002,n,t=iTime*6.;
+    vec3  q = iResolution,
+          p = P(t),
+          Z = normalize( P(t+2.)- p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3((u-q.xy/2.)/q.y, 1)  * mat3(-X, cross(X, Z), Z);
+    for(o*=i; i++<1e2;) {
+        p += D * s;
+        p.xy *= mat2(cos(cos(t*.001)*.001+vec4(0,33,11,0)));
+        q = P(p.z)+cos(t+p.yzx)*.3;
+        s  = 5.  - min(length((p-q).xy),
+                   min(abs(p.y) + 10.,
+                   min(length(p.xy - q.y - 5.) ,
+                       length(p.xy - q.x + 5.))));
+        for (n = 2.6; n < 16.; n += n )
+            s -= abs(dot(step(.1, sin( p.z + t + p*n )), vec3(1))) / n;
+        d += s = .01 + abs(s)*.9;
+        o += 1./s/d;
+    }
+    o = tanh(o * vec4(2,3,2,1) / 3e1);
+}
+

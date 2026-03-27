@@ -1,0 +1,31 @@
+// ID: WcsyDS
+// Name: Field & Sky
+// User: diatribes
+// Date: 1756002601
+
+
+// ===== PASS 0: Image =====
+
+// 😎
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime;
+    vec3  q,p = iResolution;
+    u = (u+u-p.xy)/p.y;
+    
+    for(o*=i; i++<128.;
+        d += s = .01 + abs(min(.5 - p.y*.3, .5 + q.y*.3))*.6,
+        o += 1. /  s)
+        
+        for (p = vec3(u* d,d),s = .05; s < 1.;
+             q = p += cos(t+p.z+p.yzx*.02)*.01,
+             q += abs(dot(sin(p.z+p * s * 24.), vec3(.4))) / s,
+             p += abs(dot(sin(.4*t+.3*p.z+p * s * 16.), vec3(.003))) / s,
+             s += s);
+             
+    o *= mix(vec4(1,2,5,0),
+             vec4(4,2.3,1,0),
+             smoothstep(.1, .0, p.y));
+             
+    o = tanh(o / 3e3 / max(length(u-vec2(1.3, .65)), .5));
+}
+

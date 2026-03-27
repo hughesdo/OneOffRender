@@ -1,0 +1,30 @@
+// ID: wXXyz7
+// Name: Orb Clouds
+// User: diatribes
+// Date: 1759415224
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,e,s,t = iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    if (abs(u.y) > .4) { o = vec4(0); return; }
+
+    for(o*=i; i++<128.;
+        p *= vec3(.25, .5, 1),
+        d += s = min(.001+.5*abs(e), .1+.27*abs(6. - length(p.xy))),
+        o += 2./s + 1e1*vec4(6,2,1,0)/e)
+        for (p = vec3(u * d, d + t*4.),
+            p.xy *= mat2(cos(.01*p.z+vec4(0,33,11,0))),
+            e = max(length(p - vec3(
+                    sin(sin(t*.2)+t*.4) * 6.,
+                    1.+sin(sin(t*.5)+t*.2) *4.,
+                    32.+t*4.+cos(t*.3)*8.))-.1, .001),
+             s = .01; s < 2.; s += s )
+             p.yz -= abs(dot(sin(.6*t + .3*p / s ), p-p+s)),
+             p.yz += abs(dot(sin(.5*t + .2*p / s ), p-p+s*.5));
+    o = tanh(o/5e3/length(u));
+}
+

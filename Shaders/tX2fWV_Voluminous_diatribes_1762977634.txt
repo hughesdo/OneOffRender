@@ -1,0 +1,57 @@
+// ID: tX2fWV
+// Name: Voluminous
+// User: diatribes
+// Date: 1762977634
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 q,p = iResolution;
+    
+    float i, s,
+          // start the ray at a small random distance,
+          // this will reduce banding
+          d=.125*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          tun,
+          t = iTime * .3;
+          
+    // scale coords
+    u =(u-p.xy/2.)/p.y;
+
+    for(o*=i; i++<1e2; ) {
+        
+        // shorthand for standard raymarch sample, then move forward:
+        // p = ro + rd * d, p.z + t
+        q = p = vec3(u * d, d + t*2e1);
+        
+        // tunnel (cylinder)
+        tun =2. - length(p.xy);
+        
+        // rot
+        p.xy *= mat2(cos(.1*p.z+.1*t+vec4(0,33,11,0)));
+        
+        // repeat
+        q.xz = cos(q.xz)*.6;
+        p.z = cos(p.z) * .6;
+        
+        // turbulence
+        for (s = 1.; s++ <6.;
+            q += sin(.6*t+p.zxy*.3),
+            p += sin(t+t+p.yzx*s)*.4);
+
+        // distance to spheres or tunnel
+        d += s = max(tun,
+                .02 + .3*abs(min(length(p+3.*sin(p.z*.5))-2.,
+                              length(q-2.*sin(p.z*.4))-6.)));
+        
+        // color: 1.+cos so we don't go negative, cos(d+vec4(6,4,2,0)) samples from the palette
+        // divide by s for form and distance
+        o +=(1.+cos(p.z+vec4(3,1,0,0)))/s;
+        
+    }
+    
+    // tonemap and divide brightness
+    o = tanh(max(o /1.5e3, 0.));
+}

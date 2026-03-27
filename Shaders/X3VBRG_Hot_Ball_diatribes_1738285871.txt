@@ -1,0 +1,145 @@
+// ID: X3VBRG
+// Name: Hot Ball
+// User: diatribes
+// Date: 1738285871
+
+
+// ===== PASS 0: Image =====
+
+#define MAX_STEPS 120.
+#define MAX_DIST 60.
+#define SURFACE_DIST .001
+#define inf (MAX_DIST+1.0)
+
+#define TIME_MULTIPLIER 3.
+#define ORB_RADIUS 1.3
+
+#define FRACT_ITERATIONS 8
+
+vec3 path(float z) {
+    return vec3(
+        sin(z*.1)*2.*cos(z*.1)*2.,
+        sin(z*.05)*1.5*cos(z*.1)*2.,
+        iTime*TIME_MULTIPLIER+1.5
+    );
+}
+
+
+// tanh(cos(x)*15-12)-4
+vec3 lightPosition(vec3 p) {
+    p-=path(p.z);
+    return p-vec3(
+        sin(iTime*.4)*1.,
+        8.+tanh(cos(iTime*.6)*2.)*16.,
+        8.+tanh(cos(iTime*.8)*4.)*8.
+    );
+}
+
+// modified from the fractal function found here:
+// https://www.shadertoy.com/view/4XdfW4
+float fractal(vec3 p, out vec3 rgb, int iterations){
+  float m = 1.;
+  for (int i = 0; i < iterations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.2,.8)-1.75;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-3. * m)*2.5;
+  rgb=vec3(p.xy,2.5) * m;
+  return length(rgb*.1);
+}
+
+vec3 plasma(vec2 uv) {
+    float t = iTime / 2.0;
+    float r = distance(uv*10., vec2(sin(t), sin(1.0/t)*.1));
+    float g = distance(uv*10., vec2(0, r));
+    float b = distance(uv*10., vec2(r, sin(t)));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(uv.x+t) + cos(uv.y+t));
+    
+    value *= 100.;
+    r/=value;
+    g/=value;
+    b/=value;
+
+    r *= 3.5;
+    g *= .02;
+    b = r-b; 
+    return vec3(r,g,b);
+}
+
+float scene(vec3 p, out vec3 rgb) {
+    vec3 lightPos = lightPosition(p);
+	vec3 tun = mod(abs(vec3(p.x,p.y-8.,p.z) - path(p.z)),32.);
+    float orb = length(lightPos)-ORB_RADIUS;
+    float hit = min(5.+p.y,min(orb,max(4.-tun.x,4.-tun.y)));
+    if (orb == hit) {
+        rgb = plasma(sin(lightPos.xy));
+    } else if (5.+p.y == hit) {
+        rgb = plasma(tun.xy);
+    } else {
+        fractal(vec3(tun.yx,sin(p.z)),rgb,FRACT_ITERATIONS);
+    }
+    return hit;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+  float dist = 0.0;
+  for(float i = 0.; i < MAX_STEPS; i++) {
+    vec3 p = ro + rd * dist;
+    float step = scene(p, rgb);
+    dist += step;
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+  return dist;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+  vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+  vec3 ww = normalize(target - origin);
+  vec3 uu = normalize(cross(ww, rr));
+  vec3 vv = normalize(cross(uu, ww));
+  return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 rgb;
+
+  vec3 n = scene(p,rgb) - vec3(
+    scene(p-e.xyy,rgb),
+    scene(p-e.yxy,rgb),
+    scene(p-e.yyx,rgb));
+
+  return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec3 rgb = vec3(1.);
+	
+    vec2 uv = -1.0 + 2.0*(fragCoord.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = vec3(0., 0., iTime*TIME_MULTIPLIER);
+	vec3 la = ro + vec3(0., 0., 1.);
+	ro.xy = path(ro.z).xy;
+	la.xy = path(la.z).xy+lightPosition(ro).xy*.1;
+
+	vec3 rd = normalize(vec3(uv,1.)*lookAt(ro,la,0.));
+
+	float d = raymarch(ro, rd, rgb);
+    vec3 p = ro + rd * d;
+    
+    float diffuse = max(dot(normal(p), normalize(ro-p)), .0);
+    rgb *= diffuse;
+    
+    float len = length(lightPosition(p));
+    rgb *= (pow(len,-len*.1)*vec3(.8,.1,.1));
+    
+    if (d > MAX_DIST) {
+
+    }
+    
+    fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+}

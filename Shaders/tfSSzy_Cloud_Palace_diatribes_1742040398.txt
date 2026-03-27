@@ -1,0 +1,53 @@
+// ID: tfSSzy
+// Name: Cloud Palace
+// User: diatribes
+// Date: 1742040398
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 1.5)
+#define P(z) (vec3(tanh(cos((z) * .24) * .6) * 8., \
+                    tanh(cos((z) * .3) * .6) * 8., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+
+#define LIGHTS_COUNT 8.
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.006,l,w=1.,d=0.,
+          orb[int(LIGHTS_COUNT)], i;
+    vec3  r = iResolution, q,
+          e = vec3(.005,0,0),
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.15)*1.)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;;
+    for(int steps = 0; s > .005 && steps++ < 100;) {
+        p = ro + D * d;
+        q = p;
+        q.xy -= P(q.z).xy;
+        q.x -= 3.5;
+        q = clamp(q, -1.0, 1.0) * 2.0 - q;
+        w = .5;
+        for (int j; j++ < 8; q *= l, w *= l )
+            q  = abs(sin(q)) - 1.,
+            l = 1.6/dot(q,q);
+        s = length(q)/w;
+        for (i = 0.; i < LIGHTS_COUNT; i++) {
+            orb[int(i)] = length(p - vec3(P(p.z).xy+sin(1.4*p.z)*.25,
+                           3.+T+tanh(cos(i+T*.1)*.2)*(i*2.5)))-.04;
+            s = min(s, orb[int(i)]);
+            orb[0] = min(orb[0],orb[int(i)]);
+        }
+        o.rgb += (abs(sin(p))*.15);
+        for(float a=.4;a < 16.;
+            s-=abs(dot(sin(p*a*24.),
+            vec3(.75)))/a*.01,a+=a);
+        d += s;
+    };
+    o.rgb = o.rgb/orb[0]*.1;
+    o = vec4(pow(vec3(o.rgb),vec3(.45)), 1.);
+}

@@ -1,0 +1,71 @@
+// ID: tXtGDN
+// Name: Super Sphere Bore
+// User: diatribes
+// Date: 1751328834
+
+
+// ===== PASS 0: Image =====
+
+/*
+    I was playing with super sphere geometry seen in recent @mrange
+    shaders, they're fun and easy to get on the screen, see here
+    for an example that I used as a reference:
+        https://www.shadertoy.com/view/3cGXDh
+
+    This is a split tunnel through a bunch of super spheres.
+
+*/
+
+#define P(z) vec3(cos(vec2(.03,.05)*(z))*32.,z) 
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void mainImage(out vec4 o, vec2 u) {
+    // init
+    float i,a,s,t=iTime*4.,d;
+    vec3  q,p = iResolution;
+   
+    // scale coords
+    // rotate a little left, right, left, right...
+    // .04 is the freq, 2. is the amount
+    u = (u-p.xy/2.)/p.y * rot(sin(t*.04)*2.);
+    
+    // ro and p are on our path at position 't' (time)
+    vec3 ro = p = P(t);
+    
+    // this is our look-at matrix,
+    // we want to look ahead by t+4., or so...
+    // try other values, many will work, you'll just look
+    // down the path soon or later
+    vec3 Z = normalize( P(t+4.)- p),
+         X = normalize(vec3(Z.z,0,-Z)),
+         // typical ray dir vector of vec3(u, 1) * lookAt
+         D = vec3(u, 1)  * mat3(-X, cross(X, Z), Z);
+
+    // clear o, 100 steps, accumulate color
+    for(o*=i; i++<1e2;o += (1.+cos(.3*d+vec4(3,1,0,1)))) {
+        // march, i.e., p = ro + rd * d, d += t*3.,
+        p = ro + D * d,
+        // subtract path xy from p.xy, save as q.
+        // we need q for tunnel dist later
+        q = p - P(p.z),
+        // min of: repeat p with sin,, repeat p with cos
+        p = min(sin(p), cos(p)),
+        // super sphere power
+        p = p*p*p*p,
+        // .001 + abs for translucent super spheres
+        // 2.-length(q.xy-q.x) is our plane that slices the tunnel
+        // 4.-length(q.xy) is our tunnel
+        s = max(
+            max(2.-length(q.xy - q.x), 4.-length(q.xy)),
+            .005 + abs(dot(p,p*.5)-.2));
+        // accumulate distance,
+        // understep a bit to correct some wobbles
+        d += s * .6;
+        
+    }
+        
+    // tanh to tone map, div by dist for depth
+    o = tanh(o / d / 4.);
+}
+
+

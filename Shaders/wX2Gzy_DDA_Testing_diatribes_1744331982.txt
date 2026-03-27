@@ -1,0 +1,92 @@
+// ID: wX2Gzy
+// Name: DDA Testing
+// User: diatribes
+// Date: 1744331982
+
+
+// ===== PASS 0: Image =====
+
+// based on: https://www.shadertoy.com/view/4dX3zl
+// referenced: https://lodev.org/cgtutor/raycasting.html
+// anybody remember the permadi raycasting tutorial?
+
+#define T iTime*50.
+#define N normalize
+#define P(z) (vec3((cos((z) * .03) * 16.), \
+                   (cos((z) * .02) * 16.), (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+vec3 palette(float t,  vec3 a,  vec3 b,  vec3 c, vec3 d){
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+
+float map(vec3 p) {
+    vec2 t = P(p.z).xy;
+    vec2 sq = abs(p.xy - t);
+    float f = 15.-p.y;
+    for (float i = .4; i < 1.6;
+        f +=  abs(dot(sin(p* i * 512.),
+        vec3(.55))) / i, i *= 1.4142);
+    float s = 8. -
+               min(length(p.y - t.x),
+               min(length(p.xy - t.x),
+               min(length(p.xy - t.xy),
+                   length(p.xy - t.y))));
+    return min(f,max(s, min(10. - sq.x, 4. - sq.y)));
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    vec3  id,
+          r = iResolution,
+    
+          // rayPos
+          p = P(T),
+          Z = N( P(T+20.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          
+          // rayDir
+          rd = vec3(rot(sin(T*.02)*.3)*(u-r.xy/2.)/r.y, 1)
+              * mat3(-X, cross(X, Z), Z),
+          fp = floor(p);
+              
+    // rayStep
+	vec3 rs = sign(rd),
+         // deltaDist
+	     dd = 1. / abs(rd),
+         // sideDist
+		 sd = (rs * (fp - p) + (rs * 0.5) + 0.5) * dd; 
+
+    o-=o;
+    float i,s,d = 0.;
+	for (i=0.; i++ < 160.;) {
+        s = map(fp);
+        d += s;
+        id = fp/s;
+		if (s < 0.) break;
+
+        if (sd.x < sd.y) 
+            if (sd.x < sd.z) 
+                sd.x += dd.x,
+                fp.x += rs.x;
+            else 
+                sd.z += dd.z,
+                fp.z += rs.z;
+        else 
+            if (sd.y < sd.z) 
+                sd.y += dd.y,
+                fp.y += rs.y;
+            else 
+                sd.z += dd.z,
+                fp.z += rs.z;
+	}
+    for (i = .4; i < 1.6;
+        o.rgb +=  abs(dot(sin(fp* i * 128.),
+        vec3(.14))) / i, i *= 1.4142);
+    o.rgb *= palette(length(id),
+                     vec3(0.8,0.1,0.9),
+                     vec3(0.7,0.2,0.8),
+                     vec3(0.6,0.1,0.7),
+                     vec3(0.5,0.0,0.6));
+    o.rgb = pow(o.rgb*exp(-d/90.), vec3(.45));
+}
+

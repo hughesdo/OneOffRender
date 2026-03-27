@@ -1,0 +1,81 @@
+// ID: t3BfRy
+// Name: Flowing Hexagons
+// User: OneHung
+// Date: 1762614543
+
+
+// ===== PASS 0: Image =====
+
+// Flowing Hexagons
+// Inspired by Xor's hexagonal tiling with sine distortions
+
+void mainImage(out vec4 fragColor, vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    float t = iTime * 0.4;
+    
+    // Create flowing distortion using sine waves
+    vec2 flow = uv + 0.3 * vec2(
+        sin(uv.y * 3.0 + t) + cos(uv.x * 2.0 - t * 0.7),
+        cos(uv.x * 3.0 - t) + sin(uv.y * 2.0 + t * 0.7)
+    );
+    
+    // Hexagonal tiling setup
+    vec2 hexSize = vec2(0.15);
+    vec2 hexGrid = vec2(2.0, 3.464) * hexSize; // sqrt(3) ≈ 1.732 * 2
+    
+    // Offset every other row for hex pattern
+    vec2 cell = flow / hexGrid;
+    cell.x += 0.5 * mod(floor(cell.y), 2.0);
+    
+    // Get cell center and position within cell
+    vec2 cellId = floor(cell);
+    vec2 cellPos = fract(cell) - 0.5;
+    
+    // Transform to hexagonal space
+    cellPos.x *= hexGrid.x / hexGrid.y;
+    
+    // Distance to hex center
+    float d = length(cellPos);
+    
+    // Create hex pattern with smooth edges
+    float hexDist = max(
+        abs(cellPos.x) * 0.866 + abs(cellPos.y) * 0.5,
+        abs(cellPos.y)
+    );
+    
+    // Smooth circles in hex grid
+    float pattern = smoothstep(0.35, 0.32, d);
+    
+    // Add pulsing based on cell position
+    float pulse = sin(cellId.x * 0.5 + cellId.y * 0.7 + t * 2.0) * 0.5 + 0.5;
+    pattern *= 0.6 + 0.4 * pulse;
+    
+    // Color based on position and time
+    vec3 color1 = vec3(0.1, 0.4, 0.8);   // Deep blue
+    vec3 color2 = vec3(0.9, 0.3, 0.6);   // Pink-red
+    vec3 color3 = vec3(0.2, 0.9, 0.7);   // Cyan-green
+    
+    // Mix colors based on cell position and pattern
+    float colorMix = sin(cellId.x * 0.3 + cellId.y * 0.4 + t * 0.5) * 0.5 + 0.5;
+    vec3 baseColor = mix(color1, color2, colorMix);
+    baseColor = mix(baseColor, color3, sin(colorMix * 3.14 + t) * 0.5 + 0.5);
+    
+    // Apply pattern
+    vec3 color = baseColor * pattern;
+    
+    // Add glow around each hex
+    float glow = exp(-d * 8.0) * 0.3 * pulse;
+    color += baseColor * glow;
+    
+    // Subtle background gradient
+    vec3 bg = mix(
+        vec3(0.05, 0.02, 0.15),
+        vec3(0.15, 0.05, 0.25),
+        length(uv) * 0.5
+    );
+    color += bg * (1.0 - pattern);
+    
+    fragColor = vec4(color, 1.0);
+}
+

@@ -1,0 +1,57 @@
+// ID: wffXz8
+// Name: The Projector
+// User: diatribes
+// Date: 1740627564
+
+
+// ===== PASS 0: Image =====
+
+// I started with a minimal/deconstructed version
+// of Tangled Sierpinski by pb here
+// https://www.shadertoy.com/view/NsXcDs
+// thanks @pb :)
+
+// Fractals are crazy, you change the slightest thing
+// and it's a completely different image
+
+#define T (iTime*1.)
+#define DIST_MAX 5.
+#define P1(z) (vec3(0., 0., (z)))
+
+float map(vec3 p) {
+    const float mscale = .75;
+    p = mod(p + 1.0, 3.0) - 1.0;
+    vec4 q = vec4(p, 1.0);
+    for(int i = 0; i < 15; i++) {
+        q.xyz = abs(q.xyz);
+        q = mscale*q/clamp(pow(length(q.xyz),2.), .5, 1.) 
+            - vec4(.35, .9, 0.6, 0.0);
+    }
+    return length(q.xyz)/q.w - .001;
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.x;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+1.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(u, 1.);
+    float d = 0.,s, steps=0.;
+    do{
+        p = ro + rd * d;
+        s = map(p);
+        d += (s*3.);
+        steps++;
+
+    } while (steps < 70. && d < DIST_MAX && s > .001);
+
+    vec3 c = vec3(.5/d,.25/d, .5/d);
+    c += sin(d)+sin(p);
+    o = vec4(vec3(c/d), 1.);
+    o.rgb = pow(o.rgb, vec3(.4154545));
+}

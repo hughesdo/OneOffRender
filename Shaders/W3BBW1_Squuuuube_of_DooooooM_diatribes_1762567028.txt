@@ -1,0 +1,76 @@
+// ID: W3BBW1
+// Name: Squuuuube of DooooooM
+// User: diatribes
+// Date: 1762567028
+
+
+// ===== PASS 0: Image =====
+
+/*
+    apollonian fractal in the background
+    rounded corner super shape sqube, see @mrange shaders for some nice ones:
+    https://www.shadertoy.com/view/43jXWt
+    
+    and a couple lights...
+*/
+
+
+#define T iTime
+
+// apollonian fractal
+float fractal(vec3 p) {
+    float s,w,l;
+    p /= 3.;
+    p.z *= .6;
+    p += .04*(cos(T+dot(cos(T+p+cos(.3*p)), p) *  p ));
+    p.y += 1.5; // or p.x += 1.5
+    p += cos(.2*T+p.yzx*.3)*.4;
+    for (s=0.,w=.6; s++ < 8.; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+        
+    return length(p)/w*4.;
+}
+
+// it's just some sine noise and a tunnel, mostly
+vec4 fire(vec3 p) {
+    float s, i, d, n, T = iTime;
+    vec4 o = vec4(0);
+    p += cos(p.z+T+p.yzx*.5)*.6;
+    s = 6.-length(p.xy);
+    p.xy *= mat2(cos(T+vec4(0,33,11,0)));
+    for (n = 1.4; n < 24.; n += n )
+        s -= abs(dot(sin( p.z + 8.*T + p*n ), vec3(1))) / n;
+    s = (.01 + abs(s)*.015);
+    o += 1. / s;
+    return (vec4(7,2,1,1) * o * o );
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    float s, i, d=1., e;
+    vec3  q, p = iResolution;
+    
+    // scale coords
+    u = (u+u - p.xy) / p.y;
+
+    for(o = vec4(0); i++ <64. && d < 1e2; )
+        // p = ro + rd * d
+        q = p = vec3(u*d, d - 4. ),
+        // flying light
+        e = length(p - vec3(
+                sin(sin(T*3.5)+T*.7)*.8,
+                sin(sin(T*1.3)+T*.5)*.8,
+                cos(T*.5)*.2)),
+        // rotation
+        p.yz *= mat2(cos(.2*T+vec4(0,33,11,0))),
+        // dist to sqube or fracal or light
+        d += s = min(.3*e, min(fractal(p), .005+.6*abs(pow(dot(p=p*p*p*p,p),.1) -1.))),
+        // color
+        o += 2e1*fire(q)+(1e1*vec4(1,4,8,0)/ s
+          + 5e4*vec4(2,1,8,0) /e
+          + 1e2*vec4(1,3,4,0)/length(u)*d*d);
+    
+    // tonemap
+    o = tanh(o / 2e7);
+}
+

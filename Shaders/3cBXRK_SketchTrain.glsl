@@ -1,0 +1,48 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Sketch Train
+// Created by diatribes
+// Shadertoy ID: 3cBXRK
+// https://www.shadertoy.com/view/3cBXRK
+
+#define P(z) vec3(tanh(cos((z) * .31) * .6) * 6., \
+                  tanh(cos((z) * .33) * .5) * 6., (z))
+#define T ((sin(iTime*.5)+iTime*.5)) * 6.
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void main()
+{
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    float s=.002,d=0.,i,l,w,ws;
+    vec3  r = vec3(iResolution.xy, iResolution.y),
+          p = P(T),ro = p,
+          Z = normalize( P(T+3.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.3)*.3)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;;
+    for(i = 0.; i++ < 100. && s > .001;) {
+        p = ro + D * d;
+        p.xy -= P(p.z).xy;
+        p.y -= 1.5;
+        p.x *= .5;
+        w = .6;
+        ws = .4;
+        for (int j; j++ < 6; p *= l, w *= l )
+            p  = abs(sin(p)) - 1.,
+            l = (1.+ws)/dot(p+.05,p),
+            ws += ws * .2;
+        s = length(p)/w;
+        d += s;
+    }
+    o.rgb += pow(1. - exp(i>65.?d:(-d/2.)), .45);
+    
+    fragColor = o;
+}
+

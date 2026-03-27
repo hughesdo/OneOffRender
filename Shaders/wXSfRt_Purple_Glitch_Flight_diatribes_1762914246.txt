@@ -1,0 +1,28 @@
+// ID: wXSfRt
+// Name: Purple Glitch Flight
+// User: diatribes
+// Date: 1762914246
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float d=.4+.1*dot(fract(sin(u)), sin(u)),a,i,s,t = .2*iTime;
+    vec3  p = iResolution;    
+    u = (u+u-p.xy)/p.y;
+    u += cos(t*vec2(.4,.8)) * vec2(.3,.1);
+    vec2 v = (.2+.2*sin(t*6.))+u + (u.yx*.8+.2-vec2(-1.,.1));
+    for(o*=0.; i++<5e1 && d < 1e2;
+        s = sin(p.z)*5.+16. - abs(p.y),
+        d += s = .01+.1*abs(s),
+        o += .2*vec4(6,3,12.,0)/length(v)
+          + (1.+cos(.5*p.z+vec4(4,2,1,0)))/(1e1*s))
+        for(p = vec3(u*d,d+t*1e1),
+            p.xy *= mat2(cos(.02*p.z+.4*t+vec4(0,33,11,0))),
+            a = .01; a < .5;
+            p -= dot(ceil(cos(t+.3*p / a)), vec3(4.)) * a,
+            p += ceil(sin(p.yzx*.3)*3.),
+            a += a);
+    o = tanh(o*o/1e4);
+}
+

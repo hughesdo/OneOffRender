@@ -1,0 +1,53 @@
+// ID: WfGGDc
+// Name: Spacejunk Party
+// User: diatribes
+// Date: 1748570617
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime)
+
+
+#define P(z) vec3(tanh(cos((z) * .2) * .3) *16., \
+                  tanh(cos((z) * .3) * .4) * 16., (z))
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,l,g,d,i;
+    vec3  r = iResolution,
+          p = P(T),ro=p,q,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.2))*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    d = .025*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+    for(o*=i; i++<1e2 && s > .001; ) {
+        vec3 p = ro + D * d *.6;
+        q = p;
+        
+        q = p + cos(T+p.z+p.zxy);
+        q.z += dot(cos(T+q*.2), sin(q * .3));
+        g = 1.5 - dot(cos(T+q*1.), cos(q*.3));
+
+        l = dot(abs(q-floor(q)-.5), vec3(.4)); 
+        
+        for (s = .2; s < 1.;
+            p -= dot(cos(T+p * s*8.), vec3(.02)) / s,
+            p += sin(p.zxy*.13)*.44,
+            s *= 1.4142);
+            
+        q.xy = P(p.z).xy;
+        
+        d += s = min(l,
+                 min(.03 + abs(s)*.2,
+                     .01 + abs(g*3.)*.15));
+        
+        o += (1.+cos(d+vec4(1,2,4,0))) / s / d;
+    }
+    
+    o *= o / 2e5;
+    o = (o / (o + 0.155) * 1.019);
+
+}

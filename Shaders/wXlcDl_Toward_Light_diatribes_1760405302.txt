@@ -1,0 +1,42 @@
+// ID: wXlcDl
+// Name: Toward Light
+// User: diatribes
+// Date: 1760405302
+
+
+// ===== PASS 0: Image =====
+
+// play here :D
+
+#define T iTime
+#define FLIGHT_SPEED 2e2
+
+#define WHITE vec4(1)
+#define RED vec4(5,2,1,0)
+#define BLUE vec4(1,2,4,0)
+
+#define LIGHTNING_COLOR RED
+#define LIGHTNING_FREQ  tanh(cos(t+sin(1e1*t)))
+
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    float l,i,d,s,c,w,n,t = T;
+    vec3 q,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    u.y-=.2;
+    for(o=vec4(0); i++<128.;
+        w = .5*max(q.y+1e1, .001),
+        c = .1+.3*abs(p.y + cos(p.x*.05)*4.-1e2),
+        d += s = min(c,w),
+        l = 1e1*LIGHTNING_FREQ*length(u-vec2(0,1)),
+        o += (w < c ? .05/s : 3e1/s)+.05*LIGHTNING_COLOR/l*d)
+        for (q = p = vec3(u * d, d + t*FLIGHT_SPEED),
+             p.x += t * 1e2,
+             q.xz *= R(1.),
+             n = .01; n < 3.; n += n )
+             p -= abs(dot(sin(.5*t + .05*p / n * .2), vec3(2e1))) * n,
+             q += abs(dot(sin(q.z*.01 + .02*q / n ), vec3(6.))) * n;
+    o = tanh(o*o/4e8);
+}
+

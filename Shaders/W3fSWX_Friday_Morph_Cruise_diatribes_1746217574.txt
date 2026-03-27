@@ -1,0 +1,48 @@
+// ID: W3fSWX
+// Name: Friday Morph Cruise
+// User: diatribes
+// Date: 1746217574
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime*.5
+
+
+// @Shane's Menger function hacked up
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float map(vec3 q){
+    float d, s = 32.;
+    vec3 p = q*2.;
+    
+    p += cos(p.yzx+T*2.6)*.1;
+    
+    float l, w = 1.1;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p)-(tanh(cos(iTime)*5.3)*1.7)*.1;;
+        
+    d = length(p)/w;
+    MENGERLAYER(1.,max, 1.);
+    MENGERLAYER(6., max, 2.25);
+    MENGERLAYER(8., max, 4.);
+    return d;
+}
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = T/8.,i,z,d;
+    for (O *= i; i++ < 60.;)
+        p = z * normalize(vec3(I+sin(t*6.)*I/3.+I,0)-iResolution.xxy),
+        p.z -= 5.*t,
+        p.y -= sin(t*5.5),
+        z += (d = map(p)+9e-5),
+        O += max(sin(vec4(t+p*.3,1)), .2) / d;
+    O /= 3e5;
+    O = (O / (O + 0.155) * 1.019);
+}

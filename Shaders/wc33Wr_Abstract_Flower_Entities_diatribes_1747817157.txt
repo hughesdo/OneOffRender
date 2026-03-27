@@ -1,0 +1,38 @@
+// ID: wc33Wr
+// Name: Abstract Flower Entities
+// User: diatribes
+// Date: 1747817157
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Playing with turbulence and translucency from
+    @Xor's recent shaders, e.g.
+        https://www.shadertoy.com/view/wXjSRt
+        https://www.shadertoy.com/view/wXSXzV
+*/
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,a,b,t=iTime*.2;
+    for(o*=i; i++<1e2; ) {
+        vec3 p = d * normalize(vec3(u+u,0) - iResolution.xyy )*.8;
+        for (s = .1; s < 2.;
+            p += cos(t+p.yzx*3.)*.1,
+            p += dot(cos(p * s* 16.), vec3(.02)) / s,
+            s *= 1.4);
+        a = .125*length(p + .5 -
+                     vec3(sin(sin(t*4.)+sin(t*15.))*4.,
+                     sin(sin(t*.3) +
+                     sin(t*.8))*d/6.,
+                     tanh(cos(t*2.)*3.)*5.-9.))-.5;
+        b = .125*length(p - .5 -
+                vec3(sin(sin(t*5.)+sin(t*12.))*7.,
+                     sin(sin(t*3.) * 6.+
+                     sin(t*.6))*d/6.,
+                     tanh(cos(t*3.3)*6.)*5.-7.))-.5;
+        d += s = .01 + abs(min(a,b))*.9;
+        o += (1.+cos(d+(a < b ? vec4(3,6,2,1) : vec4(4,3,2,1)))) / s;
+    
+    }
+    o = tanh(.08*vec4(6,2,6,1)+o / 3e3);
+}

@@ -1,0 +1,118 @@
+// ID: tffcD7
+// Name: More Light Tinkering
+// User: diatribes
+// Date: 1755740555
+
+
+// ===== PASS 0: Image =====
+
+/*
+    I have no idea what I'm doing, just playing with
+    @Shane and @iq lego blocks seen here:
+    
+        https://www.shadertoy.com/view/W3VXWc
+        
+    If anybody knows if I'm remotely close to using
+    this correctly let me know please :D
+
+*/
+
+
+float map(vec3 p) {
+    // rotate
+    p.xz *= mat2(cos(iTime *.1+vec4(0,33,11,0)));
+    
+    // add some noise (bumps)
+    p += abs(dot(sin(p * 2e2), .001+p-p));
+    
+    if (mod(iTime, 16.) > 8.)
+        p = mod(p-.75, 1.5) - .75;
+    else
+        p = mod(p, 1.5) - .75;
+    
+    
+    // rounded cube
+    return pow(dot(p=p*p*p*p,p),.125) - .4;
+}
+
+// IQ's "uint" based uvec3 to float hash with Fabrice's modification.
+float hash31(vec3 f) {
+   
+    uvec3 p = floatBitsToUint(f);
+    p = 1664525U*((p >> 2U)^(p.yzx>>1U)^p.zxy);
+    uint h32 = 1103515245U*(((p.x)^(p.y>>3U))^(p.z>>6U));
+
+    uint n = h32^(h32 >> 16);
+    return float(n & uint(0x7fffffffU))/float(0x7fffffff);
+    
+}
+
+// This is a slight retweaking of Poisson's SSS function,
+// which can be found, here:
+//
+// Conetraced Soft Shadows -- Poisson
+// https://www.shadertoy.com/view/DdtGWf
+//
+// ra is the subsurface radius.
+float subsurface(vec3 ro, vec3 rd, float ra) {
+    
+    const int sN = 10; // Sample number.
+    float sss = 0.;
+    
+    // Randomly march out from the surface in the direction 
+    // of the light accumulating weighted values.
+    for (int i=0; i<sN; i++){
+    
+        // Random, but increasing, sample distance.
+        float rnd = hash31(ro + float(i))*.1;
+        float d = float(i)*ra*(1. + rnd); 
+        // Accumulate weighted samples.
+        sss += clamp(map(ro + rd*d)/d, 0., 1.);
+        //sss += smoothstep(0., 1., map(ro + rd*h)/h);
+    }
+    
+    sss /= float(sN); // Average the scattering value.
+    
+    // Giving the results more of a bell curve distribution.
+    return smoothstep(0., 1., sss); 
+} 
+
+// https://iquilezles.org/articles/normalsSDF
+vec3 getNormal(vec3 p) {
+  float EPSILON = 1e-4;
+  #define ZERO (min(iFrame,0))
+  vec3 n = vec3(0.0);
+  for(int i = ZERO; i < 4; i++){
+      vec3 e = 0.5773*(2.0*vec3((((i+3)>>1)&1),((i>>1)&1),(i&1))-1.0);
+      n += e*map(p+e*EPSILON);
+  }
+  return normalize(n);
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,s,d,sss;
+    vec3  p = iResolution;
+    
+    // scale coords
+    u = (u+u - p.xy) / p.y;
+    
+    // raymarch
+    for(o*=i; i++ < 128.; o += s )
+        p = vec3( u*d, d - 1.),
+        d += s = map(p) * .8;
+    
+    // normal
+    vec3 n = getNormal(p);
+
+    // specular and diffuse
+    vec3 l = normalize(vec3(2,4,6));
+    o += pow(max(dot(reflect(-l,n), vec3(u,1)), 0.), 8.);
+    o += max(dot(n,l),0.);
+    
+    // sub-surface scattering
+    sss = subsurface(n, l, .1); 
+    
+    // orange color, divide down brightness
+    o = tanh(vec4(5,2,1,0)*o/2e1/sss);
+}
+

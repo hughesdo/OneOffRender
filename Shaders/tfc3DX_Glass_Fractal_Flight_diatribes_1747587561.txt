@@ -1,0 +1,38 @@
+// ID: tfc3DX
+// Name: Glass Fractal Flight
+// User: diatribes
+// Date: 1747587561
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -7 chars from @FabriceNeyret2, 412 to 405
+    
+    Thanks! :D
+    
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+    vec3  p = iResolution;
+    float t = iTime*.2,i,d,s,w,l;
+    u = (u-p.xy/2.)/p.y-sin(iTime*.3)*.5;
+    for (o *= i; i++ < 1e2;) {
+        p = .5 * vec3( u*d, d+t ),
+        s = 1. - length(p.xy+d*2.);
+        p += cos(t+p.yzx)*.05;
+        p.xy *= mat2(cos((cos(t*.3)*3.)+vec4(0,33,11,0)));
+        
+         w=.4;
+         for (int j; j++ < 6; p *= l, w *= l )
+            p  = abs(sin(p)) - 1.05,
+            l = (1.5+cos(t)*.125)/dot(p,p);
+        d += s = max(length(p)/w, s);
+        o += (1.+cos(d+vec4(1,3,4,1)))/s;
+    }
+    
+   o = tanh(o / 2e5 * exp(-d/8.));
+}
+
+

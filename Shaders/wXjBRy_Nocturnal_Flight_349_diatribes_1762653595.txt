@@ -1,0 +1,34 @@
+// ID: wXjBRy
+// Name: 🦇 Nocturnal Flight 🦇 [349]
+// User: diatribes
+// Date: 1762653595
+
+
+// ===== PASS 0: Image =====
+
+/*
+
+    -2 and UB o init fix by @bug
+    
+    ty!!   :D
+
+    bat sdf adapted from here: https://www.shadertoy.com/view/3ccXD7
+ 
+ */
+
+void mainImage( out vec4 o, vec2 u ) {
+    float d,s,i,t=iTime;
+    vec3 c,r = iResolution,p;
+    for(u = (u-r.xy/2.)/r.y; i++ < 64.;
+        d += s = min(1.+p.y,
+                 min(1.5-p.y*.1,
+                    step(.005-abs(u.x)*.4,
+                         abs(.1*sin(t*.3)+u.y - .1 + .7*abs(u.x)*sin(t*24.))))),
+        c += s*d + .1*vec3(2,3,4)/length(u-.25))
+        for (p = vec3(u*d,d+t*4.),
+            s =.1; s < 3.;s+=s)
+            p.y += abs(dot(sin(.2*p / s),  r/r)) * s;
+    o.rgb = tanh(c/1e3*exp(-d/5e1));
+}
+
+

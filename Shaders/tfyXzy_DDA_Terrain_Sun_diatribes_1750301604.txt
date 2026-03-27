@@ -1,0 +1,143 @@
+// ID: tfyXzy
+// Name: DDA Terrain Sun
+// User: diatribes
+// Date: 1750301604
+
+
+// ===== PASS 0: Image =====
+
+/*
+References that helped:
+https://lodev.org/cgtutor/raycasting.html
+https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+https://www.shadertoy.com/view/X32SD3
+https://www.shadertoy.com/view/4dX3zl
+
+*/
+
+#define STEPS 128.
+
+#define SCALE .6
+#define inf 1e9
+#define T (iTime*16.)
+
+#define N normalize
+
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+float side = 0.;
+
+float map(vec3 p) {
+    float n,s,r = 36.;
+
+    s  = length(p.xy);
+
+    for (n = .03; n < 2.;
+        p += abs(dot(sin(p * n * 4.), vec3(.1))) / n,
+        n += n);
+
+    return (r-p.y*s);
+}
+
+vec4 sky(vec3 ro, vec3 rd, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec4 o;
+    vec3 p = ro + rd;
+    for(o*=i; i++<42.;
+        d += s = .06 + abs(s)*.5,
+        o += (vec4(9,3,2,0) - sin(p.y))*s/(2.+d))
+        for (p = vec3(u * d, d + t*4.),
+            s = 5.+p.y,
+            a = .15; a < 2.; a += a)
+            p += cos(t+p.yzx)*.03,
+            s -= abs(dot(sin(.5*t+p * a * 6.), vec3( .06))) / a;
+    u.y += .05;
+    return tanh(o / 8e1 / length(u));
+}
+
+// I based this on @chronos' "Lode Style Voxel DDA 3D"
+// https://www.shadertoy.com/view/X32SD3
+vec3 tex(vec3 ro, vec3 rd, vec3 p, vec3 n) {
+    vec3 rgb;                         
+    
+    // Solve ray plane intersection equation: dot(n, ro + t * rd - p = 0.
+    // for t 
+    float t = dot(n, p - ro) / dot(n, N(rd));
+    vec3 hit = ro + N(rd) * t;
+ 
+    if(side == 0.)
+        rgb = texture(iChannel0, hit.yz*.125).rgb;
+    else if(side == 1.)
+        rgb = texture(iChannel1, hit.xz*.0675).rgb;
+    else
+        rgb = texture(iChannel2, hit.xy*.0275).rgb;
+
+    rgb.r *= t*.02;
+    return rgb*t*.03;
+}
+
+vec4 marchVoxels(vec3 fp, vec3 sd, vec3 rs, vec3 dd, float iters, float minS) {
+
+    float i,s,d=0.;
+	for (i=0.; i++ < iters;) {
+
+        if(sd.x <= sd.y && sd.x <= sd.z){
+            sd.x += dd.x; // Add delta dist
+            fp.x += rs.x; // step right/left
+            side = 0.;    // yz wall
+        } else if(sd.y <= sd.z && sd.y <= sd.x) {
+            sd.y += dd.y; // Add delta dist
+            fp.y += rs.y; // step up/down
+            side = 1.;    // xz wall
+        }  else {
+            sd.z += dd.z; // Add delta dist
+            fp.z += rs.z; // step front/back
+            side = 2.;    // xy wall
+        }
+        if (fp.y < -64.) return vec4(STEPS+1.);
+        s = map(fp*SCALE);
+        d += s;
+		if (s < minS) break;
+
+	}
+    
+    return vec4(fp, i);
+}
+
+
+void mainImage(out vec4 o, vec2 u) {
+
+    vec3  id,
+          blue = vec3(.15,.11,.57)*1.5,
+          red = vec3(.7,.11,.05)*2.5,
+          green = vec3(.11,.32,.11)*1.5,
+          e = vec3(.005,0,0),
+          r = iResolution;
+    u = (u-r.xy/2.)/-r.y;
+          // rayPos
+    vec3  p = vec3(0,0,T), ro = p,
+          // rayDir
+          rd = vec3(u, 1),
+          fp = floor(p);
+              
+    // rayStep
+	vec3 rs = sign(rd),
+         // deltaDist
+	     dd = 1. / abs(rd),
+         // sideDist
+		 sd = (rs * (fp - p) + (rs * 0.5) + 0.5) * dd; 
+
+    o *= 0.;
+    
+    vec4 vox = marchVoxels(floor(p), sd, rs, dd, STEPS, .01);
+    vec3 n = vec3(side==0., side==1., side==2.);
+    p = vox.xyz  + .5 - rs * .5;
+    o.rgb = tex(ro, rd, p, n);
+    
+    if (vox.w > STEPS) o = sky(ro, rd, u);
+    else o *= max(dot(n, N(rd)), .2)*3.*exp(-vox.w/42.);
+    
+    u.y += .05;
+    o = tanh(o / length(u) / 2.);
+}
+

@@ -1,0 +1,77 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Fractal Skimmer
+// Created by diatribes
+// Shadertoy ID: 3cfXRM
+// https://www.shadertoy.com/view/3cfXRM
+
+#define T (iTime*1.3)
+#define DIST_MAX 12.
+#define P1(z) (vec3(tanh(cos((z) * .07) * 1.7) * 6., 0., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float map(vec3 p) {
+    const float mscale = .65;
+    p.xy = mod(p.xy + 1.0, 2.0) - 1.0;
+    p.z = mod(p.z + 1.0, .5) - .25;
+    vec4 q = vec4(p, 1.0);
+    for(int i = 0; i < 15; i++) {
+        q.xyz = abs(q.xyz);
+        q = mscale*q/clamp(pow(length(q.xyz),2.), .5, 1.) 
+            - vec4(.1, .99, .13, 0.0);
+    }
+
+    return length(q.xyz)/q.w - .0275;
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.01, 0);
+    vec3 n = map(p) - vec3(
+        map(p-e.xyy),
+        map(p-e.yxy),
+        map(p-e.yyx));
+
+    return normalize(n);
+}
+
+void main()
+{
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = P1(T),
+         la = P1(T+4.)+sin(P1(T).x);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.5)*.25)*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s;
+    float steps = 0.;
+    do{
+        p = ro + rd * d;
+        s = map(p);
+        d += s;
+        steps++;
+    } while (steps < 130. && d < DIST_MAX && s > .001);
+    if (d < DIST_MAX && steps < 130.) {
+        vec3 c = vec3(.5,.25, .5);
+        c += sin(d)+sin(p);
+        o.rgb = vec3(c/d)*max(dot(normal(p), normalize(ro-p)), .0);
+        o.rgb *= mix(vec3(.1,.5,.3)/d,
+                     vec3(.4,.3,.2)/d,
+                     smoothstep(25.,1.,d));
+        o.rgb = pow(o.rgb-dot(u,u), vec3(.45));
+    } else {
+        o = vec4(0.);    
+    }
+    
+    fragColor = o;
+}
+

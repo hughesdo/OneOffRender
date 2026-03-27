@@ -1,0 +1,157 @@
+// ID: M3yyDm
+// Name: Purple Draynk
+// User: diatribes
+// Date: 1736310228
+
+
+// ===== PASS 0: Image =====
+
+
+// First raymarching attempt...
+// Based on the raymarching explanation here:
+// https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+
+#define MAX_STEPS 100
+#define MAX_DIST 100.0
+#define SURFACE_DIST 0.001
+#define inf 1e10
+
+// This function comes from glsl-rotate
+// https://github.com/dmnsgn/glsl-rotate/blob/main/rotation-3d.glsl
+mat4 rotation3d(vec3 axis, float angle) {
+  axis = normalize(axis);
+  float s = sin(angle);
+  float c = cos(angle);
+  float oc = 1.0 - c;
+
+  return mat4(
+      oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s,
+      oc * axis.z * axis.x + axis.y * s, 0.0, oc * axis.x * axis.y + axis.z * s,
+      oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
+      oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s,
+      oc * axis.z * axis.z + c, 0.0, 0.0, 0.0, 0.0, 1.0);
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+// The SDF of this cross is 3 box stretched to infinity along all 3 axis
+float sdCross(in vec3 p) {
+  float da = sdBox(p.xyz, vec3(inf, 1.0, 1.0));
+  float db = sdBox(p.yzx, vec3(1.0, inf, 1.0));
+  float dc = sdBox(p.zxy, vec3(1.0, 1.0, inf));
+  return min(da, min(db, dc));
+}
+
+float scene(vec3 p) {
+
+  float d = 0.0;
+  float scale = 1.0;
+
+  float angle = iTime * 0.9;
+  vec3 axis = vec3(sin(iTime) * .1, cos(iTime) * .05, sin(iTime * .3) * .3);
+  mat4 m = rotation3d(axis, angle);
+  p = (m * vec4(p, 1.0)).xyz;
+
+  // Loop and decrease scale of cross
+  for (int i = 0; i < 4; i++) {
+    // Repeat the cross
+    vec3 a = mod(p * scale, 3.0) - 1.0;
+    vec3 r = 1.0 - 3.00 * abs(a);
+
+    // DECREASE the scale of the cross
+    scale *= 3.25;
+    float c = sdCross(r) / scale;
+    d = max(d, c);
+  }
+  return d;
+}
+
+float raymarch(vec3 ro, vec3 rd) {
+  float dist = 0.0;
+  for (int i = 0; i < MAX_STEPS; i++) {
+
+    // Ray origin extended by dist in rd direction
+    vec3 p = ro + rd * dist;
+
+    // Calculate the distance from the current position
+    // to an object in the scene or infinity
+    float step = scene(p);
+
+    // Track the total distance of the ray
+    dist += step;
+
+    // If we've gone too far, or are very close to a surface
+    if (dist > MAX_DIST || step < SURFACE_DIST) {
+      break;
+    }
+  }
+
+  // Infinity or the distance to a surface
+  return dist;
+}
+
+// https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 n =
+      scene(p) - vec3(scene(p - e.xyy), scene(p - e.yxy), scene(p - e.yyx));
+
+  return normalize(n);
+}
+
+vec3 getColor(float amount) {
+  return vec3(.25, 0, .25) * sin(sin(iTime) * .5 + .5 + .25) *
+         vec3(.473, 0, .833) * amount;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+
+  // Normalize coords
+  vec2 uv = fragCoord.xy / iResolution.xy;
+
+  // Center
+  uv -= 0.5;
+
+  // Match aspect ratio
+  uv.x *= iResolution.x / iResolution.y;
+
+  // Ray origin
+  vec3 ro = vec3(0, 0, (sin(iTime) * .5 + .5));
+
+  // Light Position
+  vec3 lightPosition = ro;
+
+  // Ray direction
+  vec3 rd = normalize(vec3(uv, -1.0));
+
+  // Distance from ray origin to a scene object
+  float d = raymarch(ro, rd);
+
+  // Extend our ray out to raymarched dist
+  vec3 p = ro + rd * d;
+
+  // Will be final color
+  vec3 color = vec3(0.0);
+
+  // If the ray didn't go to infinity
+  if (d < MAX_DIST) {
+
+    // Calculate the normal
+    vec3 normal = getNormal(p);
+
+    // Calculate the light direction
+    vec3 lightDirection = normalize(lightPosition - p);
+
+    // Calculate diffuse light
+    float diffuse = max(dot(normal, lightDirection), 0.0);
+
+    // Our final color is just lit gray
+    color = vec3(1.0, 1.0, 1.0) * (diffuse);
+  }
+
+  fragColor = vec4(color * getColor(d*2.0), 1.0);
+}
+

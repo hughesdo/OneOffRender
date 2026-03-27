@@ -1,11 +1,247 @@
 [
   {
+    "name": "infinite_drift_stars_v2_ar.glsl",
+    "preview_image": "infinite_drift_stars_v2_ar.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Updated version of Infinite Drift starfield. Smooth diagonal-scrolling multi-layer starfield with parallax depth, magenta→purple→blue→cyan→green palette. Select stars click into bright audio-reactive halos on transients while the rest twinkle gently independent of the music. Subtle nebula background wash and edge vignette.",
+    "audio_reactive": true
+  },
+  {
+    "name": "infinite_drift_stars_ar.glsl",
+    "preview_image": "infinite_drift_stars_ar.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Smoothly scrolling diagonal starfield with 5 depth layers and parallax. Stars are colored across a magenta→purple→blue→cyan→green palette by ID. 20% of stars are designated audio-reactive: each listens to a specific frequency bin and \"clicks\" into a bright glow halo on transients. The remaining 80% twinkle gently independent of audio. Subtle background nebula wash and edge vignette complete the depth.",
+    "audio_reactive": true
+  },
+  {
+    "name": "plasma_spectrograph_ar.glsl",
+    "preview_image": "plasma_spectrograph_ar.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Continuous fibrous plasma stream that maps the live frequency spectrum to color bands across its cross-section — magenta (sub-bass) through purple, blue, cyan, to green (highs). Domain-warped directional FBM noise creates organic striation and turbulence. Each color band's brightness is driven by its actual audio energy. Includes a hot white-magenta core pulse on bass hits, filament edge highlights, and a soft bloom haze.",
+    "audio_reactive": true
+  },
+  {
+    "name": "saw_wave_plasma_ar.glsl",
+    "preview_image": "saw_wave_plasma_ar.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Sawtooth-colored particle stream — audio-reactive 3D plasma flow. 8 depth layers of particles stream along a tilted axis with curl-noise turbulence. The saw-wave color palette cycles magenta→purple→blue→cyan→green with sharp resets. Bass drives glow intensity, particle size, stream spread, and flow speed. White-hot core hotness near the stream center. Orbiting camera with slow drift.",
+    "audio_reactive": true
+  },
+  {
+    "name": "particle_nebula_ar.glsl",
+    "preview_image": "particle_nebula_ar.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive 3D particle nebula with Fresnel edge glow. 7 layers of drifting particles fill a volumetric cloud with teal-to-blue color depth gradient. Per-particle Fresnel shading simulates tiny spheres glowing at their edges. Bass drives camera FOV and orbit sway; per-particle FFT samples control individual size and glow. Scattered bright star particles and a subtle procedural nebula wash complete the depth.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Paez_Plasma Orb.glsl",
+    "preview_image": "Paez_Plasma Orb.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Bass-reactive plasma orb from PAEz. A looping interference pattern of sine waves creates a pulsing orb of color. Bass drives animation speed, UV warp strength, orb zoom (breathe effect), and brightness pump via tanh tone mapping. 4x AA samples for smooth edges.",
+    "audio_reactive": true
+  },
+  {
+    "name": "cdak_oneoff_v4.glsl",
+    "preview_image": "cdak_oneoff_v4.JPG",
+    "stars": 4,
+    "buffer": "cdak_oneoff_v4.buffer.A.glsl",
+    "texture": null,
+    "description": "cdak tunnel port V4 \u00e2\u20ac\u201d introduces audio reactivity for heavy drum beat music alongside the stable camera from V3. Bass punches up the thickness and intensity of the blue/purple edge detection lines, shifts their colors based on mids/highs, and adds a pulsing warm glow.",
+    "audio_reactive": true
+  },
+  {
+    "name": "cdak_oneoff_v2.glsl",
+    "preview_image": "cdak_oneoff_v2.JPG",
+    "stars": 4,
+    "buffer": "cdak_oneoff_v2.buffer.A.glsl",
+    "texture": null,
+    "description": "cdak tunnel port V2 \u00e2\u20ac\u201d adds MusicCave-style audio streak glow. During raymarching, FFT energy is sampled at each step based on tunnel depth (frequency bins mapped to Z position), accumulating bright warm streaks wherever the ray grazes a surface. On loud transients the architecture lights up with orange-white fire streaks that follow the geometry edges and fractal lattice detail. All other audio reactivity from V1 retained (bass specular pulse, broadband edge glow). No camera wobble.",
+    "audio_reactive": true
+  },
+  {
+    "name": "cdak_oneoff.glsl",
+    "preview_image": "cdak_oneoff.JPG",
+    "stars": 4,
+    "buffer": "cdak_oneoff.buffer.A.glsl",
+    "texture": null,
+    "description": "Verbatim GLSL port of cdak 4K intro by Quite & Orange (1st at Chaos Constructions 2010). Two-pass buffer system: Buffer A raymarches the architectural tunnel and fractal lattice geometry; Image pass runs the original Sobel edge detection producing the characteristic bluish-purple edge lines, plus volumetric glow and tone curve grading. Stable version \u2014 no audio wobble on camera.",
+    "audio_reactive": true
+  },
+  {
+    "name": "DD - New Sig2.glsl",
+    "preview_image": "DD - New Sig2.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Signature piece combining a generative NewSig tiled background, @OneHung SDF text with a Stargate kawoosh water raymarcher. The 25-second looping timeline opens with a giant spiral-in of blocky '@OneHung' lettering over a colorful procedural cell-grid, then at 11.5s a gyroid-FBM portal explodes outward with a twisted-space capsule kawoosh. Audio drives the outer frequency-monitor ring radius and pulses the text glow. Fire rendering illuminates hot cells and text outlines with orange flame.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Edge Plasma.glsl",
+    "preview_image": "Edge Plasma.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive edge tendril shader. Electric plasma tendrils reach inward from screen borders, leaving the center clear for compositing. Purple-to-magenta cosine palette with blue-white electric cores and orange-gold plasma nodes. Bass drives tendril depth and turbulence; mids modulate warp speed; highs add fine electric detail and sparkle. Black background ideal for Screen/Add blend mode.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Where Is Her Mind Plasma.glsl",
+    "preview_image": "Where Is Her Mind Plasma.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Wreath \u00e2\u20ac\u201d audio-reactive electric plasma ring with Rive vector feathering. Deep purple and electric blue tendrils with hot orange highlights at peak intensity. Hollow center for compositing. Bass breathes the ring radius and drives turbulence; mids modulate plasma density and flicker.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Rainbow Gyroid Orb.glsl",
+    "preview_image": "Rainbow Gyroid Orb.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive rainbow gyroid orb with plasma core. A centered gyroid cage structure cycles through full-spectrum rainbow hues driven by bass. Features fresnel-lit plasma, rainbow veins, atmospheric cage glow, and screen-wide bass pulse. Colors shift dynamically with music intensity.",
+    "audio_reactive": true
+  },
+  {
+    "name": "AA- Bioluminescent Glass Ribbons.glsl",
+    "preview_image": "AA- Bioluminescent Glass Ribbons.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Bioluminescent Glass Ribbons - Smooth glassy organic ribbons with reflections. Features bass-driven ribbon pulsing, mid-frequency twist control, bass-boosted glow, mid-frequency color shifts, and subtle high-frequency camera shake. Includes realistic glass material with reflectivity and refraction.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/WcyfRD",
+    "author": "Shadertoy"
+  },
+  {
+    "name": "AA - Chroma Orbital 2.glsl",
+    "preview_image": "AA - Chroma Orbital 2.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Chroma Orbital - Diverse Shapes Edition. Varied orbiting objects including Boing, RubberCube, Gyroid, and Torus. Features audio-reactive pulsing with bass, mid-frequency orbit influence, and high-frequency sparkle. Includes three-point lighting, chromatic aberration, and post-processing effects.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/3cGfzw",
+    "author": "Shadertoy"
+  },
+  {
+    "name": "AA - MilkDrop1.glsl",
+    "preview_image": "AA - MilkDrop1.JPG",
+    "stars": 4,
+    "buffer": "AA- MilkDrop1.buffer.A.glsl",
+    "texture": null,
+    "description": "MilkDrop Tribute - Classic MilkDrop aesthetics with modern GLSL implementation. Features wave displacement, geometric overlays, color cycling, and beat-reactive pulsing. Includes beat detection with hysteresis, shape memory, and evolving parameters driven by audio frequency bands.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/tcKBzm",
+    "author": "Shadertoy"
+  },
+  {
+    "name": "Hide and Seek - Close Orb.glsl",
+    "preview_image": "Hide and Seek - Close Orb.JPG",
+    "stars": 5,
+    "buffer": "Hide and Seek - Close Orb.buffer.A.glsl",
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "585f9546c092f53ded45332b343144396c0b2d70d9965f585ebc172080d8aa58"
+      }
+    },
+    "description": "Crystalline Void - Close Orb Version by @OneHung. Same as Hide and Seek but with the gyroid orb positioned closer to the camera for better visibility. Crystalline/void aesthetic with audio-reactive geometry that breathes and pulses. Features procedural iridescent materials, smooth camera path through infinite recursive structure, and multi-bounce reflections.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/3cyfzm",
+    "author": "@OneHung"
+  },
+  {
+    "name": "Hide and Seek.glsl",
+    "preview_image": "Hide and Seek.JPG",
+    "stars": 5,
+    "buffer": "Hide and Seek.buffer.A.glsl",
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "585f9546c092f53ded45332b343144396c0b2d70d9965f585ebc172080d8aa58"
+      }
+    },
+    "description": "Crystalline Void - Audio Reactive Fractal Flythrough by @OneHung. Crystalline/void aesthetic with audio-reactive geometry that breathes and pulses. Features procedural iridescent materials, smooth camera path through infinite recursive structure, and multi-bounce reflections. Geometry pulses with bass, color shifts with mids, and detail complexity increases with treble.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/3cyfzm",
+    "author": "@OneHung"
+  },
+  {
+    "name": "Shader_Jam_Cube_Tunnel.glsl",
+    "preview_image": "Shader_Jam_Cube_Tunnel.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Shader Jam - Cube Tunnel. Audio reactive fractal cube tunnel with FFT-driven geometry scaling and emission. Features volumetric rendering, dynamic camera movement, and beat-synced color palettes.",
+    "audio_reactive": true
+  },
+  {
+    "name": "LiveArchive_number_4.glsl",
+    "preview_image": "LiveArchive_number_4.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "LiveArchive number 4 by Flopine. Algorave Nogozon 2019. Raymarched fractal scene with rotating geometry, water simulation, and colorful palette. Features smooth min blending and cylinder primitives.",
+    "audio_reactive": false
+  },
+  {
+    "name": "SESSIONS_shaderjam_2023.glsl",
+    "preview_image": "SESSIONS_shaderjam_2023.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "SESSIONS shaderjam 2023. Audio reactive fractal tunnel with colorful visuals. Bass frequencies control geometry size and modulate the fractal iterations.",
+    "audio_reactive": true
+  },
+  {
     "name": "01d-kabuto_Fixed.glsl",
     "preview_image": "01d-kabuto_Fixed.JPG",
     "stars": 0,
     "buffer": null,
     "texture": null,
     "description": "Audio-reactive tunnel with spheres and planes. Bass frequencies control sphere size, audio modulates colors and textures throughout the raymarched scene.",
+    "audio_reactive": true
+  },
+  {
+    "name": "EdgeDetectionUsing_dFdx_dFdy.glsl",
+    "preview_image": "EdgeDetectionUsing_dFdx_dFdy.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: gam0022. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xtd3W7. Edge detection using dFdx/dFdy with video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EdgeDetectionUsing_dFdx_dFdy_c-base.glsl",
+    "preview_image": "EdgeDetectionUsing_dFdx_dFdy_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "c-base-full-loop-blue-green.mp4",
+    "description": "Original author: gam0022. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xtd3W7. Edge detection using dFdx/dFdy with c-base video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons.glsl",
+    "preview_image": "EverydaySkeletons.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "SpaceTravel1Min.mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. Everyday 022/100 with SpaceTravel video texture. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: SpaceTravel1Min.mp4",
     "audio_reactive": true
   },
   {
@@ -81,6 +317,22 @@
     "audio_reactive": false
   },
   {
+    "name": "Revised Reality.glsl",
+    "preview_image": "Revised Reality.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Revised Reality - Cinema with traveling audio-reactive orb by dean_the_coder and Chronos. Features a magical orb that travels between a cubemap screen and movie theater. Lightning bolts dance to bass beats, isle lights glow with mids, and the orb pulses and changes colors with audio. Includes volumetric glow, Fresnel reflections, and dynamic lighting effects.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/NlScRy",
+    "author": "dean_the_coder"
+  },
+  {
     "name": "SIG15 EntryLevel.glsl",
     "preview_image": "SIG15 EntryLevel.JPG",
     "stars": 3,
@@ -139,7 +391,7 @@
   },
   {
     "name": "Waveform.glsl",
-    "preview_image": "WaveForm.JPG",
+    "preview_image": "Waveform.JPG",
     "stars": 4,
     "buffer": null,
     "texture": null,
@@ -172,6 +424,15 @@
     "texture": null,
     "description": "Audio-reactive tunnel vortex effect with rotating geometry. Bass frequencies control tunnel depth and rotation speed, creating dynamic visual flow synchronized to music.",
     "audio_reactive": true
+  },
+  {
+    "name": "Gemmarium.glsl",
+    "preview_image": "Gemmarium.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Static raymarched gem and orb scene with mirrored floor and volumetric-style glow. Purely time-based animation with no audio reactivity or external textures.",
+    "audio_reactive": false
   },
   {
     "name": "Bubble Colors.glsl",
@@ -414,15 +675,6 @@
     "audio_reactive": true
   },
   {
-    "name": "Waveform3d.glsl",
-    "preview_image": "Waveform3d.JPG",
-    "stars": 4,
-    "buffer": true,
-    "texture": null,
-    "description": "3D audio waveform visualization with raymarching and reflections. Features vertical scrolling feedback buffer that creates trailing effects. The waveform data drives the surface displacement creating dynamic audio-reactive geometry.",
-    "audio_reactive": true
-  },
-  {
     "name": "Audio Reactive Magical Orb-2.glsl",
     "preview_image": "Audio Reactive Magical Orb-2.JPG",
     "stars": 5,
@@ -457,5 +709,2769 @@
     },
     "description": "Enhanced neural network shader with sophisticated edge detection, HSV color manipulation, and advanced audio-reactive morphing. Features multi-band audio analysis, luminance-based displacement scaling, and edge-reactive effects for professional-quality image distortion.",
     "audio_reactive": true
+  },
+  {
+    "name": "Bouncing Vectors.glsl",
+    "preview_image": "Bouncing Vectors.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive bouncing vector field with dynamic particle animation. Bass frequencies control depth offset and animation intensity, while treble frequencies modulate grid density, frequency scaling, and glow effects for responsive visual feedback.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Wavelights.glsl",
+    "preview_image": "Wavelights.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Procedural wave-based light patterns with rotating geometry and ripple effects. Creates dynamic, flowing light structures with mathematical precision and smooth color transitions.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Wavelights2.glsl",
+    "preview_image": "Wavelights2.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Variant of Wavelights with modified rotation parameters and color channels. Produces similar wave patterns with different visual characteristics and color emphasis.",
+    "audio_reactive": false
+  },
+  {
+    "name": "UV Mapping Truchet Tiles.glsl",
+    "preview_image": "UV Mapping Truchet Tiles.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Complex raymarched Truchet tile patterns with UV mapping and reflections. Features animated gears, intricate geometric patterns, and sophisticated lighting with multiple bounces for professional visual effects.",
+    "audio_reactive": false
+  },
+  {
+    "name": "3DAudioVisualizerNumber2.glsl",
+    "preview_image": "3DAudioVisualizerNumber2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dtj3zW. 3D Audio Visualizer #2. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AbstractMusic.glsl",
+    "preview_image": "AbstractMusic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: MatHack. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4stSRs. Abstract Music. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AcidBlossomvisualizerSound.glsl",
+    "preview_image": "AcidBlossomvisualizerSound.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Forthro. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/mlcfW2. Acid blossom visualizer (Sound!). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Anastasia.glsl",
+    "preview_image": "Anastasia.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dcSRj. Anastasia. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ASpaceFlower.glsl",
+    "preview_image": "ASpaceFlower.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DslfR7. Mind flowers. License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "AttemptAtVDJEffects.glsl",
+    "preview_image": "AttemptAtVDJEffects.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "pexels-eberhard-grossgasteiger-966927.jpg"
+    },
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XctGzf. Attempt at VDJ effects. License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio-reactive_scene_1st_attempt.glsl",
+    "preview_image": "Audio-reactive_scene_1st_attempt.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/cslSRr. Audio-reactive scene 1st attempt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BasicAudioVisualizer.glsl",
+    "preview_image": "BasicAudioVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: chronos. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/lsdGR8. Basic Audio Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioVisual.glsl",
+    "preview_image": "AudioVisual.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Passion. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MsBSzw. AudioVisual. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioVisualizerBars3_sidhu.glsl",
+    "preview_image": "AudioVisualizerBars3_sidhu.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ramansinghdhiman. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/lcBSWR. AudioVisualizer bars 3 (sidhu). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Auroras.glsl",
+    "preview_image": "Auroras.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nimitz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGGRt. Auroras. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BINTANG_HITAM.glsl",
+    "preview_image": "BINTANG_HITAM.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: zhonkvision. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtlBW7. BINTANG HITAM. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BlueprintOfTheArchitekt.glsl",
+    "preview_image": "BlueprintOfTheArchitekt.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4tySDW. Blueprint of the Architekt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Blunderbuss.glsl",
+    "preview_image": "Blunderbuss.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3lBfzz. Blunderbuss. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "BubblesMusicVisualizer.glsl",
+    "preview_image": "BubblesMusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: liyouvane. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/llXBWB. Bubbles music visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "BurningHeart.glsl",
+    "preview_image": "BurningHeart.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: dnnkeeper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/llXGRX. Burning Heart. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Audio-Visualizer.glsl",
+    "preview_image": "Audio-Visualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: CoolerZ. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wd3XzS. Audio-Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioFlightv2_strobes.glsl",
+    "preview_image": "AudioFlightv2_strobes.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: byt3_m3chanic. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7tfyRl. Audio Flight v2 (strobes). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "AudioReactiveFractal.glsl",
+    "preview_image": "AudioReactiveFractal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: FaustianBargainForTop. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtSBR1. Audio Reactive Fractal. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CallOfThesiren.glsl",
+    "preview_image": "CallOfThesiren.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Quasimondo. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7sSSDd. Call of the Siren . License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CheshireCat_forked.glsl",
+    "preview_image": "CheshireCat_forked.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: teassy000 and julianlumia. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdtSWr. Cheshire Cat and cute little shader combined. https://www.shadertoy.com/view/wsf3RN. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Christmas_tree.glsl",
+    "preview_image": "Christmas_tree.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: vanshika. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MfGBWm. Christmas tree ::). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "cloned_RainbowSpectrum.glsl",
+    "preview_image": "cloned_RainbowSpectrum.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: hornet. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ldX3D8. cloned: rainbow spectrum. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cross_SDF_Fractal.glsl",
+    "preview_image": "Cross_SDF_Fractal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: bradjamesgrant. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tssfz7. Cross SDF fractal. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "CubeMusicTransmitter.glsl",
+    "preview_image": "CubeMusicTransmitter.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    },
+    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4lBSRm. \u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u201a\u00ac\u00c5\u00be\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00ab Low Frequency Flow. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "danagas-wingman.glsl",
+    "preview_image": "danagas-wingman.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdtXDf. danaga's wingman. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DancingColorRings.glsl",
+    "preview_image": "DancingColorRings.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/md3GDl. Dancing Color Rings. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DancingCubeField_Visualiser.glsl",
+    "preview_image": "DancingCubeField_Visualiser.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: Pelegefen. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/fl2XRm. Dancing Cube Field (Visualiser). License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "Dancing_stick_figures.glsl",
+    "preview_image": "Dancing_stick_figures.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Eybor. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdByzy. Dancing stick figures. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DarkSideOfTheMoon.glsl",
+    "preview_image": "DarkSideOfTheMoon.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nyri0. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/sdSyz3. The Dark Side of the Moon. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Day30-XargantianPolyjupe.glsl",
+    "preview_image": "Day30-XargantianPolyjupe.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: jeyko. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tlG3RV. Day 30 - Xargantian Polyjupe. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DDDAudioVisualizer.glsl",
+    "preview_image": "DDDAudioVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtl3Dr. 3D Audio Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Dice.glsl",
+    "preview_image": "Dice.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-Reactive D&D Dice Morphing by @Jaenam97. Holofoil dice that morph between D4, D6, D8, D10, D12, and D20 shapes. Features audio-reactive grid density, hue shifting, chromatic aberration, and nested box fractals. Bass and mid frequencies drive visual intensity and color shifts.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/tfGyzt",
+    "author": "@Jaenam97"
+  },
+  {
+    "name": "DiscoGoldrays.glsl",
+    "preview_image": "DiscoGoldrays.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kishimisu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dt33RS. Disco Godrays [411 chars]. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "DnB_corridor.glsl",
+    "preview_image": "DnB_corridor.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NldSW7. DnB corridor. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "DodecaIcosaAndStellations.glsl",
+    "preview_image": "DodecaIcosaAndStellations.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ChunderFPV. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/McsXz8. Dodeca, icosa & stellations. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Domain_warped_FBM_noise.glsl",
+    "preview_image": "Domain_warped_FBM_noise.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: liamegan. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wttXz8. Domain warped FBM noise. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "echappatoire.glsl",
+    "preview_image": "echappatoire.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u2020\u00e2\u20ac\u2122\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "echappatoire_with_heart.glsl",
+    "preview_image": "echappatoire_with_heart.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u2020\u00e2\u20ac\u2122\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ElectricDream.glsl",
+    "preview_image": "ElectricDream.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: mu6k. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ld23Wd. Electric Dream. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EtherealPulsarMusicVisualizer.glsl",
+    "preview_image": "EtherealPulsarMusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Forthro. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/dtyfzD. Ethereal Pulsar Music Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Evacuation.glsl",
+    "preview_image": "Evacuation.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Xor. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4l2GW1. Evacuation. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverybodyDance.glsl",
+    "preview_image": "EverybodyDance.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XsySDW. Everybody Dance. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons_c-base.glsl",
+    "preview_image": "EverydaySkeletons_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "c-base-full-loop-blue-green.mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. everyday 022/100. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "EverydaySkeletons_earth.glsl",
+    "preview_image": "EverydaySkeletons_earth.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": "pexels_videos_3931(1080p).mp4",
+    "description": "Original author: kalin. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MslBDN. everyday 022/100. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ExclamationHeartNr.2.glsl",
+    "preview_image": "ExclamationHeartNr.2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ArthurTent. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/43dGDn. Exclamation Heart Nr.2 <3!. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "audio_reactive": true
+  },
+  {
+    "name": "ExitTheMatrix.glsl",
+    "preview_image": "ExitTheMatrix.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Kali. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NlsXDH. Exit the Matrix. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "EyeOfHajiSauron.glsl",
+    "preview_image": "EyeOfHajiSauron.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: arminkz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/X3jcWR. Eye of Haji Sauron. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FFTDomainColoring.glsl",
+    "preview_image": "FFTDomainColoring.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: pixelbeast. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Mt2GWt. FFT Domain Coloring. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "fftexperiment.glsl",
+    "preview_image": "fftexperiment.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: nshelton. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4tK3zG. fft experiment. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FlowerSpeaker.glsl",
+    "preview_image": "FlowerSpeaker.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: coposuke. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttXczX. Flower Speaker. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FluidicSpace.glsl",
+    "preview_image": "FluidicSpace.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: EnigmaCurry. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/tdS3DD. Fluidic Space. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "FontDemo.glsl",
+    "preview_image": "FontDemo.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "arthurtent.jpeg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel3": "38c3_visuals.png"
+    },
+    "description": "Original author: gigatron. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xt3XWf. Font demo. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkDancingGlowLights.glsl",
+    "preview_image": "ForkDancingGlowLights.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtsBWH. Fork: Dancing Glow Lights. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkNixieTubeClock.glsl",
+    "preview_image": "ForkNixieTubeClock.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: picoplanetdev. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Dds3WB. Fork Nixie Tube Clock. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkPixelRickRadiantMusicVis.glsl",
+    "preview_image": "ForkPixelRickRadiantMusicVis.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: ArthurTent. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MXdGz4. Fork Pixel Rick+Radiant MusicVis. License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForkRadarPanel.glsl",
+    "preview_image": "ForkRadarPanel.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: willis. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wtyfzV. Radar Panel. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_Complicating_things_even_further.glsl",
+    "preview_image": "Fork_Complicating_things_even_further.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pink. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/csfyzS. Fork Complicating things even.... License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_Complicating_things_even_further2.glsl",
+    "preview_image": "Fork_Complicating_things_even_further2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pink. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/csfyzS. Fork Complicating things even.... License: CC0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fork_DiveIntoMusic.glsl",
+    "preview_image": "Fork_DiveIntoMusic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/cst3zl. Fork: Dive Into Music. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Foxie.glsl",
+    "preview_image": "Foxie.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: z0rg. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NdlGzs. Foxie. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fractal77MusicVisualizer.glsl",
+    "preview_image": "Fractal77MusicVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: orblivius. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XXBGzw. Fractal 77 Music Visualizer. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "GalaxyOfUniverses.glsl",
+    "preview_image": "GalaxyOfUniverses.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdXSzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Gauges.glsl",
+    "preview_image": "Gauges.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Genizm-IdVisualizer.glsl",
+    "preview_image": "Genizm-IdVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "glxyEpilogue.glsl",
+    "preview_image": "glxyEpilogue.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Hexagone.glsl",
+    "preview_image": "Hexagone.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "IctalurusForest.glsl",
+    "preview_image": "IctalurusForest.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "InerciaRoyaliptic.glsl",
+    "preview_image": "InerciaRoyaliptic.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Informer.glsl",
+    "preview_image": "Informer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "inFX.1b.glsl",
+    "preview_image": "inFX.1b.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "beton_3_pexels-photo-5622880.jpeg"
+    },
+    "description": "Original author: genizm. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtBfRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "its-a-skurr.glsl",
+    "preview_image": "its-a-skurr.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "JamSession.glsl",
+    "preview_image": "JamSession.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "JetAnotherVisualizer.glsl",
+    "preview_image": "JetAnotherVisualizer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "LiveCoding_at_AirPortAnimeFes2023.glsl",
+    "preview_image": "LiveCoding_at_AirPortAnimeFes2023.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kaneta1992. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DtfBzj. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "LogSphericalKIFSZoomer.glsl",
+    "preview_image": "LogSphericalKIFSZoomer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdXSzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "LowFrequencyFlow.glsl",
+    "preview_image": "LowFrequencyFlow.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Flyguy. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtGfzw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MandelKoch-MusicVisualiserVer.glsl",
+    "preview_image": "MandelKoch-MusicVisualiserVer.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Pelegefen. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/sslXzX. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MarakamiGalaxy.glsl",
+    "preview_image": "MarakamiGalaxy.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: PixelPhil. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3tyGRz. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "MarakamiGalaxy_2.glsl",
+    "preview_image": "MarakamiGalaxy_2.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: PixelPhil. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/3tyGRz. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "March_12_2021.glsl",
+    "preview_image": "March_12_2021.jpg",
+    "stars": 1,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: TheNosiriN. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/fsl3z4. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave.glsl",
+    "preview_image": "Shaderwave.jpg",
+    "stars": 1,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ShatterFlake.glsl",
+    "preview_image": "ShatterFlake.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ctBSWt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ShitJustGotReal.glsl",
+    "preview_image": "ShitJustGotReal.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: db0x90. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Xdjczt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoapBubbleMusicVisualizerNumber1.glsl",
+    "preview_image": "SoapBubbleMusicVisualizerNumber1.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Ruzzyr. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtVSDt. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SolumObject.glsl",
+    "preview_image": "SolumObject.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/mtKGRW. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SonicPulse.glsl",
+    "preview_image": "SonicPulse.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: WillKirkby. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dcyD2. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoundBlob.glsl",
+    "preview_image": "SoundBlob.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: seb0fh. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Ms3SWr. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SoundReactiveCircle.glsl",
+    "preview_image": "SoundReactiveCircle.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Friend. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/NlsfDM. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SpaceshipConsole.glsl",
+    "preview_image": "SpaceshipConsole.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: QuantumSuper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/DlVXDc. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SuperNoise.glsl",
+    "preview_image": "SuperNoise.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XtlfWX. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SynestheticRings.glsl",
+    "preview_image": "SynestheticRings.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: isaacchurchill. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/Wt2cWR. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "SynthwaveCanyon.glsl",
+    "preview_image": "SynthwaveCanyon.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: mrange. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/slcXW8. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TechnoCore.glsl",
+    "preview_image": "TechnoCore.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: Kali. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/wtdXzS. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TestMoney.glsl",
+    "preview_image": "TestMoney.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: uratowel12. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ds23zd. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ThePopularShader.glsl",
+    "preview_image": "ThePopularShader.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: fizzer. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdB3Dw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "ThePopularShader_forward.glsl",
+    "preview_image": "ThePopularShader_forward.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: fizzer. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/XdB3Dw. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "TheRavenThatRefusedToSing.glsl",
+    "preview_image": "TheRavenThatRefusedToSing.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Original author: s23b. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4dSyDm. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave_vid.glsl",
+    "preview_image": "Shaderwave_vid.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "otaviogood_shader_fontgen.png",
+      "iChannel2": "pexels_videos_3931(1080p).mp4"
+    },
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. Video: pexels_videos_3931(1080p).mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "Shaderwave_vid_c-base.glsl",
+    "preview_image": "Shaderwave_vid_c-base.jpg",
+    "stars": 0,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "otaviogood_shader_fontgen.png",
+      "iChannel2": "c-base-full-loop-blue-green.mp4"
+    },
+    "description": "Original author: kosua20. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/ttBGRD. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. Video: c-base-full-loop-blue-green.mp4",
+    "audio_reactive": true
+  },
+  {
+    "name": "TheVoiceless.glsl",
+    "preview_image": "TheVoiceless.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/ls3cWM. The Voiceless"
+  },
+  {
+    "name": "ThirtyThousandWaves.glsl",
+    "preview_image": "ThirtyThousandWaves.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/7dl3Wn. Thirty-Thousand waves",
+    "texture": {
+      "iChannel1": "pierre-bamin-_EzTds6Fo44-unsplash.jpg"
+    }
+  },
+  {
+    "name": "ThunderEye.glsl",
+    "preview_image": "ThunderEye.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/Dsy3WD. Thunder Eye"
+  },
+  {
+    "name": "ToyDivision.glsl",
+    "preview_image": "ToyDivision.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/MlG3zm. ToyDivision"
+  },
+  {
+    "name": "TributeToMyOldAtari.glsl",
+    "preview_image": "TributeToMyOldAtari.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/3lyBRt. Tribute to my old Atari"
+  },
+  {
+    "name": "TruchetKaleidoscopeFTW.glsl",
+    "preview_image": "TruchetKaleidoscopeFTW.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/7lKSWW. Truchet + Kaleidoscope FTW"
+  },
+  {
+    "name": "Tycho-Awake-AlbumCover.glsl",
+    "preview_image": "Tycho-Awake-AlbumCover.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/MsGGzR. Tycho | Awake - Album Cover",
+    "texture": {
+      "iChannel1": "pierre-bamin-_EzTds6Fo44-unsplash.jpg"
+    }
+  },
+  {
+    "name": "VinylVisualizer.glsl",
+    "preview_image": "VinylVisualizer.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/XlcXDX. Vinyl Visualizer"
+  },
+  {
+    "name": "Warpspeed.glsl",
+    "preview_image": "Warpspeed.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/Msl3WH. Warp speed"
+  },
+  {
+    "name": "WavingGridTunnel.glsl",
+    "preview_image": "WavingGridTunnel.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/tlfGRN. Waving Grid Tunnel"
+  },
+  {
+    "name": "WeNeedAnExpertDaveHoskins.glsl",
+    "preview_image": "WeNeedAnExpertDaveHoskins.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/dsc3RS. We need an expert.. Dave Hoskins"
+  },
+  {
+    "name": "WindOfChange.glsl",
+    "preview_image": "WindOfChange.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/ldBSDd. Wind of change"
+  },
+  {
+    "name": "[SH16B]WIPWarpTunnel.glsl",
+    "preview_image": "[SH16B]WIPWarpTunnel.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/XtdGR7. [SH16B] WIP: Warp Tunnel",
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel3": "pexels-eberhard-grossgasteiger-966927.jpg"
+    }
+  },
+  {
+    "name": "[SH17A]FunkyDiscoBall.glsl",
+    "preview_image": "[SH17A]FunkyDiscoBall.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/wd3XzS. [SH17A] Funky Disco Ball",
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    }
+  },
+  {
+    "name": "[SH18]BabyToy.glsl",
+    "preview_image": "[SH18]BabyToy.jpg",
+    "stars": 0,
+    "buffer": false,
+    "audio_reactive": true,
+    "description": "URL: https://www.shadertoy.com/view/lldyWn. [SH18] BabyToy"
+  },
+  {
+    "name": "nanoKontrol2.glsl",
+    "preview_image": "nanoKontrol2.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/NlsfDM. Created by byt3_m3chanic",
+    "audio_reactive": true
+  },
+  {
+    "name": "nn_c.glsl",
+    "preview_image": "nn_c.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/4fyfzK. Created by ArthurTent",
+    "audio_reactive": true
+  },
+  {
+    "name": "pantera_rosa_CRT.glsl",
+    "preview_image": "pantera_rosa_CRT.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/l3GGRW. Created by jorge2017a2",
+    "audio_reactive": true
+  },
+  {
+    "name": "sound_Everyones_Favorite_Song.glsl",
+    "preview_image": "sound_Everyones_Favorite_Song.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/fldcWf. Created by Tilmann",
+    "audio_reactive": true
+  },
+  {
+    "name": "totetmatt-QuickyNr058.glsl",
+    "preview_image": "totetmatt-QuickyNr058.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/fdcGRj. Created by totetmatt",
+    "audio_reactive": true
+  },
+  {
+    "name": "totetmatt-Vortex.glsl",
+    "preview_image": "totetmatt-Vortex.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {},
+    "description": "URL: https://www.shadertoy.com/view/3tdfD2. Created by totetmatt",
+    "audio_reactive": true
+  },
+  {
+    "name": "FunkyDiscoBall2.glsl",
+    "preview_image": "FunkyDiscoBall2.jpg",
+    "stars": 0,
+    "buffer": false,
+    "texture": {
+      "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg",
+      "iChannel2": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
+    },
+    "description": "Original author: knarkowicz. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/MdySW3. Funky Disco Ball with reflective spheres. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "audio_reactive": true
+  },
+  {
+    "name": "Eagle.glsl",
+    "preview_image": "Eagle.JPG",
+    "stars": 5,
+    "buffer": true,
+    "texture": {
+      "iChannel1": "52d2a8f514c4fd2d9866587f4d7b2a5bfa1a11a0e772077d7682deb8b3b517e5.jpg",
+      "iChannel2": "fb918796edc3d2221218db0811e240e72e340350008338b0c07a52bd353666a6.jpg",
+      "iChannel3": "0c7bf5fe9462d5bffbd11126e82908e39be3ce56220d900f633d58fb432e56f5.png"
+    },
+    "description": "Homeward by David Hoskins - A crow flying over a procedural landscape. Multi-pass shader with data storage (Buffer A), landscape rendering (Buffer B), and main image with lens flare.",
+    "audio_reactive": false
+  },
+  {
+    "name": "MusicCave.glsl",
+    "preview_image": "MusicCave.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive raymarched procedural cave with stage-based camera choreography. Features composite sine-based cave geometry with pillars that respond to audio frequency data. Combines edge detection for sharp contours, volumetric glow effects, and dynamic camera rotations that change based on stage progression. Pillars and cave walls react to audio input creating synchronized visual pulsing.",
+    "audio_reactive": true
+  },
+  {
+    "name": "ForbiddenBeats.glsl",
+    "preview_image": "ForbiddenBeats.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive mathematical attractor visualization with rainbow colors. Created by diatribes. Features iterative attractor functions that create flowing, organic patterns synchronized to music. Bass frequencies modulate the attractor parameters while beat detection quantizes time progression. Rainbow hues cycle based on iteration count and position, with saturation and brightness responding to audio levels. Shadertoy ID: [TBD]",
+    "audio_reactive": true
+  },
+  {
+    "name": "wcfXRf_Frunnel9Insomnia.glsl",
+    "preview_image": "wcfXRf_Frunnel9Insomnia.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Frunnel 9: Insomnia - Fractal tunnel flight with organic camera movement. Created by diatribes. Features raymarched fractal geometry with iterative folding transformations creating intricate tunnel structures. Dynamic camera path follows parametric curves with smooth orbital motion around procedurally generated tunnel centerline. Shadertoy ID: wcfXRf",
+    "audio_reactive": false
+  },
+  {
+    "name": "332XRK_ColorSwirl.glsl",
+    "preview_image": "332XRK_ColorSwirl.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Color Swirl - Compact raymarched scene with colorful swirling patterns. Created by diatribes. Features efficient code-golfed raymarching with iterative sine-based distortions creating flowing color fields. Rotation matrices and multi-scale noise combine to produce hypnotic swirling motion. Shadertoy ID: 332XRK",
+    "audio_reactive": false
+  },
+  {
+    "name": "332XW3_ElectricFogTunnel.glsl",
+    "preview_image": "332XW3_ElectricFogTunnel.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Electric Fog Tunnel - Volumetric tunnel flight through electric fog effects. Created by diatribes. Features raymarched tunnel with parametric path following and multi-scale noise distortions creating electric fog appearance. Dynamic color gradients shift based on position and time. Shadertoy ID: 332XW3",
+    "audio_reactive": false
+  },
+  {
+    "name": "332yWD_CoreBurn.glsl",
+    "preview_image": "332yWD_CoreBurn.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Core Burn - Dual volumetric effects combining fire and heart shapes. Created by diatribes. Features two separate raymarched volumetric functions blended together: a rotating fire column with multi-scale noise and a pulsing heart shape with organic distortions. Warm color palette with red and orange tones. Shadertoy ID: 332yWD",
+    "audio_reactive": false
+  },
+  {
+    "name": "33B3Rm_AbstractInterference3.glsl",
+    "preview_image": "33B3Rm_AbstractInterference3.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Abstract Interference 3 - Complex tunnel flight with fractal orb and interference patterns. Created by diatribes. Features dual-pass raymarching: first through a parametric tunnel with tracking orb, then through fractal geometry with iterative folding. Red orb creates interference patterns when hit. Dynamic camera with rolling motion. Shadertoy ID: 33B3Rm",
+    "audio_reactive": false
+  },
+  {
+    "name": "33BSzt_FractalStrandsDemo.glsl",
+    "preview_image": "33BSzt_FractalStrandsDemo.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Strands Demo - Colorful fractal strands flight with turbulence. Created by diatribes. Features camera following parametric path through rotating fractal geometry with 9 iterations of sine-based folding. Turbulence distortions and dynamic rotation create flowing strand-like structures. Distance-based color accumulation and tone mapping. Shadertoy ID: 33BSzt",
+    "audio_reactive": false
+  },
+  {
+    "name": "33f3WH_FlowerTunnel.glsl",
+    "preview_image": "33f3WH_FlowerTunnel.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Flower Tunnel - Fractal tunnel with flower-like patterns. Created by diatribes. Features camera following sinusoidal path through fractal geometry with 6 iterations creating organic flower shapes. Dynamic scaling based on z-position creates pulsing effect. Inverted color scheme with distance fade. Shadertoy ID: 33f3WH",
+    "audio_reactive": false
+  },
+  {
+    "name": "33GGWd_CoffeeClouds.glsl",
+    "preview_image": "33GGWd_CoffeeClouds.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Coffee Clouds - Volumetric cloud-like formations with warm tones. Created by diatribes. Features raymarched volumetric rendering with multi-scale noise creating coffee-colored cloud patterns. Camera movement with gentle oscillation. Radial gradient vignette effect. Shadertoy ID: 33GGWd",
+    "audio_reactive": false
+  },
+  {
+    "name": "33jSDc_ColorRipples.glsl",
+    "preview_image": "33jSDc_ColorRipples.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Color Ripples [273] - Colorful rippling plane with rotation. Created by diatribes. Features raymarched plane with multi-scale sine distortions creating ripple effects. Rotating geometry and color cycling based on distance. Compact code-golfed implementation. Shadertoy ID: 33jSDc",
+    "audio_reactive": false
+  },
+  {
+    "name": "33KSWz_SpiralOverload.glsl",
+    "preview_image": "33KSWz_SpiralOverload.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Spiral Overload - Psychedelic spiral patterns with camera movement. Created by diatribes. Features volumetric raymarching with rotating coordinates and division by sine/cosine creating spiral distortions. Multi-scale step patterns and radial color mixing. Shadertoy ID: 33KSWz",
+    "audio_reactive": false
+  },
+  {
+    "name": "33l3zj_Noise42.glsl",
+    "preview_image": "33l3zj_Noise42.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Noise42 - Red noise pattern with animated vignette. Created by diatribes. Features multi-scale noise accumulation with dynamic vignette that moves and pulses. Red color scheme. Compact implementation. Shadertoy ID: 33l3zj",
+    "audio_reactive": false
+  },
+  {
+    "name": "33lGz4_LittleGemFlight.glsl",
+    "preview_image": "33lGz4_LittleGemFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Little Gem Flight - Fractal gem with oscillating camera position. Created by diatribes. Features 8-iteration fractal with dynamic scaling parameter creating gem-like structure. Camera position oscillates horizontally. Color modulation based on camera position. Distance fade. Shadertoy ID: 33lGz4",
+    "audio_reactive": false
+  },
+  {
+    "name": "33lGzn_KeepGoing.glsl",
+    "preview_image": "33lGzn_KeepGoing.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Keep Going - Tunnel flight with fractal structures and noise. Created by diatribes. Features camera following parametric path through tunnel with floor/ceiling constraints. Combines multi-scale noise with 8-iteration box-folding fractal. Rolling camera rotation. Red-tinted color scheme with distance fade and gamma correction. Shadertoy ID: 33lGzn",
+    "audio_reactive": false
+  },
+  {
+    "name": "33scR2_FireSmokeTinkering.glsl",
+    "preview_image": "33scR2_FireSmokeTinkering.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Fire & Smoke Tinkering - Volumetric fire and smoke simulation. Created by diatribes. Features two separate volumetric functions (fire and smoke) blended together. Fire uses multi-scale noise with warm color gradient. Smoke uses distorted raymarching with turbulence. Shadertoy ID: 33scR2",
+    "audio_reactive": false
+  },
+  {
+    "name": "33V3Dt_CandyCruise.glsl",
+    "preview_image": "33V3Dt_CandyCruise.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Candy Cruise - Colorful tunnel with candy-like patterns. Created by diatribes. Features volumetric tunnel with oscillating radius and rotating coordinates. Multi-scale additive and subtractive noise creates candy texture. Camera movement with gentle oscillation. Color cycling based on depth. Shadertoy ID: 33V3Dt",
+    "audio_reactive": false
+  },
+  {
+    "name": "33VGzW_Mycorrhizae.glsl",
+    "preview_image": "33VGzW_Mycorrhizae.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Mycorrhizae [294] - Twisted spiral with multi-scale noise. Created by diatribes. Features raymarched spiral pattern with rotation based on depth. Multi-scale noise distortion creates organic mycorrhizae-like structures. Central light with radial falloff. Code-golfed implementation. Shadertoy ID: 33VGzW",
+    "audio_reactive": false
+  },
+  {
+    "name": "33XGRN_3xGlowPath.glsl",
+    "preview_image": "33XGRN_3xGlowPath.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "3x Glow Path - Tunnel flight with 3-iteration fractal. Created by diatribes. Features camera following sinusoidal path through tunnel. 3-iteration fractal creates glowing structures. Distance-based color accumulation and distance fade. Shadertoy ID: 33XGRN",
+    "audio_reactive": false
+  },
+  {
+    "name": "33y3Wd_DeepSpiralHorizon.glsl",
+    "preview_image": "33y3Wd_DeepSpiralHorizon.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Deep Spiral Horizon - Psychedelic spiral with cinema bars and depth-based color. Created by diatribes. Features twisted and mirrored geometry with multi-scale noise. Cinema bars at top/bottom. Camera movement with oscillation. Depth-based color mixing and central light. Shadertoy ID: 33y3Wd",
+    "audio_reactive": false
+  },
+  {
+    "name": "3c2XWw_FractalOrbFlightAO.glsl",
+    "preview_image": "3c2XWw_FractalOrbFlightAO.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Orb Flight AO - Tunnel flight with fractal and tracking orb with ambient occlusion. Created by diatribes. Features camera following parametric path through tunnel with 8-iteration fractal. Tracking orb with oscillating movement. Ambient occlusion lighting from Shane. Rolling camera rotation. Gamma correction. Shadertoy ID: 3c2XWw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cBGzR_BiocoreInspection.glsl",
+    "preview_image": "3cBGzR_BiocoreInspection.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Biocore Inspection - Tunnel flight with rotating disc and tubes. Created by diatribes. Features camera following parametric path through tunnel with walls. Rotating tubes using rounded cylinder SDF from iq. Tracking disc with oscillating position. Fractal coloring. Rolling camera rotation. Shadertoy ID: 3cBGzR",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cBXzw_WickedWoodsFlight.glsl",
+    "preview_image": "3cBXzw_WickedWoodsFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Wicked Woods Flight - Forest-like fractal tunnel with tracking orb. Created by diatribes. Features camera following parametric path with ground plane and multi-scale noise. 8-iteration fractal creates tree-like structures. Tracking orb. Color division by orb distance. Shadertoy ID: 3cBXzw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ccyD7_HappyGlowCruise.glsl",
+    "preview_image": "3ccyD7_HappyGlowCruise.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Happy Glow Cruise - Menger sponge tunnel with glowing orb. Created by diatribes. Features camera following parametric path through tunnel with floor/ceiling constraints. Multi-layer Menger fractal using macro. Tracking orb with light accumulation. Colorful glow effects. Rolling camera rotation. Shadertoy ID: 3ccyD7",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cdyzS_IceWater.glsl",
+    "preview_image": "3cdyzS_IceWater.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Ice Water - Icy water scene with cinema bars. Created by diatribes. Features camera movement and multi-scale noise. Cinema bars at top/bottom. Blue/cyan color palette. Light sources. Shadertoy ID: 3cdyzS",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cj3R3_MoreSunSurf.glsl",
+    "preview_image": "3cj3R3_MoreSunSurf.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "More Sun Surf - Ocean surface with plasma sun. Created by diatribes. Features camera following parametric path over wavy ocean surface. Plasma coloring. Sun orb in sky. Rolling camera rotation. Gamma correction. Shadertoy ID: 3cj3R3",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cjcWD_NightCloudDance.glsl",
+    "preview_image": "3cjcWD_NightCloudDance.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Night Cloud Dance - Night clouds with moon and tracking orb. Created by diatribes. Features camera movement and multi-scale noise. Tracking orb with oscillating movement. Plane with noise. Moon light source. Blue tint. Shadertoy ID: 3cjcWD",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cl3z7_PlasmaOceanNoiseClouds.glsl",
+    "preview_image": "3cl3z7_PlasmaOceanNoiseClouds.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Ocean, Noise Clouds - Ocean with plasma and noise clouds. Created by diatribes. Features forward movement over wavy ocean surface. Plasma coloring on water. Noise clouds in sky. Normal-based lighting. Fog. Gamma correction. Shadertoy ID: 3cl3z7",
+    "audio_reactive": false
+  },
+  {
+    "name": "3clBW2_DreamEntity894.glsl",
+    "preview_image": "3clBW2_DreamEntity894.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Dream Entity #894 - Dream-like scene with star and lights. Created by diatribes. Features camera movement and multi-scale noise with turbulence. Warped planes. Blue light source. Star light source. Purple/magenta color palette. Shadertoy ID: 3clBW2",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cS3WG_3from1Tunnel.glsl",
+    "preview_image": "3cS3WG_3from1Tunnel.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "3 from 1 Tunnel - Three tunnels from one path. Created by diatribes. Features camera following parametric path through three offset tunnels. Rolling camera rotation. Colorful fractal-like coloring. Shadertoy ID: 3cS3WG",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cs3zM_RoughWaters.glsl",
+    "preview_image": "3cs3zM_RoughWaters.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Rough Waters - Stormy ocean with lightning and dark clouds. Created by diatribes. Features forward movement over wavy ocean surface. Plasma coloring on water. Noise clouds in sky. Lightning flashes. Normal-based lighting. Dark color palette. Gamma correction. Shadertoy ID: 3cs3zM",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cSBzw_SoulsofMercy.glsl",
+    "preview_image": "3cSBzw_SoulsofMercy.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Souls of Mercy - Fractal with fire overlay. Created by diatribes. Features 7-iteration fractal with rotation and turbulence. Fire effect with multi-scale noise. Mixed together. Blue/orange color palette. Shadertoy ID: 3cSBzw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cSyDG_HalfnHalf.glsl",
+    "preview_image": "3cSyDG_HalfnHalf.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Half n' Half - Split screen with different colors. Created by diatribes. Features forward/backward movement with rotations. Grid-based distance field. Split coloring based on u.x vs u.y. Diagonal line highlight. Shadertoy ID: 3cSyDG",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cSyWz_FloatTunnel.glsl",
+    "preview_image": "3cSyWz_FloatTunnel.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Float Tunnel - Tunnel flight with floating noise. Created by diatribes. Features camera following parametric path through tunnel. Multi-scale noise with turbulence. Color mixing based on distance. Orange/red color palette. Shadertoy ID: 3cSyWz",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cVXWD_CloudWaves.glsl",
+    "preview_image": "3cVXWD_CloudWaves.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Cloud Waves - Clouds with light source. Created by diatribes. Features forward movement with multi-scale noise and turbulence. Plane with noise. Light source. Shadertoy ID: 3cVXWD",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cXSWr_FractalSkimmer3.glsl",
+    "preview_image": "3cXSWr_FractalSkimmer3.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Skimmer 3 - Sierpinski-style fractal flight with plasma. Created by diatribes. Features camera following parametric path. 18-iteration fractal based on pb's Tangled Sierpinski. Plasma coloring. Rolling camera rotation. Gamma correction. Shadertoy ID: 3cXSWr",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cXyzB_DesertDuo.glsl",
+    "preview_image": "3cXyzB_DesertDuo.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Desert Duo - Desert scene with two orbs and sun beam. Created by diatribes. Features camera sway and forward movement. Multi-scale noise. Tracking orb. Ground plane and clouds. Angled sun beam light. Orange/red color palette. Shadertoy ID: 3cXyzB",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cyGRh_PolarFlight328Comments.glsl",
+    "preview_image": "3cyGRh_PolarFlight328Comments.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Polar Flight (328) Comments - Translucent mountains and clouds. Created by diatribes. Features forward movement with two planes distorted differently. Turbulence and multi-scale noise. Grayscale. Shadertoy ID: 3cyGRh",
+    "audio_reactive": false
+  },
+  {
+    "name": "3f23RK_PlasmaCathederal.glsl",
+    "preview_image": "3f23RK_PlasmaCathederal.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Cathederal - Cathedral-like tunnel with plasma. Created by diatribes. Features camera following parametric path through tunnel with custom length2 function. Plasma coloring. Rolling camera rotation. Gamma correction. Shadertoy ID: 3f23RK",
+    "audio_reactive": false
+  },
+  {
+    "name": "3f3cDN_OneLife.glsl",
+    "preview_image": "3f3cDN_OneLife.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "One Life - Tunnel with light source. Created by diatribes. Features camera movement and forward movement. Multi-scale noise. Tunnel with oscillating radius. Blue light source. Color mixing. Only 32 steps. Shadertoy ID: 3f3cDN",
+    "audio_reactive": false
+  },
+  {
+    "name": "3f3yWr_CalmCruise.glsl",
+    "preview_image": "3f3yWr_CalmCruise.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Calm Cruise - Menger sponge tunnel with grid and glowing orb. Created by diatribes. Features camera following parametric path through tunnel with floor/ceiling constraints. Multi-layer Menger fractal. Grid-based distance field. Tracking orb with light accumulation. Rolling camera rotation. Shadertoy ID: 3f3yWr",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fBfzw_Emptiness.glsl",
+    "preview_image": "3fBfzw_Emptiness.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Emptiness - Empty space with plane and multi-scale noise. Created by diatribes. Features camera sway and forward/sideways movement. Two different noise loops. Plane. Different coloring for plane vs space. Shadertoy ID: 3fBfzw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fdXzf_datavortex.glsl",
+    "preview_image": "3fdXzf_datavortex.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "data vortex - Data vortex with rotation and step noise. Created by diatribes. Features backward movement with rotation matrices. Step function noise. Blue/purple color palette. Shadertoy ID: 3fdXzf",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ffcD8_0xff0000.glsl",
+    "preview_image": "3ffcD8_0xff0000.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "0xff0000 - Red-focused scene with plane and noise. Created by diatribes. Features forward movement with multi-scale noise. Plane with oscillating radius. Red channel accumulation. Shadertoy ID: 3ffcD8",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ffGDr_ChillFluffyOrbs.glsl",
+    "preview_image": "3ffGDr_ChillFluffyOrbs.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Chill Fluffy Orbs - Five fluffy orbs with gyroid noise. Created by diatribes. Features camera following path through tunnel with 5 parametric paths. 5 glowing orbs with light accumulation. Gyroid noise for fluffiness. Multi-scale noise. Colored orb lighting. Gamma correction. Shadertoy ID: 3ffGDr",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ffGRf_MiniDuo.glsl",
+    "preview_image": "3ffGRf_MiniDuo.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Mini Duo - Two tunnel paths with multi-scale noise. Created by diatribes. Features camera following parametric path through two tunnels. Multi-scale noise. Rolling camera rotation. Color based on position. Gamma correction. Shadertoy ID: 3ffGRf",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fj3DV_Plasmactal.glsl",
+    "preview_image": "3fj3DV_Plasmactal.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasmactal - Three-path tunnel with plasma coloring. Created by diatribes. Features camera following parametric path through three tunnels. Plasma coloring. Rolling camera rotation. Color mixing. Gamma correction. Shadertoy ID: 3fj3DV",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fjGDm_GlowTube.glsl",
+    "preview_image": "3fjGDm_GlowTube.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Glow Tube - Two-path tunnel with glowing fractal coloring. Created by diatribes. Features camera following parametric path through two tunnels. Fractal-based RGB coloring. Rolling camera rotation. Gamma correction. Vignette. Shadertoy ID: 3fjGDm",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fKSDD_CloudDawn.glsl",
+    "preview_image": "3fKSDD_CloudDawn.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Cloud Dawn - Dawn sky with clouds and sun. Created by diatribes. Features forward movement with multi-scale noise. Plane for clouds. Sun-like light source. Orange/yellow color palette. Inspired by Xor's Runner. Shadertoy ID: 3fKSDD",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fsSDM_Frunnel5GlowFlip.glsl",
+    "preview_image": "3fsSDM_Frunnel5GlowFlip.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Frunnel 5: Glow Flip - Fractal tunnel with grid and glow. Created by diatribes. Features camera following parametric path through tunnel. 8-iteration fractal with grid-based modulo. Rolling camera rotation. Fractal coloring. Lighting. Gamma correction. Shadertoy ID: 3fsSDM",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ft3DS_StarFieldFlight351.glsl",
+    "preview_image": "3ft3DS_StarFieldFlight351.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Star Field Flight [351] - Star field with rotation and movement. Created by diatribes. Features forward movement with rotation and translation. Laser field-style distance field. Color based on distance. Inspired by Xor's laser field. Shadertoy ID: 3ft3DS",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fXcWl_Starfire1.glsl",
+    "preview_image": "3fXcWl_Starfire1.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Starfire1 - Sphere with multi-scale noise and fire colors. Created by diatribes. Features camera sway with sphere distance field. Multi-scale noise. Orange/red fire color palette. Shadertoy ID: 3fXcWl",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fXXzH_FractalPewPew.glsl",
+    "preview_image": "3fXXzH_FractalPewPew.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Pew Pew - Sierpinski-style fractal. Created by diatribes. Features forward movement with 15-iteration fractal based on pb's Tangled Sierpinski. Modulo-based repetition. Purple/pink color palette. Gamma correction. Shadertoy ID: 3fXXzH",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fySzh_MintySpiral.glsl",
+    "preview_image": "3fySzh_MintySpiral.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Minty Spiral - Spiral with rotation. Created by diatribes. Features forward movement with rotation matrix. Fract-based distance field. Green/cyan color palette. Only 60 steps. Shadertoy ID: 3fySzh",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fyXWd_ChillMoonClouds297.glsl",
+    "preview_image": "3fyXWd_ChillMoonClouds297.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Chill Moon Clouds [297] - Clouds with moon-like light source. Created by diatribes. Features forward movement with multi-scale noise. Plane with oscillating radius. Light source. Grayscale. Shadertoy ID: 3fyXWd",
+    "audio_reactive": false
+  },
+  {
+    "name": "3X2BWw_UniverseBall.glsl",
+    "preview_image": "3X2BWw_UniverseBall.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Universe Ball - Sphere with grid and turbulence. Created by diatribes. Features sphere distance field with rotation and turbulence. Grid-based distance field. Color based on position. Inspired by Jaenam's gem shaders. Shadertoy ID: 3X2BWw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3X2cDc_DigitalDownpour.glsl",
+    "preview_image": "3X2cDc_DigitalDownpour.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Digital Downpour - Digital rain effect with plane and light source. Created by diatribes. Features backward movement with rotation. Multi-scale noise with round function. Plane. Light source. Blue/green color palette. Only 32 steps. Shadertoy ID: 3X2cDc",
+    "audio_reactive": false
+  },
+  {
+    "name": "3X2XDW_LittleMountain.glsl",
+    "preview_image": "3X2XDW_LittleMountain.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Little Mountain - Mountain terrain with sky. Created by diatribes. Features fast forward movement with terrain based on sin functions. Multi-scale noise. Sky with moon-like light source. Gamma correction. Shadertoy ID: 3X2XDW",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XB3Dm_FracturedCruise.glsl",
+    "preview_image": "3XB3Dm_FracturedCruise.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractured Cruise - Tunnel with fractal inside. Created by diatribes. Features camera following parametric path through tunnel. Two-stage raymarch: tunnel then fractal. 8-iteration fractal. Rolling camera rotation. Color mixing based on position. Gamma correction. Shadertoy ID: 3XB3Dm",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XdXRj_SuperShapeCell.glsl",
+    "preview_image": "3XdXRj_SuperShapeCell.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Super Shape Cell - Super shape with orb and noise. Created by diatribes. Features backward movement with rotation. Super shape distance field. Tracking orb. High-frequency noise. Inspired by mrange's super shape shaders. Shadertoy ID: 3XdXRj",
+    "audio_reactive": false
+  },
+  {
+    "name": "3Xf3DH_ColorPuffTunnels.glsl",
+    "preview_image": "3Xf3DH_ColorPuffTunnels.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Color Puff Tunnels - Two-path tunnel with multi-scale noise. Created by diatribes. Features camera following parametric path through two tunnels. Multi-scale noise. Rolling camera rotation. Color accumulation. Gamma correction. Shadertoy ID: 3Xf3DH",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XfSDl_LittleFractalFlight2.glsl",
+    "preview_image": "3XfSDl_LittleFractalFlight2.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Little Fractal Flight 2 - Fractal with rotation and translation. Created by diatribes. Features forward movement with rotation. 4-iteration fractal. Translation based on time. Color based on position. Uses Xor's raymarcher. Tonemap. Shadertoy ID: 3XfSDl",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XGSR3_SmoothTubesBubbleDude.glsl",
+    "preview_image": "3XGSR3_SmoothTubesBubbleDude.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Smooth Tubes & Bubble Dude - Tubes with glowing orb. Created by diatribes. Features camera following parametric path through tubes. Grid-based modulo for tubes. Tracking orb with light accumulation. Rolling camera rotation. Color based on position. Shadertoy ID: 3XGSR3",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XjBWD_BitFalls.glsl",
+    "preview_image": "3XjBWD_BitFalls.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Bit Falls - Pixelated water and terrain with moon. Created by diatribes. Features forward movement with pixelation and posterization. Terrain and water with multi-scale noise. Moon light source. Color based on terrain vs water. Shadertoy ID: 3XjBWD",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XjSzw_MengerChill.glsl",
+    "preview_image": "3XjSzw_MengerChill.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Menger & Chill - Menger sponge tunnel. Created by diatribes. Features camera following parametric path through tunnel. Multi-layer Menger fractal. Turbulence. Rolling camera rotation. Lighting and AO. Color based on position. Tonemap. Gamma correction. Shadertoy ID: 3XjSzw",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cfBWB_HolographicDataplaneTransport.glsl",
+    "preview_image": "3cfBWB_HolographicDataplaneTransport.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Holographic Dataplane Transport - Fast tunnel with grid patterns. Created by diatribes. Features camera following parametric path through tunnel. Grid-based distance field. Step function for patterns. Rolling camera rotation. Shadertoy ID: 3cfBWB",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cfXRM_FractalSkimmer.glsl",
+    "preview_image": "3cfXRM_FractalSkimmer.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Skimmer - Sierpinski-style fractal with modulo repetition. Created by diatribes. Features forward movement with rotation. 15-iteration fractal. Modulo-based repetition. Lighting with normal calculation. Color mixing based on distance. Gamma correction. Shadertoy ID: 3cfXRM",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cKcR1_BitflipPondFlight.glsl",
+    "preview_image": "3cKcR1_BitflipPondFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Bitflip Pond Flight - Terrain with round-based noise. Created by diatribes. Features fast forward movement with rotation. Round function for bit-like appearance. Multi-scale noise. Cinema bars. Purple/blue color palette. Only 64 steps. Shadertoy ID: 3cKcR1",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cSSzR_LittleColorfulFlight.glsl",
+    "preview_image": "3cSSzR_LittleColorfulFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Little Colorful Flight - Tunnel with fractal. Created by diatribes. Features camera following parametric path through tunnel. 6-iteration fractal. Color accumulation with sin. Shadertoy ID: 3cSSzR",
+    "audio_reactive": false
+  },
+  {
+    "name": "3cSXzG_BrightColorFlight.glsl",
+    "preview_image": "3cSXzG_BrightColorFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Bright Color Flight - Tunnel with fractal and clamp. Created by diatribes. Features camera following parametric path through tunnel. 8-iteration fractal with clamp. Color accumulation. Distance fade. Gamma correction. Shadertoy ID: 3cSXzG",
+    "audio_reactive": false
+  },
+  {
+    "name": "3f2XRD_LavaFlight.glsl",
+    "preview_image": "3f2XRD_LavaFlight.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Lava Flight - Tunnel with fractal and wave distortion. Created by diatribes. Features camera following parametric path through tunnel. 6-iteration fractal. Wave-based distortion. Color accumulation. Orange/red color palette. Shadertoy ID: 3f2XRD",
+    "audio_reactive": false
+  },
+  {
+    "name": "3fcyD2_DarkFalls.glsl",
+    "preview_image": "3fcyD2_DarkFalls.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Dark Falls - Waterfall with mist. Created by diatribes. Features forward movement with rotation. Mist function with rotation and noise. Mirrored planes. Multi-scale noise. Cinema bars. Grayscale. Shadertoy ID: 3fcyD2",
+    "audio_reactive": false
+  },
+  {
+    "name": "3ffXWl_GatewayFractalTunnel.glsl",
+    "preview_image": "3ffXWl_GatewayFractalTunnel.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Gateway Fractal Tunnel - Sierpinski-style fractal tunnel. Created by diatribes. Features forward movement. 15-iteration fractal. Modulo-based repetition. Lighting with normal calculation. Color based on position. Gamma correction. Shadertoy ID: 3ffXWl",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XKSzV_TubeCruiseBubbleDude.glsl",
+    "preview_image": "3XKSzV_TubeCruiseBubbleDude.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Tube Cruise Bubble Dude - Tunnel flight with wisp chase and tube obstacles. Created by diatribes. Features forward movement. Wisp chase with rotation. Tube obstacles with modulo repetition. Lighting with normal calculation. Color based on position. Shadertoy ID: 3XKSzV",
+    "audio_reactive": false
+  },
+  {
+    "name": "3Xl3Rl_TwistsTriTunnelTerrain.glsl",
+    "preview_image": "3Xl3Rl_TwistsTriTunnelTerrain.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Twists Tri Tunnel Terrain - Twisted triangular tunnel with terrain. Created by diatribes. Features forward movement with rotation. Triangular tunnel with twist. Terrain with noise. Lighting with normal calculation. Color based on position. Shadertoy ID: 3Xl3Rl",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XlBRH_DigitalPhoenix.glsl",
+    "preview_image": "3XlBRH_DigitalPhoenix.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Digital Phoenix - Abstract phoenix-like pattern. Created by diatribes. Features rotation and scaling. Multi-layer noise. Color based on position. Gamma correction. Shadertoy ID: 3XlBRH",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XlfWX_ParasiticEnd.glsl",
+    "preview_image": "3XlfWX_ParasiticEnd.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Parasitic End - Organic parasitic pattern. Created by diatribes. Features forward movement. Multi-scale noise. Lighting with normal calculation. Color based on position. Shadertoy ID: 3XlfWX",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XlyDf_Lyfe.glsl",
+    "preview_image": "3XlyDf_Lyfe.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Lyfe - Abstract life-like pattern. Created by diatribes. Features rotation and scaling. Multi-layer noise. Color based on position. Gamma correction. Shadertoy ID: 3XlyDf",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XlyzH_OrbArena.glsl",
+    "preview_image": "3XlyzH_OrbArena.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Orb Arena - Arena with orbs. Created by diatribes. Features forward movement. Orbs with modulo repetition. Lighting with normal calculation. Color based on position. Shadertoy ID: 3XlyzH",
+    "audio_reactive": false
+  },
+  {
+    "name": "3Xs3zl_InfernoCruise.glsl",
+    "preview_image": "3Xs3zl_InfernoCruise.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Inferno Cruise - Fiery tunnel cruise. Created by diatribes. Features forward movement. Fire-like noise. Lighting with normal calculation. Warm color palette. Shadertoy ID: 3Xs3zl",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XXcW4_VibeRide2SpareParts.glsl",
+    "preview_image": "3XXcW4_VibeRide2SpareParts.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Vibe Ride 2 Spare Parts - Abstract vibe ride pattern. Created by diatribes. Features forward movement with rotation. Multi-scale noise. Color based on position. Shadertoy ID: 3XXcW4",
+    "audio_reactive": false
+  },
+  {
+    "name": "3XXGRB_NightmareHall.glsl",
+    "preview_image": "3XXGRB_NightmareHall.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Nightmare Hall - Dark hallway with nightmare aesthetic. Created by diatribes. Features forward movement. Dark color palette. Lighting with normal calculation. Shadertoy ID: 3XXGRB",
+    "audio_reactive": false
+  },
+  {
+    "name": "3Xy3z1_10StepTest.glsl",
+    "preview_image": "3Xy3z1_10StepTest.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "10 Step Test - Test pattern with 10 steps. Created by diatribes. Features forward movement. 10-step raymarching. Lighting with normal calculation. Color based on position. Shadertoy ID: 3Xy3z1",
+    "audio_reactive": false
+  },
+  {
+    "name": "433BzB_CyclicFractalGraffitiHall.glsl",
+    "preview_image": "433BzB_CyclicFractalGraffitiHall.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Cyclic Fractal Graffiti Hall - Hallway with cyclic fractal graffiti. Created by diatribes. Features forward movement. Cyclic fractal pattern. Graffiti-like colors. Lighting with normal calculation. Shadertoy ID: 433BzB",
+    "audio_reactive": false
+  },
+  {
+    "name": "43GBz3_TunnelCaveExperiment2.glsl",
+    "preview_image": "43GBz3_TunnelCaveExperiment2.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Tunnel Cave Experiment 2 - Cave tunnel experiment. Created by diatribes. Features forward movement. Cave-like noise. Lighting with normal calculation. Earth tones. Shadertoy ID: 43GBz3",
+    "audio_reactive": false
+  },
+  {
+    "name": "43yyDc_PlasmaPitTunnel.glsl",
+    "preview_image": "43yyDc_PlasmaPitTunnel.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Pit Tunnel - Tunnel with plasma pit. Created by diatribes. Features forward movement. Plasma-like noise. Lighting with normal calculation. Vibrant colors. Shadertoy ID: 43yyDc",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XcBWj_PlasmaBathHouse.glsl",
+    "preview_image": "4XcBWj_PlasmaBathHouse.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Bath House - Bath house with plasma effects. Created by diatribes. Features forward movement. Plasma-like noise. Lighting with normal calculation. Warm colors. Shadertoy ID: 4XcBWj",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XcBWM_2DFractalExperiment.glsl",
+    "preview_image": "4XcBWM_2DFractalExperiment.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "2D Fractal Experiment - 2D fractal pattern experiment. Created by diatribes. Features rotation and scaling. Multi-iteration fractal. Color based on iteration count. Shadertoy ID: 4XcBWM",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XdfW7_2dFractalExperiment.glsl",
+    "preview_image": "4XdfW7_2dFractalExperiment.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "2d Fractal Experiment - Another 2D fractal experiment. Created by diatribes. Features rotation and scaling. Multi-iteration fractal. Color based on iteration count. Shadertoy ID: 4XdfW7",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XdfW7_2dFractalExperiment_AudioReactive.glsl",
+    "preview_image": "4XdfW7_2dFractalExperiment_AudioReactive.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "2d Fractal Experiment - Audio Reactive - Smooth hue-shifting version of the original fractal. Colors smoothly transition based on high-frequency audio (treble). Animation remains unchanged. Created by diatribes, audio reactive modification. Shadertoy ID: 4XdfW7",
+    "audio_reactive": true
+  },
+  {
+    "name": "4XGcWc_PlasmaGrid.glsl",
+    "preview_image": "4XGcWc_PlasmaGrid.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Grid - Grid with plasma effects. Created by diatribes. Features rotation. Grid pattern with plasma noise. Vibrant colors. Shadertoy ID: 4XGcWc",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XKfzd_WormholeTunnel.glsl",
+    "preview_image": "4XKfzd_WormholeTunnel.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Wormhole Tunnel - Wormhole-style tunnel. Created by diatribes. Features forward movement with rotation. Wormhole distortion. Lighting with normal calculation. Color based on position. Shadertoy ID: 4XKfzd",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XVBR1_OrbLightHall.glsl",
+    "preview_image": "4XVBR1_OrbLightHall.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Orb Light Hall - Hallway with orb lights. Created by diatribes. Features forward movement. Orb lights with modulo repetition. Lighting with normal calculation. Color based on position. Shadertoy ID: 4XVBR1",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XVBzW_FractalTunnelChase.glsl",
+    "preview_image": "4XVBzW_FractalTunnelChase.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Tunnel Chase - Chase through fractal tunnel. Created by diatribes. Features forward movement. Multi-iteration fractal. Lighting with normal calculation. Color based on position. Gamma correction. Shadertoy ID: 4XVBzW",
+    "audio_reactive": false
+  },
+  {
+    "name": "4XVfWm_FractalTexturemapExperiment.glsl",
+    "preview_image": "4XVfWm_FractalTexturemapExperiment.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Fractal Texturemap Experiment - Experimental fractal texturing. Created by diatribes. Features forward movement. Fractal with texturemap-like effects. Lighting with normal calculation. Color based on position. Shadertoy ID: 4XVfWm",
+    "audio_reactive": false
+  },
+  {
+    "name": "l33BWN_PlasmaRaymarchExperiment.glsl",
+    "preview_image": "l33BWN_PlasmaRaymarchExperiment.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Raymarch Experiment - Experimental plasma raymarching. Created by diatribes. Features forward movement. Plasma effects with raymarching. Lighting with normal calculation. Color based on position. Shadertoy ID: l33BWN",
+    "audio_reactive": false
+  },
+  {
+    "name": "l3cBRN_Powerball.glsl",
+    "preview_image": "l3cBRN_Powerball.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Powerball - Energetic orb visualization. Created by diatribes. Features forward movement. Orb with power effects. Lighting with normal calculation. Color based on position. Shadertoy ID: l3cBRN",
+    "audio_reactive": false
+  },
+  {
+    "name": "l3cfDH_Psychedelixploration.glsl",
+    "preview_image": "l3cfDH_Psychedelixploration.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Psychedelixploration - Psychedelic exploration. Created by diatribes. Features forward movement. Psychedelic effects. Lighting with normal calculation. Color based on position. Shadertoy ID: l3cfDH",
+    "audio_reactive": false
+  },
+  {
+    "name": "l3tBWs_TotemHall.glsl",
+    "preview_image": "l3tBWs_TotemHall.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Totem Hall - Hallway with totem structures. Created by diatribes. Features forward movement. Totem-like structures. Lighting with normal calculation. Color based on position. Shadertoy ID: l3tBWs",
+    "audio_reactive": false
+  },
+  {
+    "name": "l3yBDV_GyroidPlaneTunnels.glsl",
+    "preview_image": "l3yBDV_GyroidPlaneTunnels.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Gyroid Plane Tunnels - Tunnels with gyroid plane structures. Created by diatribes. Features forward movement. Gyroid plane effects. Lighting with normal calculation. Color based on position. Shadertoy ID: l3yBDV",
+    "audio_reactive": false
+  },
+  {
+    "name": "lXKyRy_PlasmaOutline.glsl",
+    "preview_image": "lXKyRy_PlasmaOutline.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma outline - Plasma with outline effects. Created by diatribes. Features forward movement. Plasma outline visualization. Lighting with normal calculation. Color based on position. Shadertoy ID: lXKyRy",
+    "audio_reactive": false
+  },
+  {
+    "name": "lXtfWj_NeuroglitchHall.glsl",
+    "preview_image": "lXtfWj_NeuroglitchHall.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Neuroglitch Hall - Hallway with neuroglitch effects. Created by diatribes. Features forward movement. Neuroglitch visualization. Lighting with normal calculation. Color based on position. Shadertoy ID: lXtfWj",
+    "audio_reactive": false
+  },
+  {
+    "name": "lXVBD3_TunnelOrbsTest.glsl",
+    "preview_image": "lXVBD3_TunnelOrbsTest.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Tunnel Orbs Test - Test of tunnel with orbs. Created by diatribes. Features forward movement. Orb lights in tunnel. Lighting with normal calculation. Color based on position. Shadertoy ID: lXVBD3",
+    "audio_reactive": false
+  },
+  {
+    "name": "lXVcDR_IsoColor.glsl",
+    "preview_image": "lXVcDR_IsoColor.jpg",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "iso color - Isometric color visualization. Created by diatribes. Features isometric transformation. Color based on position. Shadertoy ID: lXVcDR",
+    "audio_reactive": false
+  },
+  {
+    "name": "lXyfDV_TunnelPlaneSplitExperiment.glsl",
+    "preview_image": "lXyfDV_TunnelPlaneSplitExperiment.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Tunnel Plane Split Experiment - Experimental tunnel with plane splitting. Created by diatribes. Features forward movement. Gyroid plane effects. Lighting with normal calculation. Color based on position. Shadertoy ID: lXyfDV",
+    "audio_reactive": false
+  },
+  {
+    "name": "M3cBzS_Hall9000.glsl",
+    "preview_image": "M3cBzS_Hall9000.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Hall9000 - Hallway with fractal cross structures. Created by diatribes. Features forward movement. Fractal cross patterns. Lighting with normal calculation. Color based on position. Shadertoy ID: M3cBzS",
+    "audio_reactive": false
+  },
+  {
+    "name": "M3GfRt_CanyonCruise.glsl",
+    "preview_image": "M3GfRt_CanyonCruise.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Canyon Cruise - Cruise through canyon. Created by diatribes. Features forward movement. Canyon-like structures. Lighting with normal calculation. Color based on position. Shadertoy ID: M3GfRt",
+    "audio_reactive": false
+  },
+  {
+    "name": "M3GfWV_TunnelPlanes.glsl",
+    "preview_image": "M3GfWV_TunnelPlanes.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Tunnel Planes - Tunnel with plane structures. Created by diatribes. Features forward movement. Plasma plane effects. Lighting with normal calculation. Color based on position. Shadertoy ID: M3GfWV",
+    "audio_reactive": false
+  },
+  {
+    "name": "M3yfWd_PurpleGreenChase.glsl",
+    "preview_image": "M3yfWd_PurpleGreenChase.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Purple & Green Chase - Chase with purple and green orbs. Created by diatribes. Features forward movement. Gyroid effects. Orb lights. Lighting with normal calculation. Color based on position. Shadertoy ID: M3yfWd",
+    "audio_reactive": false
+  },
+  {
+    "name": "M3yyDm_PurpleDraynk.glsl",
+    "preview_image": "M3yyDm_PurpleDraynk.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Purple Draynk - Purple fractal cross visualization. Created by diatribes. Features rotation. Fractal cross patterns. Lighting with normal calculation. Color based on position. Shadertoy ID: M3yyDm",
+    "audio_reactive": false
+  },
+  {
+    "name": "MXcfWH_TheresAPartyInMyHead.glsl",
+    "preview_image": "MXcfWH_TheresAPartyInMyHead.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "There's a party in my head - Rotating box and cross with plasma effects. Created by diatribes. Features rotation. Box and cross structures. Plasma coloring. Lighting with normal calculation. Shadertoy ID: MXcfWH",
+    "audio_reactive": false
+  },
+  {
+    "name": "wfKyzt_AuroraSky.glsl",
+    "preview_image": "wfKyzt_AuroraSky.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Aurora Sky - Northern lights dancing over a dark horizon. Created by OneHung. Audio reactive aurora intensity and colors - bass affects curtain brightness, mid shifts hues, treble makes stars twinkle. Shadertoy ID: wfKyzt",
+    "audio_reactive": true
+  },
+  {
+    "name": "wfycWG_DriftingLattice.glsl",
+    "preview_image": "wfycWG_DriftingLattice.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Drifting Lattice - Overlapping grids fading in and out. Created by OneHung. Audio reactive lattice visibility and glow - bass, mid, and treble each control different lattice layers. Shadertoy ID: wfycWG",
+    "audio_reactive": true
+  },
+  {
+    "name": "wcKczt_FirefliesAtDusk.glsl",
+    "preview_image": "wcKczt_FirefliesAtDusk.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Fireflies at Dusk - Summer evening with glowing insects. Created by OneHung. Audio reactive firefly blink intensity and ambient glow - different frequency bands affect different firefly groups. Shadertoy ID: wcKczt",
+    "audio_reactive": true
+  },
+  {
+    "name": "3X2fDW_HazyDays.glsl",
+    "preview_image": "3X2fDW_HazyDays.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Hazy Days - Blue lake and sky scene with sun. Created by OneHung. Water by FabriceNeyret2, sky by BigWings. Audio reactive sun pulse. Camera bobs on waves. Shadertoy ID: 3X2fDW",
+    "audio_reactive": true
+  },
+  {
+    "name": "tfVcWG_JiggyGeometry.glsl",
+    "preview_image": "tfVcWG_JiggyGeometry.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Jiggy Geometry - Infinite descent through audio reactive falling portals. Created by OneHung. Enhanced with audio-reactive turbulence and parallax effects. Various frame shapes with unique colors. Shadertoy ID: tfVcWG",
+    "audio_reactive": true
+  },
+  {
+    "name": "wfyczt_SpaceCave.glsl",
+    "preview_image": "wfyczt_SpaceCave.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Space Cave - Audio-reactive breathing cave inspired by Blackle Mori. Created by OneHung. Features erosion, edge glow, breathing walls, fog, and rim lighting - all audio reactive. Shadertoy ID: wfyczt",
+    "audio_reactive": true
+  },
+  {
+    "name": "WcdyW2_GyroidOrbJourney.glsl",
+    "preview_image": "WcdyW2_GyroidOrbJourney.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Gyroid Orb Journey v4 - Plasma orb edition inspired by BigWings' Alien Orb. Created by OneHung. Gyroid-cage structure with glowing plasma core. Audio drives plasma intensity and color. Shadertoy ID: WcdyW2",
+    "audio_reactive": true
+  },
+  {
+    "name": "33ScR1_AudioReactiveMagicalOrb2.glsl",
+    "preview_image": "33ScR1_AudioReactiveMagicalOrb2.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Audio Reactive Magical Orb 2 - Based on Chronos' original. Created by OneHung. Audio affects colors and orb size, not internal animation. Volumetric glow with Fresnel reflections. Shadertoy ID: 33ScR1",
+    "audio_reactive": true
+  },
+  {
+    "name": "wXjyRh_AudioReactiveMagicalOrb3.glsl",
+    "preview_image": "wXjyRh_AudioReactiveMagicalOrb3.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Audio Reactive Magical Orb 3 - With environment lighting. Created by OneHung. Features spotlight, radial glow, and ambient lighting on cubemap. Dark atmosphere with orb as light source. Shadertoy ID: wXjyRh",
+    "audio_reactive": true
+  },
+  {
+    "name": "3XSczm_AudioReactiveMagicalOrb4.glsl",
+    "preview_image": "3XSczm_AudioReactiveMagicalOrb4.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": {
+      "iChannel1": {
+        "type": "cubemap",
+        "basename": "cobblestone_street_night"
+      }
+    },
+    "description": "Audio Reactive Magical Orb 4 - With edge rainbow waves. Created by OneHung. Bass-triggered expanding rainbow rings on cubemap edges. Persistent edge glow and surface-responsive spotlight. Shadertoy ID: 3XSczm",
+    "audio_reactive": true
+  },
+  {
+    "name": "t3BfRy_FlowingHexagons.glsl",
+    "preview_image": "t3BfRy_FlowingHexagons.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Flowing Hexagons - Hexagonal tiling with audio-reactive glow. Created by OneHung. Bass, mid, and treble frequencies control hexagon colors and glow intensity. Shadertoy ID: t3BfRy",
+    "audio_reactive": true
+  },
+  {
+    "name": "t3SBzy_PlasmaWaves.glsl",
+    "preview_image": "t3SBzy_PlasmaWaves.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Plasma Waves - Sine wave interference patterns. Created by OneHung. Audio-reactive ripples and color intensity driven by frequency bands. Shadertoy ID: t3SBzy",
+    "audio_reactive": true
+  },
+  {
+    "name": "W3BfRR_HarmonicVortex.glsl",
+    "preview_image": "W3BfRR_HarmonicVortex.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Harmonic Vortex - Flowing tunnel with frequency-based coloring. Created by OneHung. Audio drives tunnel flow speed and color harmonics. Shadertoy ID: W3BfRR",
+    "audio_reactive": true
+  },
+  {
+    "name": "w3BfRy_LiquidOrbs.glsl",
+    "preview_image": "w3BfRy_LiquidOrbs.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Liquid Orbs - Organic orbs with audio-reactive sizes. Created by OneHung. Bass, mid, and treble control different orb sizes and glow intensity. Shadertoy ID: w3BfRy",
+    "audio_reactive": true
+  },
+  {
+    "name": "W3jBzG_AudioReactiveOrbs.glsl",
+    "preview_image": "W3jBzG_AudioReactiveOrbs.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio Reactive Orbs - Three orbs representing frequency bands. Created by OneHung. Bass=pink, mid=cyan, treble=gold. Each orb reacts to its frequency range. Shadertoy ID: W3jBzG",
+    "audio_reactive": true
+  },
+  {
+    "name": "w3lcDf_LateNightColorful1.glsl",
+    "preview_image": "w3lcDf_LateNightColorful1.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Late Night Colorful 1 - Fractal patterns with audio color intensity. Created by OneHung. Audio modulates color saturation and pattern complexity. Shadertoy ID: w3lcDf",
+    "audio_reactive": true
+  },
+  {
+    "name": "Wc3cR2_NeonChillAudioReactive.glsl",
+    "preview_image": "Wc3cR2_NeonChillAudioReactive.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Neon Chill - Audio Reactive - Neon waves with layered audio response. Created by OneHung. Multiple wave layers react to different frequency bands. Shadertoy ID: Wc3cR2",
+    "audio_reactive": true
+  },
+  {
+    "name": "WcdyR2_CrystalOrbCathedral.glsl",
+    "preview_image": "WcdyR2_CrystalOrbCathedral.jpg",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Crystal Orb Cathedral - Diatribes-style with audio-reactive orb colors. Created by OneHung. Cathedral structure with glowing orbs that pulse to audio. Shadertoy ID: WcdyR2",
+    "audio_reactive": true
+  },
+  {
+    "name": "WcdyRj_ChromaticWaveInterference.glsl",
+    "preview_image": "WcdyRj_ChromaticWaveInterference.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Chromatic Wave Interference - Metallic wave highlights with audio. Created by OneHung. Audio affects wave amplitude and chromatic aberration. Shadertoy ID: WcdyRj",
+    "audio_reactive": true
+  },
+  {
+    "name": "WXSBRR_AudioReactiveTunnelPulse.glsl",
+    "preview_image": "WXSBRR_AudioReactiveTunnelPulse.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio Reactive Tunnel Pulse - Pulsing tunnel with frequency-driven expansion. Created by OneHung. Tunnel radius and colors react to audio. Shadertoy ID: WXSBRR",
+    "audio_reactive": true
+  },
+  {
+    "name": "WXXyWl_LateNightColorful2.glsl",
+    "preview_image": "WXXyWl_LateNightColorful2.jpg",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Late Night Colorful 2 - Colorful fractal with kick detection. Created by OneHung. Bass kicks trigger visual bursts and color shifts. Shadertoy ID: WXXyWl",
+    "audio_reactive": true
+  },
+  {
+    "name": "Matrix1.glsl",
+    "preview_image": "Matrix1.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": {
+      "iChannel1": "08b42b43ae9d3c0605da11d0eac86618ea888e62cdd9518ee8b9097488b31560.png"
+    },
+    "description": "Matrix Rain Effect - Classic green falling characters using Amiga font texture. Features randomized character selection and multiple falling streams with varying speeds for authentic Matrix-style digital rain effect.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Audio-Reactive Wave Interference.glsl",
+    "preview_image": "Audio-Reactive Wave Interference.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-Reactive Wave Interference - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "BUBBLE PLASMA REACTOR.glsl",
+    "preview_image": "BUBBLE PLASMA REACTOR.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "BUBBLE PLASMA REACTOR - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Cosmic Vortex - Audio Reactive.glsl",
+    "preview_image": "Cosmic Vortex - Audio Reactive.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Cosmic Vortex - Audio Reactive - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Demo Inspired Shader.glsl",
+    "preview_image": "Demo Inspired Shader.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Demo Inspired Shader - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Frequency Cathedral.glsl",
+    "preview_image": "Frequency Cathedral.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Frequency Cathedral - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Ionize - Rive Feathering Edition Xor - PAEz.glsl",
+    "preview_image": "Ionize - Rive Feathering Edition Xor - PAEz.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Ionize - Rive Feathering Edition Xor - PAEz - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Ionize - Rive Feathering Edition.glsl",
+    "preview_image": "Ionize - Rive Feathering Edition.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Ionize - Rive Feathering Edition - Audio reactive shader",
+    "audio_reactive": false
+  },
+  {
+    "name": "Kinetic Rings v4.glsl",
+    "preview_image": "Kinetic Rings v4.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Kinetic Rings v4 - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Lava Tunnel Shader.glsl",
+    "preview_image": "Lava Tunnel Shader.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Lava Tunnel Shader - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "ORBITAL SINGULARITY.glsl",
+    "preview_image": "ORBITAL SINGULARITY.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "ORBITAL SINGULARITY - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "RAINBOW PARTICLE VORTEX.glsl",
+    "preview_image": "RAINBOW PARTICLE VORTEX.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "RAINBOW PARTICLE VORTEX - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "Raymarched Neon Tunnel Shader V2.glsl",
+    "preview_image": "Raymarched Neon Tunnel Shader V2.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Raymarched Neon Tunnel Shader V2 - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "The Serpent's Cathedral v3.glsl",
+    "preview_image": "The Serpent's Cathedral v3.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "The Serpent's Cathedral v3 - Audio reactive shader",
+    "audio_reactive": true
+  },
+  {
+    "name": "PAEz - BASEHIT_DETECTION.IMAGE.GLSL",
+    "preview_image": "PAEz - BASEHIT_DETECTION.IMAGE.JPG",
+    "stars": 0,
+    "buffer": "PAEz - BASEHIT_DETECTION.BUFFER.A.GLSL",
+    "texture": null,
+    "description": "FFT Beat Detection Test - Advanced beat detector using low and high frequency bands with flux analysis, coincidence detection, and adaptive thresholding. Visualizes FFT spectrum with color-coded frequency bands and flash effects on detected beats. Test shader for verifying FFT frequency data bucket accuracy.",
+    "audio_reactive": true,
+    "url": null,
+    "author": "@OneHung"
+  },
+  {
+    "name": "Xor-WaveForm.glsl",
+    "preview_image": "Xor-WaveForm.JPG",
+    "stars": 0,
+    "buffer": "Xor-WaveForm.buffer.A.glsl",
+    "texture": null,
+    "description": "Scrolling Waveform Visualizer by @XorDev - Raymarched 3D waveform with scrolling trails effect. Uses Buffer A for temporal feedback to create flowing waveform history. Features reflections and depth-based coloring. Test shader for audio waveform data visualization.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/wfyczt",
+    "author": "@XorDev"
+  },
+  {
+    "name": "FFT-Diagnostic.glsl",
+    "preview_image": "FFT-Diagnostic.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "FFT Diagnostic Tool - Full-spectrum FFT visualizer for verifying audio frequency data. Displays all 512 FFT bins with grid markers every 64 bins. Shows both row 0 and row 1 of audio texture for comparison. Essential test shader for debugging FFT data bucket mapping and frequency response.",
+    "audio_reactive": true,
+    "url": null,
+    "author": "@OneHung"
+  },
+  {
+    "name": "PAEz-DirectTest.glsl",
+    "preview_image": "PAEz-DirectTest.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Direct Audio Texture Test - Bypasses buffer system to read FFT data directly from audio texture row 0. Simple bar visualization with first 32 bins highlighted in orange. Test shader for verifying direct audio texture access and FFT bin mapping.",
+    "audio_reactive": true,
+    "url": null,
+    "author": "@OneHung"
+  },
+  {
+    "name": "FinalTest-AudioDirect.glsl",
+    "preview_image": "FinalTest-AudioDirect.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio Texture Row Comparison - Split-screen test comparing row 0 and row 1 of audio texture. Top half shows row 0, bottom half shows row 1. Test shader for verifying FFT data consistency across texture rows and identifying any differences in frequency data storage.",
+    "audio_reactive": true,
+    "url": null,
+    "author": "@OneHung"
+  },
+  {
+    "name": "PAEz - BaseHits.glsl",
+    "preview_image": "PAEz - BaseHits.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Simplified FFT Bars - Basic FFT spectrum visualizer reading directly from audio texture. Displays frequency bars with first 32 bins highlighted in orange. Includes frequency band highlighting for low and high ranges. Test shader for basic FFT visualization without beat detection complexity.",
+    "audio_reactive": true,
+    "url": null,
+    "author": "@OneHung"
+  },
+  {
+    "name": "Where Is Her Mind Dice.glsl",
+    "preview_image": "Where Is Her Mind Dice.JPG",
+    "stars": 0,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-Reactive D&D Dice Morphing - Single-pass raymarcher that cycles through all six polyhedral dice (D4, D6, D8, D10, D12, D20) with smooth organic morphing transitions. Bass drives scale pulsing and morph speed, mids shift the iridescent hue, highs boost sparkle density. Features chromatic aberration, fresnel rim glow, nested box fractals, and per-channel color phasing for a holographic holofoil look. Based on @Jaenam97's Holofoil Dice.",
+    "audio_reactive": true,
+    "url": "https://www.shadertoy.com/view/tfGyzt",
+    "author": "@Jaenam97"
+  },
+  {
+    "name": "A0 - AUDIO REACTIVE GYROID ORB 2.glsl",
+    "preview_image": "A0 - AUDIO REACTIVE GYROID ORB 2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Rainbow-colored gyroid cage structure with audio-reactive plasma core. Centered orb with pulsing intensity driven by bass frequencies and rainbow color shifting.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A0 - AUDIO REACTIVE GYROID.glsl",
+    "preview_image": "A0 - AUDIO REACTIVE GYROID.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive gyroid surface with adjustable rotation speed and thickness. Bass, mids, and treble frequencies control different aspects of the gyroid structure appearance and movement.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A0 - Gyroid Dreams TEST.glsl",
+    "preview_image": "A0 - Gyroid Dreams TEST.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Gyroid tunnel fly-through with audio-reactive glowing orb leading the way. Features a carved path through the gyroid structure with the orb wobbling and pulsing to audio input.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A4 - Cosmic Vortex.glsl",
+    "preview_image": "A4 - Cosmic Vortex.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Swirling cosmic vortex with audio-reactive colors and movement. Features spectrum-based color palette with separate bass, mid, and high frequency controls.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A4 - RAINBOW PARTICLE VORTEX.glsl",
+    "preview_image": "A4 - RAINBOW PARTICLE VORTEX.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Swirling rainbow galaxy vortex filled with sparkles and particles. Audio-reactive controls for sensitivity, vortex speed, spiral arms, and particle behavior.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A4 - Reactive Neon Vortex.glsl",
+    "preview_image": "A4 - Reactive Neon Vortex.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive neon tunnel vortex with magenta-to-yellow color transitions. Bass, mid, and high frequencies control different aspects of the vortex appearance and intensity.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A4 - SDF RAINBOW VORTEX.glsl",
+    "preview_image": "A4 - SDF RAINBOW VORTEX.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Crystalline particle vortex using SDF techniques with rainbow colors. Audio reactivity affects color hue shifting and particle appearance.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A5 - Audio-Reactive Wave Interfe.glsl",
+    "preview_image": "A5 - Audio-Reactive Wave Interfe.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Wave interference patterns with audio synchronization. Multiple wave sources create dynamic interference patterns that respond to audio input.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A9 - PSYCHEDELIC FRACTAL SNAKE.glsl",
+    "preview_image": "A9 - PSYCHEDELIC FRACTAL SNAKE.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Psychedelic fractal snake moving in a spiral path with audio reactivity. Features 18 segments with fractal detail, configurable movement speed, and spiral tightness.",
+    "audio_reactive": true
+  },
+  {
+    "name": "AA - Meh 1.glsl",
+    "preview_image": "AA - Meh 1.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Compact audio-reactive visual with sine wave distortions and multi-layered color effects. Bass, mid, and high frequencies control pulse, time offset, and visual intensity.",
+    "audio_reactive": true
+  },
+  {
+    "name": "AAA - Waves Layer1.glsl",
+    "preview_image": "AAA - Waves Layer1.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Chromatic flowing waves layer with raymarched undulating surface. Features rich rainbow color blending optimized for sharp colors and performance.",
+    "audio_reactive": false
+  },
+  {
+    "name": "BB - Glass refraction mosaic.glsl",
+    "preview_image": "BB - Glass refraction mosaic.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Liquid mosaic glass orb with audio-reactive specular highlights. Bass frequencies control brightness, warmth, and bloom spread of the glass reflections.",
+    "audio_reactive": true
+  },
+  {
+    "name": "CC - Chaos Crystal Color.glsl",
+    "preview_image": "CC - Chaos Crystal Color.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Smooth audio-reactive fractal with bass pulse expansion and mid-frequency domain warping. Treble frequencies boost color intensity for dynamic visual response.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Heaven and Hell.glsl",
+    "preview_image": "Heaven and Hell.JPG",
+    "stars": 4,
+    "buffer": true,
+    "texture": null,
+    "description": "Crystal nebula sphere with reflection opacity and adjustable glow intensity. Rotating sphere with camera orbit, bloom effects, and configurable reflection properties.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Mirrored Room.glsl",
+    "preview_image": "Mirrored Room.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive mirrored room with floor and ceiling tiles responding to bass hits. Features plasma rainbow effects, tile hue shifting, scale warping, and brightness boosts on audio beats.",
+    "audio_reactive": true
+  },
+  {
+    "name": "MovingWithoutTravelling.glsl",
+    "preview_image": "MovingWithoutTravelling.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Moving without travelling effect with FFT-based audio reactivity. Psychedelic tunnel with audio-driven distortions by mrange.",
+    "audio_reactive": true
+  },
+  {
+    "name": "PhiFlow_AureaSpiral.glsl",
+    "preview_image": "PhiFlow_AureaSpiral.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Golden ratio spiral with audio-reactive particle system. Bass controls zoom and swirl, mids affect rotation, and treble modulates particle scale with dynamic particle count.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Reflective truchet.glsl",
+    "preview_image": "Reflective truchet.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Reflective truchet tile pattern with simple lighting effects. Inspired by UV Mapping Truchet Tiles by byt3_m3chanic.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Riding Inside the Mirror Gyroid.glsl",
+    "preview_image": "Riding Inside the Mirror Gyroid.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Journey through a mirrored gyroid structure with colorful palette cycling. Features smooth camera path following the gyroid natural curves.",
+    "audio_reactive": false
+  },
+  {
+    "name": "Truchet 9.glsl",
+    "preview_image": "Truchet 9.JPG",
+    "stars": 3,
+    "buffer": null,
+    "texture": null,
+    "description": "Rainbow dancing truchet kaleidoscope pattern with audio input. Features adjustable color speed, variation, saturation, brightness, and dark area controls.",
+    "audio_reactive": true
+  },
+  {
+    "name": "cdak_oneoff_v3.glsl",
+    "preview_image": "cdak_oneoff_v3.JPG",
+    "stars": 4,
+    "buffer": "cdak_oneoff_v3.buffer.A.glsl",
+    "texture": null,
+    "description": "cdak port V3 \u2014 identical to V1 except the camera x/y wobble is smoothly damped to near-zero by t=80s, keeping the camera looking forward for the full render. Same Sobel edge lines, same tone curve, same geometry.",
+    "audio_reactive": false
   }
 ]

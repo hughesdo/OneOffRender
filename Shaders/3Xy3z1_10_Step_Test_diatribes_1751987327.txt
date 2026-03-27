@@ -1,0 +1,65 @@
+// ID: 3Xy3z1
+// Name: 10 Step Test
+// User: diatribes
+// Date: 1751987327
+
+
+// ===== PASS 0: Image =====
+
+// I was playing around with low raymarch steps
+// Just wanted to see what was possible in the 10-20 step range
+// This is what I came up with in 10 steps
+
+void mainImage(out vec4 o, vec2 u) {
+    // i iterator, d distance, s signed distance, a river, b ground, n noise, t time
+    float i, d, s, a, b, n, t=iTime*.65;
+    
+    // p is resolution temporarily, then the ground, q is river
+    vec3 p = iResolution, q;
+    
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    
+    // stolen from @Shane :)
+    // make cinema bars at top and bottom
+    if(abs(u.y)>.4){ o = vec4(0); return; }
+
+    
+    // march 10 steps
+    for(o*=i; i++<10.; ) {
+        // march and save sample to p and q
+        q = p = vec3(u * d, d);
+        
+        // move the river
+        q.z += t*9.;
+        
+        // find a nice spot
+        p.x -= 50.;
+        
+        // get river plane dist
+        a = 32. + p.y - length(p.y);
+        
+        // get ground plane dist
+        b = 42. + p.y - abs(cos(p.x*.03)*38.);
+        
+        // noise loop
+        for (n = .1; n < 2.; n += n )
+            // noise river
+            a += abs(dot(sin(4.*t+q*n*3.), vec3(.13))) / n,
+            // noise grond
+            b += abs(dot(sin(p*n*1.), vec3(.23))) / n;
+        // accumulate distance
+        d += s = .08 + abs(min(a,b))*.8;
+        
+        // accumulate brightness
+        o += 1. / s;
+    }
+    // move moon up
+    u.y -= .25;
+    
+    // if river is closer, blue, else brown
+    // div by 3e2 to bring brightness down
+    // div by dot(u,u) for moon
+    o = tanh(vec4(a > b?7:4,5, a > b?3:9,1)*o  / 3e2 / pow(dot(u,u),.9));
+}
+

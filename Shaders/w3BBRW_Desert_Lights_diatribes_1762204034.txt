@@ -1,0 +1,71 @@
+// ID: w3BBRW
+// Name: Desert Lights
+// User: diatribes
+// Date: 1762204034
+
+
+// ===== PASS 0: Image =====
+
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( t*c*6. ) * 16.,        \
+                    sin( t*c*3. ) * 12. + 12.,  \
+                    Z+zt+cos(t)*42. )  ) - c )
+
+
+void mainImage(out vec4 o, vec2 u) {
+
+    float
+          // raymarch iterator
+          i,
+          // total distance
+          d,
+          // signed distance
+          s,
+          // entity (orb) distance
+          e,
+          // time (orb movement, camera sway, etc.)
+          t=iTime,
+          // flight time, z and x coord speed for flight
+          zt = t * 1e2,
+          xt = t * 5e1;
+          
+    vec3 p = iResolution;
+    
+    // scale coords and move the camera around a bit
+    u = (u+u-p.xy)/p.y+cos(t*.3)*vec2(.4,.2);
+    
+    // clear o, march up to 128
+    for(o*=i; i++<128.;
+        
+        // accumulate distance of orb, plane or clouds
+        d += s = min(e, min(1.+ p.y*.6, 5.-p.y*.05)),
+        
+        // accumulate brightness
+        o += s + 1./e*d)
+        
+        // noise start
+        for(p = vec3(u*d,d+zt), // p = ro + rd * d, p.z += zt;
+
+            e = max( .8* min( O( 6e1, .1),
+                         min( O( 7e1, .2),
+                         min( O( 8e1, .3),
+                         min( O( 9e1, .5),
+                              O( 1e2, .6) )))), .001 ),
+
+            // move to the side
+            p.x -= xt,
+
+            // start noise at .02, until 2, grow by s += s
+            s = .02;
+            s < 2.;
+            s += s)
+                 // apply noise
+                 p += abs(dot(sin(p * s), p-p+.12)) / s;
+    
+    // make our angled sun beam light thing
+    u += (u.yx*.7+.2-vec2(-1.,.1));
+    
+    // tanh tonemap, color, brightness, light
+    o = tanh(o*o/d/3e3/length(u));
+}
+

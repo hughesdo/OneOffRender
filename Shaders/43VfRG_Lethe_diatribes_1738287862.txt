@@ -1,0 +1,139 @@
+// ID: 43VfRG
+// Name: Lethe
+// User: diatribes
+// Date: 1738287862
+
+
+// ===== PASS 0: Image =====
+
+#define MAX_STEPS 120.
+#define MAX_DIST 60.
+#define SURFACE_DIST .001
+#define inf (MAX_DIST+1.0)
+
+#define TIME_MULTIPLIER 2.
+#define FRACT_ITERATIONS 8
+
+vec3 path(float z) {
+    return vec3(
+        sin(z*.1)*2.*cos(z*.1)*2.,
+        0.,
+        iTime*TIME_MULTIPLIER+1.5
+    );
+}
+
+
+
+// modified from the fractal function found here:
+// https://www.shadertoy.com/view/4XdfW4
+float fractal(vec3 p, out vec3 rgb, int iterations){
+  float m = 1.;
+  for (int i = 0; i < iterations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.2,.9)-1.75;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-3. * m)*2.5;
+  rgb=vec3(p.xy,2.5) * m;
+  return length(rgb*.1);
+}
+
+vec3 plasma(vec2 uv) {
+    float t = iTime / 2.0;
+    uv *= 10.;
+    float r = distance(uv, vec2(sin(t), sin(t)));
+    float g = distance(uv, vec2(0, 3.));
+    float b = distance(uv, vec2(r, sin(t)*25.));
+    float value = abs(sin(r+t) + sin(g+t) + sin(b+t) + sin(uv.x+t) + cos(uv.y+t));
+    value = sqrt(value);
+    r/=value;
+    g/=value;
+    b/=value;
+
+    return vec3(r,g,b);
+}
+
+float scene(vec3 p, out vec3 rgb, bool skipRiver) {
+	vec3 tun = mod(abs(vec3(p.x,p.y-8.,p.z) - path(p.z)),32.);
+    
+    float w1 = sin(iTime+p.z*.5)*.09;
+    float w2 = sin(iTime+p.z*.3)*.07;
+    float w3 = cos(iTime+p.z*1.3)*.07;
+    float river = skipRiver ? inf : 1.5+p.y+w1+w2+w3;
+    float bed = 3.5+p.y;
+    
+    float hit = min(bed,min(river,max(4.-tun.x,4.-tun.y)));
+    if (river == hit) {
+        rgb = plasma(tun.xy/(8.0/tun.z))*vec3(1.75,.15,.35);
+    } else if (bed == hit) {
+        rgb = texture(iChannel0,p.xz/8.).xyz;
+    } else {
+        fractal(vec3(tun.yx,sin(p.z)),rgb,FRACT_ITERATIONS);
+    }
+    return hit;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb, bool skipRiver) {
+  float dist = 0.0;
+  for(float i = 0.; i < MAX_STEPS; i++) {
+    vec3 p = ro + rd * dist;
+    float step = scene(p, rgb, skipRiver);
+    dist += step;
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+  return dist;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+  vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+  vec3 ww = normalize(target - origin);
+  vec3 uu = normalize(cross(ww, rr));
+  vec3 vv = normalize(cross(uu, ww));
+  return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 rgb;
+  bool skipRiver=false;
+
+  vec3 n = scene(p,rgb,skipRiver) - vec3(
+    scene(p-e.xyy,rgb,skipRiver),
+    scene(p-e.yxy,rgb,skipRiver),
+    scene(p-e.yyx,rgb,skipRiver));
+
+  return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec3 rgb = vec3(1.);
+	
+    vec2 uv = -1.0 + 2.0*(fragCoord.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = vec3(0., 0., iTime*TIME_MULTIPLIER);
+	vec3 la = ro + vec3(0., 0., 1.);
+	ro.xy = path(ro.z).xy;
+	la.xy = path(la.z).xy;
+
+	vec3 rd = normalize(vec3(uv,1.)*lookAt(ro,la,0.));
+	float d = raymarch(ro, rd, rgb, true);
+    vec3 p = ro + rd * d;
+    
+    vec3 riverRgb;
+    d += raymarch(ro, rd, riverRgb, false);
+    rgb = mix(rgb,riverRgb,.25);
+    
+    float diffuse = max(dot(normal(p), normalize(ro-p)), .0);
+    rgb *= diffuse;
+    
+    rgb *= (pow(d,-d*.035))*vec3(.025,.2,1.1);
+    
+    if (d > MAX_DIST) {
+
+    }
+    
+    fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+}

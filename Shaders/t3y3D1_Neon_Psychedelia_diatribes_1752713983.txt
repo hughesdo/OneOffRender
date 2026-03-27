@@ -1,0 +1,45 @@
+// ID: t3y3D1
+// Name: Neon Psychedelia
+// User: diatribes
+// Date: 1752713983
+
+
+// ===== PASS 0: Image =====
+
+/*
+ Playing with this idea:
+    https://www.shadertoy.com/view/w3VGzc
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, // iterator
+          d, // total distance
+          s, // signed distance
+          n, // noise iterator
+          t = iTime;
+    // p is temporarily resolution,
+    // then raymarch position
+    vec3 p = iResolution;
+    
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    
+    // clear o, up to 100, accumulate distance, colorize
+    for(o*=i; i++<1e2;d += s = .005+abs(s)*.7, o += (1.+cos(d+vec4(6,2,4,1)))/s)
+        // march, equivalent to p = ro + rd * d, p.z += d+t+t
+        for (p = vec3(u * d, d+t+t),
+             // mirror p more than once
+             // https://www.shadertoy.com/view/w3VGzc
+             p = 2. - abs(abs(p)-2.),
+             // twist by p.z, equivalent to p.xy *= rot(p.z*.2)
+             p.xy *= mat2(cos(p.z*.2+vec4(0,33,11,0))),
+             // dist to our spiral'ish thing that will be distorted by noise
+             s = sin(p.y+p.x),
+             // start noise at 1, until 32, grow by n+=n
+             n = 1.; n < 32.; n += n )
+                 // subtract noise from s, pass .3*t+ through sin for some movement
+                 s -= abs(dot(cos(.3*t+p*n), vec3(.3))) / n;
+    // divide down brightness and make a light in the center
+    o = tanh(o*o/3e7);
+}
+

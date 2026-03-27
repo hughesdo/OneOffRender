@@ -1,0 +1,30 @@
+// ID: W33XDS
+// Name: Flares
+// User: diatribes
+// Date: 1753884290
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,a,d,s,t=iTime*4.;
+    
+    vec3  p = iResolution;
+    
+    u = (u+u-p.xy)/p.y;
+    if(iTime < 1. || abs(u.y)>.8){ o = vec4(0); return; }
+    u += vec2(cos(t*t)*.01);
+    
+    for(o*=i; i++<64.;
+        d += s = .05 + abs(s)*.2,
+        o += 1./max(s*d, .005))
+        for (p = vec3(u * d, d),
+             p.xy *= mat2(cos(.03*t+p.z*.2+vec4(0,33,11,0))),
+             s = 4. - abs(p.x),
+             a = 1.; a < 24.; a += a)
+             s -= abs(dot(sin(.1*t+.1*p.z+p * a), 1.3+p-p)) / a;
+    
+    o = tanh(vec4(8.-cos(.2*t)*3.,2.5-cos(.2*t)*.5,1,0)*o / 4e2);
+}
+

@@ -1,0 +1,26 @@
+// ID: w3BSzR
+// Name: XRO 240
+// User: diatribes
+// Date: 1745711313
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = iTime,i,z,d;
+    for(O *= i; i++ < 90.;
+        O += .002*max(sin(t + vec4(1, z, 1.-z, 0)), .2) / d)
+        p = z * normalize(vec3(I+I,0)-iResolution.xzy),
+        p.z -= t,
+        p += cos(t+p.yzx),
+        z += d = .03 + abs(dot(tanh(t+p)*.3,cos(p*2.)));
+    O = tanh(O);
+}
+/*
+    I saw in Xor's recent shaders that great effects
+    can be had by sampling basic geometry and distorting
+    it. One type mentioned was a gyroid:
+    https://www.shadertoy.com/view/tXlXDX
+*/
+

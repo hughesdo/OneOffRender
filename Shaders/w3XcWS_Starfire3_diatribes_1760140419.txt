@@ -1,0 +1,37 @@
+// ID: w3XcWS
+// Name: Starfire3
+// User: diatribes
+// Date: 1760140419
+
+
+// ===== PASS 0: Image =====
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,a,d,s1,s2,t=iTime;
+    
+    vec3  p,r = iResolution;
+    u = ((u-r.xy/2.)/r.y+cos(t*.2)*vec2(.1,.1));
+
+    for(o=vec4(0); i++<1e2;) {
+        p = vec3(u * d, d - 32.),
+        p.y += 4.,
+        p.x += 4.,
+        p.yz *= R(-t*.013),
+        p.xz *= R(t*.011),
+        s1 = length(p) - 20.,
+        s2 = length(p) - 20.;
+    
+        for (a = 1.; a < 16.; a += a)
+            p += cos(.15*t+a+p.yzx*3.)*.3,
+            s1 -= abs(dot(sin(t+1.1*p * a * 6.), vec3(.4))) / a,
+            s2 -= abs(dot(sin(t+.3*p * a * 2.5), vec3(.3))) / a;
+        
+        d += s1 = min(.001+.4*abs(s1), .005+.2*abs(s2)),
+        o += vec4(16,2.3-cos(.5*t)*.6,.8,0)/s1;  
+    }
+    
+    o = tanh(o / 1e4 / max(length(u+.8), .01));
+}
+

@@ -51,7 +51,7 @@ float smooth_random(vec2 co, float shft) {
                       fract(co.y));
 }
 
-vec4 texture(vec2 p) {
+vec4 getTransitionTexture(vec2 p) {
     return mix(texture(from, p), texture(to, p), sigmoid(progress, 10.0));
 }
 
@@ -77,7 +77,7 @@ vec4 transition(vec2 p) {
     for (float i = 0.0; i < repeats; i++) {
         vec2 q = vec2(cos(degrees((i / repeats) * 360.0)), sin(degrees((i / repeats) * 360.0))) * (rand(vec2(i, p.x + p.y)) + bluramount);
         vec2 uv2 = p + (q * bluramount);
-        blurred_image += texture(uv2);
+        blurred_image += getTransitionTexture(uv2);
     }
     blurred_image /= repeats;
     return blurred_image + vec4(f, 0.0);

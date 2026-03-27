@@ -1,0 +1,50 @@
+// ID: tXSBDK
+// Name: Remember
+// User: diatribes
+// Date: 1763066393
+
+
+// ===== PASS 0: Image =====
+
+// fuzzy brain
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 q,p = iResolution;
+    
+    float i, s,
+          // start the ray at a small random distance,
+          // this will reduce banding
+          d=.125*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          t = iTime * .1;
+          
+    // scale coords
+    u =(u+u-p.xy)/p.y;
+    if (abs(u.y) > .8) { o = vec4(0); return; }
+
+    for(o*=i; i++<64.; ) {
+        
+        // shorthand for standard raymarch sample, then move forward:
+        // p = ro + rd * d, p.z + t
+        q = p = vec3(u * d, d + t*5.);
+        p.xy *= mat2(cos(.1*p.z+.1*t+vec4(0,33,11,0)));
+        
+        q.xz = cos(q.xz);
+        p.z = cos(p.z) ;
+        // turbulence
+        for (s = 1.; s++ <6.;
+            q += sin(.6*t+p.zxy*.6),
+            p += sin(t+t+p.yzx*s)*.6);
+
+        // distance to spheres
+        d += s = .02 + abs(min(length(p+3.*sin(p.z*.5))-4., length(q-2.*sin(p.z*.4))-6.))*.2;
+        
+        // color: 1.+cos so we don't go negative, cos(d+vec4(6,4,2,0)) samples from the palette
+        // divide by s for form and distance
+        o +=.01*vec4(6,2,1,0)/length(u*sin(t+t+t)) + 1. / s * length(u);
+        
+    }
+    
+    // tonemap and divide brightness
+    o = tanh(max(o /6e2 + dot(u,u)*.35, 0.));
+}

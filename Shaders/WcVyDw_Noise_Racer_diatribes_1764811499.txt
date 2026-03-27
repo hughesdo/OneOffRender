@@ -1,0 +1,97 @@
+// ID: WcVyDw
+// Name: Noise Racer
+// User: diatribes
+// Date: 1764811499
+
+
+// ===== PASS 0: Image =====
+
+/*
+    @FabriceNeyret2 motion blur by redefining iTime
+    See @GregRostami's shader for blur here:
+    https://www.shadertoy.com/view/Ns3fDf
+    
+    
+    I liked Fabrice's all-in-one solution and the imperfect noise
+    adds to the glitch retro effect
+*/
+
+#define iTim ( iTime + fract(1e4*sin(dot(gl_FragCoord.xy,vec2(137,-13))))* iTimeDelta )
+#define T iTim*1e2
+#define P(z) (vec3(cos((z)*.003)*128.+cos((z) * .005)  *256., \
+                   cos((z)*.006)*256., (z)))
+#define N normalize
+
+float lights;
+
+float map(vec3 p) {
+    vec3 q = P(p.z);
+
+    // entity (flying light orb)
+    // just a sphere with z coord offset by time
+    float e = length(p - vec3(
+               q.x+sin(T*.05),
+               q.y,
+               48.+T+sin(.005*T)*32.))-.001;
+               
+    // accumulate orb light
+    lights += 1e1/e;
+    
+    
+    // move p space by path
+    p.xy -= q.xy;
+    
+    // sample road plane
+    float r = 4e1-p.y;
+    
+    // mirror for square tunnel
+    p = abs(p);
+    
+    // sample square tunnel
+    float t = min(4e1-p.x, 32.-p.y);
+    // n noise iterator, s noise value
+    float n,s =-p.y-26.;
+
+    // noise here
+    s -= abs(dot(round(sin(.1*p+.1*p.yzx)), vec3(4.)));     
+    s -= abs(dot(round(sin(.1*p/2.+.1*p.yzx/2.)*16.)/8., vec3(6)));     
+    
+    // min(orb, max(tunnel + noise/1e1, road + noise)
+    return min(e, max(t + s/1e1, r + s));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float i,s,d=.4+.5*dot(fract(sin(u)), sin(u));
+    vec3  r = iResolution;
+    
+    // scale coords
+    u = (u-r.xy/2.)/r.y;
+    
+    u /= (iMouse.z > 70. ? iMouse.x / r.x : 1.);
+    
+    
+    // remember to clear o :)
+    o = vec4(0);
+
+    // raymarch origin, ray direction, look-at
+    vec3  p = P(T),ro=p,
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    
+    // 64 iterations or until d is bigly
+    for(; i++ < 64. &&  d < 2e3;)
+        // raymarch position
+        p = ro + D * d,
+        // sample and understep
+        d += s = max(map(p) * .65, .001),
+        // accumulate color for orb and geometry
+        o += 6.*vec4(1,2,5,0)*lights + 1./s;
+
+    // brightness and distance inverse fade (brighter further away)
+    // the line lights are the +abs(vec4(
+    o = tanh(o*o / 8e9 * exp(d/9e1)
+      + abs(vec4(7,2,1,0) / dot(cos(p*.03),vec3(4e1))));
+    
+}

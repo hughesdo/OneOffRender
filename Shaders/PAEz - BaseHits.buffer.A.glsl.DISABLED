@@ -1,0 +1,185 @@
+// ============================================================
+// COMBINED BEAT DETECTOR
+// Merges original Buffer A (Spectrum Copy) and Buffer B (Logic)
+//
+// iChannel0 = Music
+// iChannel1 = Buffer A (Feedback - This shader)
+// ============================================================
+
+#version 330 core
+
+out vec4 fragColor;
+
+uniform vec2 iResolution;
+uniform float iTime;
+uniform float iTimeDelta;
+uniform int iFrame;
+uniform sampler2D iChannel0;  // Audio/Music texture
+uniform sampler2D iChannel1;  // Buffer A feedback
+
+#define FFT_BINS 512
+
+// --------- MANUAL BAND SETTINGS ---------
+#define LOW_START   3
+#define LOW_END     30
+#define HIGH_START  1
+#define HIGH_END    10
+
+// --------- DETECTOR SETTINGS ---------
+#define WIN_LOW     18
+#define WIN_HIGH    10
+
+#define CLICK_FLUX_GAIN    1.6
+#define COINCIDENCE_BOOST  0.25
+#define BEATS_PER_BAR      5.0
+#define FLUX_SENSITIVITY   0.30
+#define THRESHOLD_DECAY    3.5  // Easiest thing to adjust for more or less reaction
+#define THRESHOLD_MIN      0.10
+#define REFRACTORY_JUMP    1.50
+#define MIN_BEAT_INTERVAL  0.14
+#define TOOSOON_RAISE      0.85
+#define DROP_SENSITIVITY   1.50
+#define SILENCE_TIMEOUT    1.0
+#define GAIN_LEARNING_RATE 2.0
+#define SMOOTH_HZ_LOW      18.0
+#define SMOOTH_HZ_HIGH     28.0
+
+#define DT_MIN (1.0/240.0)
+#define DT_MAX (0.05)
+
+float dtSafe() { return clamp(max(iTimeDelta, 0.0), DT_MIN, DT_MAX); }
+float alphaHz(float hz, float dt) { return 1.0 - exp(-hz * dt); }
+
+// Helper to read Music FFT directly (replaces original Buffer A lookup)
+float musicFFT(int i) { return texelFetch(iChannel0, ivec2(i, 0), 0).x; }
+
+// Helper to sum band energy
+float getBandEnergy(int startBin, int width) {
+    int safeStart = clamp(startBin, 0, FFT_BINS - width);
+    float s = 0.0;
+    // Unrolled loop for constant width is faster, but standard loop is fine here
+    for (int k = 0; k < width; k++) {
+        s += musicFFT(safeStart + k);
+    }
+    return s / float(width);
+}
+
+void mainImage(out vec4 O, in vec2 fragCoord)
+{
+    ivec2 p = ivec2(fragCoord);
+
+    // -----------------------------------------------------------
+    // PART 1: Spectrum Strip (Preserved functionality)
+    // Copies iChannel0 FFT to Row 1 so other shaders can read it
+    // -----------------------------------------------------------
+    if (p.y == 1) {
+        if (p.x >= 0 && p.x < FFT_BINS) {
+            O = vec4(musicFFT(p.x), 0.0, 0.0, 1.0);
+        } else {
+            O = vec4(0.0);
+        }
+        return;
+    }
+
+    // -----------------------------------------------------------
+    // PART 2: Beat Detection Logic (Row 0, pixels 0, 1, 2)
+    // -----------------------------------------------------------
+    if (p.y != 0 || p.x > 2) {
+        O = vec4(0.0);
+        return;
+    }
+
+    float dt = dtSafe();
+
+    // 1. Calculate Current Frame Energy
+    // Note: We map original pixel-encoded LOW_START/HIGH_START directly here
+    float eL = getBandEnergy(LOW_START, WIN_LOW);
+    float eH = getBandEnergy(HIGH_START, WIN_HIGH);
+
+    // 2. Read Previous State (Feedback)
+    // (1,0) stored smoothed energy
+    vec4 prevSmooth = texelFetch(iChannel1, ivec2(1, 0), 0);
+    float prevLow  = prevSmooth.r;
+    float prevHigh = prevSmooth.g;
+
+    // (0,0) stored detector state
+    // R=Counter, G=Silence, B=AvgStr, A=Thresh
+    vec4 prevState = texelFetch(iChannel1, ivec2(0, 0), 0);
+
+    // Initialize on frame 0
+    if (iFrame == 0) {
+        prevSmooth = vec4(eL, eH, 0.0, 1.0);
+        prevState  = vec4(0.0, 1e9, 0.5, 0.5);
+        // If we are p.x==2 (output), default to 0
+        if (p.x == 2) { O = vec4(0.0); return; }
+    }
+
+    // 3. Physics & Flux Calculation
+    float smL = mix(prevLow,  eL, alphaHz(SMOOTH_HZ_LOW, dt));
+    float smH = mix(prevHigh, eH, alphaHz(SMOOTH_HZ_HIGH, dt));
+
+    float fluxL = max(0.0, smL - prevLow)  / dt;
+    float fluxH = max(0.0, smH - prevHigh) / dt;
+
+    float combinedFlux = max(fluxL, fluxH * CLICK_FLUX_GAIN);
+    if (fluxL > 0.0 && fluxH > 0.0) combinedFlux *= (1.0 + COINCIDENCE_BOOST);
+    combinedFlux *= FLUX_SENSITIVITY;
+
+    // 4. Update State Variables
+    float counter = prevState.r;
+    float silence = prevState.g + dt;
+    float avgStr  = prevState.b;
+    float thresh  = max(THRESHOLD_MIN, prevState.a * exp(-THRESHOLD_DECAY * dt));
+
+    float beatType = 0.0; // For output pixel (2,0)
+
+    // Beat Trigger Logic
+    if (combinedFlux > thresh) {
+        bool tooSoon = (silence < MIN_BEAT_INTERVAL);
+
+        if (tooSoon) {
+            // Refractory period: just raise threshold
+            thresh = max(thresh, combinedFlux * TOOSOON_RAISE);
+        } else {
+            // Beat confirmed
+            bool isSilence = (silence > SILENCE_TIMEOUT);
+            bool isDrop    = (combinedFlux > avgStr * DROP_SENSITIVITY);
+
+            if (isSilence || isDrop) {
+                counter = 0.0;
+                beatType = 1.0;
+            } else {
+                float nextCount = mod(counter + 1.0, BEATS_PER_BAR);
+                beatType = (nextCount < 0.5) ? 1.0 : 0.5;
+                counter = nextCount;
+            }
+
+            silence = 0.0;
+            thresh  = max(thresh, combinedFlux * REFRACTORY_JUMP);
+
+            float mixFactor = 1.0 - exp(-GAIN_LEARNING_RATE * dt);
+            avgStr = mix(avgStr, combinedFlux, mixFactor);
+        }
+    }
+
+    // -----------------------------------------------------------
+    // PART 3: Pixel Output Routing
+    // -----------------------------------------------------------
+
+    // Pixel (0,0): Internal State Storage
+    if (p.x == 0) {
+        O = vec4(counter, silence, avgStr, thresh);
+    }
+    // Pixel (1,0): Smoothed Energy Storage
+    else if (p.x == 1) {
+        O = vec4(smL, smH, 0.0, 1.0);
+    }
+    // Pixel (2,0): Beat Trigger Output (The result)
+    else if (p.x == 2) {
+        O = vec4(beatType, 0.0, 0.0, 1.0);
+    }
+}
+
+void main() {
+    mainImage(fragColor, gl_FragCoord.xy);
+}

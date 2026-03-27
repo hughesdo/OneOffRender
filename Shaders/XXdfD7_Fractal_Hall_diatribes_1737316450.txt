@@ -1,0 +1,119 @@
+// ID: XXdfD7
+// Name: Fractal Hall
+// User: diatribes
+// Date: 1737316450
+
+
+// ===== PASS 0: Image =====
+
+
+// Raymarch article with repeating example:
+// https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+
+
+#define MAX_STEPS 50
+#define MAX_DIST 20.0
+#define SURFACE_DIST .001
+#define inf (MAX_DIST+1.0)
+
+vec3 repeat(vec3 p, float c) {
+  return mod(p,c)-0.5*c;
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float sdCross(in vec3 p, float s) {
+  float da = sdBox(p.xyz, vec3(s, s, s));
+  float db = sdBox(p.yzx, vec3(s, inf, s));
+  float dc = sdBox(p.zxy, vec3(s, s, inf));
+  return min(da, min(db, dc));
+}
+
+// modified from the fractal function found here:
+// https://www.shadertoy.com/view/4XdfW4
+float fractal(vec3 p, out vec3 rgb){
+  float m = 1.;
+  float offs = 1.85;
+  for (int i = 0; i < 5; i++) {
+        float n = abs(p.x*p.y*p.z);
+        p = abs(p)/clamp(n,.2,1.3)-offs;
+        m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-2. * m)*2.;
+  rgb=vec3(2.0, p.xy) * m;
+  return length(rgb);
+}
+
+float scene(vec3 p) {
+  vec3 s = repeat(p, 2.0);
+  float cross = sdCross(s, .125);
+  return min(1.0-p.x,min(1.0+p.x,min(1.0+p.y,min(1.0-p.y,cross))));
+}
+
+float raymarch(vec3 ro, vec3 rd) {
+  float dist = 0.0;
+  for(int i = 0; i < MAX_STEPS; i++) {
+
+    // Ray origin extended by dist in rd direction
+    vec3 p = ro + rd * dist;
+
+    // Calculate the distance from the current position
+    // to an object in the scene or infinity
+    float step = scene(p);
+
+    // Track the total distance of the ray
+    dist += step;
+
+    // If we've gone too far, or are very close to a surface
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+
+  // Infinity or the distance to a surface
+  return dist;
+}
+
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+
+  vec3 n = scene(p) - vec3(
+    scene(p-e.xyy),
+    scene(p-e.yxy),
+    scene(p-e.yyx));
+
+  return normalize(n);
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+  float time = iTime;
+  vec2 uv = fragCoord.xy/iResolution.xy-.5;
+  uv.x *= iResolution.x / iResolution.y;
+
+  vec3 ro = vec3(0.0, sin(time*.25)*.5, -time*.2);
+  vec3 rd = normalize(vec3(uv, -1.0));
+  
+  float d = raymarch(ro, rd);
+  vec3 color = vec3(0.0);
+  vec3 p = ro + rd * d;
+  vec3 normal = getNormal(-p);
+  vec3 lightDirection = normalize(rd);
+  float diffuse = max(dot(normal, lightDirection), .1);
+  vec3 s = repeat(p, 2.0);
+  if (d < MAX_DIST/1.5) {
+    d += fractal(s, color);
+    color *= (4.0/d)*diffuse;
+  } else {
+    s.z *= .125;
+    d += fractal(s, color);
+    color *= (.5/d);
+  }
+  fragColor = vec4(color, 1.0);
+  
+}
+

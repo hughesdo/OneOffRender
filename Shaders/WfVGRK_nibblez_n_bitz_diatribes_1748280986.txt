@@ -1,0 +1,39 @@
+// ID: WfVGRK
+// Name: nibblez n' bitz
+// User: diatribes
+// Date: 1748280986
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, n, t=iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<60.; ) {
+        // march, p = ro + rd * d, p.z += t*12;
+        p = vec3(u * d, d + t*12.);
+        // turbulence
+        p += cos(p.z+t+p.yzx*.5)*.6;
+        // modulate tunnel radius
+        s = 4.+sin(t*.4)*4.-length(p.xy);
+        // rotate
+        p.xy *= mat2(cos(t+vec4(0,33,11,0)));
+        // noise loop
+        for (n = 1.6; n < 32.; n += n )
+            // subtract noise from tunnel dist
+            // we square-off our noise with step,
+            // you'll need to look-up step() if you're not familiar with it
+            s -= abs(dot(step(.25, sin( p.z + t + p*n )), vec3(1))) / n;
+        // accumulate distance, sample
+        // See recent @Xor shaders for translucency stuff
+        d += s = .01 + abs(s)*.2;
+        // grayscale color
+        o += 1. / s;
+    }
+    // colorize
+    o *= vec4(2,3,2,1);
+    o = tanh(o*o  / 1e7);
+}
+

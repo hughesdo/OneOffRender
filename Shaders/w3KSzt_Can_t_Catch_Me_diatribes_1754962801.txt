@@ -1,0 +1,107 @@
+// ID: w3KSzt
+// Name: Can't Catch Me
+// User: diatribes
+// Date: 1754962801
+
+
+// ===== PASS 0: Image =====
+
+// @chronos suggested having the orb thing flash like it's talking to you
+// so this is my imagining of it taunting you in a race,
+// letting you catch up then taking off again :D
+// this helped me get a better handle on glowy stuff...
+// assuming i didn't do it horribly wrong :D
+
+// path
+#define P(z) vec3(cos((z) * .11)  * 4., \
+                  cos((z) * .13)  * 4., (z))
+// rotate
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// light visit frequency
+#define V cos(iTime*.3)
+
+// camera movement time
+#define T (1.*iTime+(2.*V+iTime*.2)) * 12.
+
+// speed, orb time
+#define S iTime * 6.
+
+// noise
+#define N(f, i, s) abs(dot(sin(f*p*s), i +p-p )) / s
+
+float light = 0.;
+
+float powlen(vec2 p){
+    float k = 3.;
+    p = pow(abs(p), vec2(k));
+    return pow(p.x + p.y, 1./k);
+}
+
+float sdfWisp(vec3 p) {
+
+    // subtract path xy from p.xy
+    p.xy -= P(p.z).xy;
+    
+    // move wisp left, right, up, down, back, and forth
+    return length(p - vec3(
+                    // X
+                    sin(sin(S*.5)+S*.6)*1.,
+                    // Y
+                    sin(sin(S*.5)+S*.6)*1.,
+                    // Z + T
+                    T+16.+V*10.))-.2;
+}
+
+float map(vec3 p) {
+
+    // wisp distance
+    float wisp = sdfWisp(p);
+
+    // path
+    vec3 q = P(p.z);
+
+    // tunnel with modulating radius
+    float s = cos(p.z*.1)*2.+3.5 - V -
+        min(length(p.xy - q.x - 6.),
+        min(powlen(p.xy - q.xy),
+            length(p.x - q.y + 6.)));
+            
+    // noise, surface texture on tunnel
+    s += N(1., .05, 2.);
+    s += N(2., .06, 4.);
+    s += N(3., .04, 8.);
+
+    // light
+    if(V < -.2)
+        // flash if Visiting
+        light += clamp(1./wisp, 0., 50.)
+                 * (18.+4.*sin(S*2.7)+6.*cos(S*2.1)+8.*cos(S*1.3));
+    else
+        light += clamp(1./wisp, 0., 50.)*4.;
+    
+    // return distance to tunnel or wisp
+    return min(.001+abs(wisp*.8), .0005+abs(s));
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s, d=0.,i=0.;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    vec3  p = P(T),ro=p,
+          Z = normalize( P(T+3.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(R(sin(p.z*.07)*1.5)* u, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    if(abs(u.y)>.4){ o = vec4(0); return; }
+
+    for(o *= i; i++ < 1e2;o += (1.+cos(.2*p.z+vec4(6,2,4,0)))/s+light)
+        p = ro + D * d * .7,
+        d += s = map(p);
+    
+    if (V < -.2) o.b *= 2.;
+    o = vec4(tanh(o/3e4) );
+    
+}

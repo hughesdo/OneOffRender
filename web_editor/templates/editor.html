@@ -12,8 +12,9 @@
         <header class="app-header">
             <h1>OneOffRender Video Editor</h1>
             <div class="header-actions">
-                <button id="saveProjectBtn" class="btn btn-secondary" disabled>Save Project</button>
-                <button id="renderBtn" class="btn btn-primary" disabled>Render Video</button>
+                <button id="loadProjectBtn" class="btn btn-outline btn-sm">Load</button>
+                <button id="saveProjectBtn" class="btn btn-secondary btn-sm" disabled>Save</button>
+                <button id="renderBtn" class="btn btn-primary btn-sm" disabled>Render</button>
             </div>
         </header>
 
@@ -206,6 +207,45 @@
         <div class="overlay-message">
             <h2>Select Music to Begin</h2>
             <p>Choose an audio file from the left panel to start editing</p>
+        </div>
+    </div>
+
+    <!-- Save Project Modal -->
+    <div id="saveProjectModal" class="modal-overlay" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Save Project</h3>
+                <button class="modal-close" id="closeSaveModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="projectNameInput">Project Name:</label>
+                    <input type="text" id="projectNameInput" class="form-input" placeholder="Enter project name..." maxlength="100">
+                    <p class="form-hint">Letters, numbers, spaces, hyphens, and underscores allowed.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelSaveBtn" class="btn btn-secondary btn-sm">Cancel</button>
+                <button id="confirmSaveBtn" class="btn btn-primary btn-sm">Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Project Modal -->
+    <div id="loadProjectModal" class="modal-overlay" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header">
+                <h3>Load Project</h3>
+                <button class="modal-close" id="closeLoadModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="projectList" class="project-list">
+                    <p class="loading-message">Loading projects...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelLoadBtn" class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
         </div>
     </div>
 

@@ -1,0 +1,22 @@
+// ID: t3syz2
+// Name: Foreverever...er
+// User: diatribes
+// Date: 1759886370
+
+
+// ===== PASS 0: Image =====
+
+// some tinkering with the forked shader
+void mainImage(out vec4 o, vec2 u) {
+    float i, d ,s,n,t = iTime;
+    vec3 p = iResolution;
+    u = (u-p.xy/2.)/p.y+vec2(cos(t*.2)*.4, sin(t*.2)*.25);
+    for(o*=i; i++<1e2;d += s = .001+abs(s)*.8, o += 1./s + vec4(4,1,1,0)/max(length(u),.001))
+        for (p = vec3(u * d, d+t*16.),
+             p.xy *= mat2(cos(.02*t-p.z*.07+vec4(0,33,11,0))),
+             s = max(8. - length(p.xy), tanh(p.y-2.)),
+             n = 2.; n < 6.; n *= 1.3 )
+                 s += abs(dot(step(1./d, cos(4.*t+p.z+p*n)), vec3(.4))) / n;
+    o = tanh(o / 2e4);
+}
+

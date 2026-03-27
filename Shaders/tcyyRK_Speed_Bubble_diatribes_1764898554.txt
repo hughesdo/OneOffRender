@@ -1,0 +1,49 @@
+// ID: tcyyRK
+// Name: Speed Bubble
+// User: diatribes
+// Date: 1764898554
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime, ft = iTime * 2e2;
+    vec3 p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    // move camera
+    u += vec2(cos(t*.4)*.3, cos(t*.8)*.1-.2);
+
+    for(o = vec4(0); i++<80.;)
+        p = vec3(u*d,d+ft), // p = ro + rd *d, p.z + ft;
+    
+        // entity (bubble dude)
+        e = length(p - vec3(
+                    sin(sin(t*.2)*1e1+t*3.) * 6e1,
+                    sin(sin(t*.4)) *16.-2.,
+                    1e2+ft+tanh(cos(t)*2.)*32.)),
+                
+        // plane, mix with entity
+        s = mix(-e*.7, .5*(p.y+3e1+cos(p.z*.2)),
+                smoothstep(0.,32., e)),
+
+        // accumulate distance
+        d += s = .01+abs(s),
+        
+        // color
+        o += 4. * vec4(3,2,7,0)/s
+          + 1e1/length(sin(t)*u+vec2(u.x+sin(t*2.),u.y-.3))
+          + 8.*vec4(3,1,.1,0)/length(u.y+.1)
+          + 3e1*vec4(1,2,5,0)/max(length(vec2(u.x, u.y-.5)), length(u/2.));
+          
+    
+    // swizzle mix components based on length u
+    // try different swizzles and try something like 'd'
+    // instead of length u
+    o = mix(o, (2.5+1.5*sin(t*.3))*o.zyxw, smoothstep(.2, 1., length(u)/4.));
+    
+    // tanh tonemap, saturation, brightness
+    o = tanh(o*o/5e8+.2*length(u));
+}

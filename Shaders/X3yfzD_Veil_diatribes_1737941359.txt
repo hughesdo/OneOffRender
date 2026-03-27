@@ -1,0 +1,135 @@
+// ID: X3yfzD
+// Name: Veil
+// User: diatribes
+// Date: 1737941359
+
+
+// ===== PASS 0: Image =====
+
+#define MAX_STEPS 80.
+#define MAX_DIST 40.0
+#define SURFACE_DIST .001
+#define inf (MAX_DIST+1.0)
+
+vec3 repeat(vec3 p, float c) {
+  return mod(p,c)-0.5*c;
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0)-.8;
+}
+
+float sdSphere(vec3 p, float r) {
+  return length(p) - r;
+}
+
+vec3 sdOrbLoc(vec3 p) {
+  float sa = sin(iTime*5.);
+  float ca = cos(iTime*5.);
+  mat2 m = mat2(ca,-sa,sa,ca);
+  
+  p.x += -cos(cos(iTime*4.)*1.9)*1.5;
+  p.y += 1.-sin(sin(iTime*2.))*2.5;
+  p.z -= -iTime*3.;
+  
+  p.z += 3.+tanh(cos(iTime*.5)*12.)*MAX_DIST/2.1+MAX_DIST/2.;
+  vec3 r = p-vec3(
+    0.,
+    0.,
+    -3.25);
+  r.xz *= m;
+  return r;
+}
+float sdOrb(vec3 p, float r) {
+  return sdSphere(sdOrbLoc(p), r);
+}
+
+float sdCross(in vec3 p, float s) {
+  float da = sdBox(p.xyz, vec3(s, s, s));
+  float db = sdBox(p.yzx, vec3(s, inf, s));
+  float dc = sdBox(p.zxy, vec3(s, s, inf));
+  return min(da, min(db, dc));
+}
+
+#define s(x) sin((x)+iTime)
+float plasma(vec3 p, out vec3 rgb, float z) {
+  p*=z;
+  float c = length(p) - 1.;
+  float r=distance(c+1.,s(c*p.x*p.y));
+  float g=distance(c+2.,s(c*p.z*p.z));
+  float b=distance(c+3.,s(c*p.x*p.z));
+  float v=1.+3.*abs(s(r)+s(g)+s(b));
+  rgb = vec3(r/v,g/v,b/v);
+  return length(rgb)*.1;
+}
+#undef s
+
+float scene(vec3 p, out vec3 rgb) {
+    vec3  s = repeat(p, 10.0);
+    float c = sdCross(s, 1.);
+    float o = sdOrb(p, .5);
+    float m = min(o,c);
+          m = min(m,10.-abs(p.x));
+          m = min(m,10.-abs(p.y));
+    if (o <= m && m < c) {
+        rgb = vec3(1.5);
+        return o;
+    } else if (c < m) {
+        rgb = vec3(1.5);
+        return c;
+    } else {
+        plasma(abs(s), rgb, 1.);
+        return m;
+    }
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb) {
+  float dist = 0.0;
+  for(float i = 0.; i < MAX_STEPS; i++) {
+    vec3 p = ro + rd * dist;
+    float step = scene(p, rgb);
+    dist += step;
+    if(dist > MAX_DIST || step < SURFACE_DIST) {
+        break;
+    }
+  }
+
+  return dist;
+}
+
+vec3 getNormal(vec3 p) {
+  vec2 e = vec2(.01, 0);
+  vec3 rgb;
+
+  vec3 n = scene(p,rgb) - vec3(
+    scene(p-e.xyy,rgb),
+    scene(p-e.yxy,rgb),
+    scene(p-e.yyx,rgb));
+
+  return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+  vec2 uv = fragCoord.xy/iResolution.xy-.5;
+  uv.x *= iResolution.x / iResolution.y;
+
+  vec3 ro = vec3(sin(iTime)*.5,sin(iTime)*.5, -iTime*3.);
+  vec3 rd = normalize(vec3(uv, -1.0));
+  
+  vec3 rgb;
+  float d = raymarch(ro, rd, rgb);
+  vec3 p = ro + rd * d;
+
+  vec3 normal = getNormal(p);
+  vec3 lightDirection = normalize(ro - p);
+  float diffuse = max(dot(normal, lightDirection), .0);
+  rgb *= diffuse;
+
+  float len = length(sdOrbLoc(p));
+  rgb /= pow(3.,len*.2);
+  fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+
+}
+

@@ -1,0 +1,54 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Mini Duo
+// Created by diatribes
+// Shadertoy ID: 3ffGRf
+// https://www.shadertoy.com/view/3ffGRf
+
+#define T (iTime * 20.)
+#define path1(z) (vec3(tanh(cos((z) * .027) * 2.) * 15., \
+                      tanh(cos((z) * .07) * 1.2) * 8., (z)))
+#define path2(z) (vec3(tanh(cos((z*.05) * .14) * 2.3) * 7., \
+                      tanh(cos((z*.06) * .25) * 1.2) * 8., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+void main() {
+    vec2 u = gl_FragCoord.xy;
+    vec4 o;
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,
+         ro = path1(T),
+         la = path1(T+1.5);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,- 1., 0))),
+         lay = cross(lax, laz);
+    vec3 rd = vec3(rot(sin(T*.03))*u, 1.) * mat3(-lax, lay, laz);
+    float d = 0.,s = 1., c;
+    for (float i = 0.; i < 150.; i++) {
+        p = ro + rd * d;
+        s = 3. - min(length(p.xy - path1(p.z).xy),
+                     length(p.x - path2(p.z).x));
+
+        d += s;
+        if (d > 150. || s < .01)
+            break;
+    }
+    float n = 0.;
+    for (float a = 4.; a < 16.;
+        n -= abs(dot(sin(p * a * 3.5)*4.5, vec3(1.))) / a * .75,
+        a += a);
+    d += n;
+    p = ro + rd * d;
+    c = abs(sin(p.x)+sin(p.y)+sin(p.z));
+    vec3 rgb = vec3(c+sin(p.z*.2),c*cos(p.z*.1),c);
+    o = vec4(pow(rgb/d*3.5, vec3(.45)), 1.);
+    
+    fragColor = o;
+}
+

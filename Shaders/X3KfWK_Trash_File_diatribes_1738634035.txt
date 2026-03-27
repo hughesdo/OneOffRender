@@ -1,0 +1,116 @@
+// ID: X3KfWK
+// Name: Trash File
+// User: diatribes
+// Date: 1738634035
+
+
+// ===== PASS 0: Image =====
+
+#define RADIUS 2.
+#define SPEEEEEEED 8.
+
+vec3 path1(float z) {
+    return vec3(
+        tanh(cos(z * .017)*1.) * 8.,
+        tanh(cos(z * .1)*1.) * 6.,
+        z
+    );
+}
+
+vec3 path2(float z) {
+    return vec3(
+        tanh(cos(z * .12)*1.) * 4.,
+        tanh(cos(z * .15)*1.) * 3.,
+        z
+    );
+}
+
+vec3 path3(float z) {
+    return vec3(
+        sin(z * .05) * 6.,
+        sin(z * .08) * 4.,
+        z
+    );
+}
+
+
+// modified from the fractal function found here:
+// https://www.shadertoy.com/view/4XdfW4
+vec3 fractal(vec3 p, int iterations){
+  float m = 1.;
+  for (int i = 0; i < iterations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.2,.8)-1.75;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-3.5 * m)*3.5;
+  return vec3(p.xy*.5,3.5) * m;
+}
+
+float scene(vec3 p, out vec3 rgb) {
+
+    float d1 = length(p.xy - path1(p.z).xy);
+    float d2 = length((p.xy - path2(p.z).xy).y);
+    float d3 = length((p.xy - path3(p.z).xy).x);
+
+    float hit = min(d1,min(d2, d3));
+    rgb = fractal(sin(p+hit),4)*vec3(sin(p.z)*.5+.85);
+    return RADIUS - hit;
+}
+
+float raymarch(vec3 ro, vec3 rd, out vec3 rgb, bool skipRiver) {
+   float d = 0.;
+   for(float i = 0.; i < 100.; i++) {
+        float step = scene(ro + rd * d, rgb);
+        d += step;
+        if(d > 100. || step < .001) {
+            break;
+        }
+    }
+    return d;
+}
+
+mat3 lookAt(vec3 origin, vec3 target, float roll) {
+    vec3 rr = vec3(sin(roll), cos(roll), 0.0);
+    vec3 ww = normalize(target - origin);
+    vec3 uu = normalize(cross(ww, rr));
+    vec3 vv = normalize(cross(uu, ww));
+    return mat3(uu, vv, ww);
+}
+
+vec3 normal(vec3 p) {
+    vec2 e = vec2(.01, 0);
+    vec3 rgb;
+
+    vec3 n = scene(p,rgb) - vec3(
+        scene(p-e.xyy,rgb),
+        scene(p-e.yxy,rgb),
+        scene(p-e.yyx,rgb));
+
+    return normalize(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec3 rgb = vec3(1.);
+    vec2 uv = -1.0 + 2.0*(fragCoord.xy/iResolution.xy);
+	uv.x *= iResolution.x/iResolution.y;
+
+	vec3 ro = path1(-iTime*SPEEEEEEED);
+	vec3 la = path1(ro.z-5.);
+
+	vec3 rd = normalize(vec3(uv,1.)*lookAt(ro,la,sin(2.*sin(iTime*.3))));
+	float d = raymarch(ro, rd, rgb, true);
+    vec3 p = ro + rd * d;
+    
+    if (d < 100.) {
+        float diffuse = max(dot(normal(p), normalize(ro-p)), .0);
+        rgb *= diffuse;
+        rgb *= 1./d;
+    } else {
+        vec3 red = vec3(.3, 0.00, 0.125);
+        vec3 blue = vec3(0.0, 0.125, 0.5);
+        rgb = mix(red.xyz, blue.xyz, uv.y);
+    }
+
+    fragColor = vec4(pow(rgb, vec3(.45)), 1.0);
+}

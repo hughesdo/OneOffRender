@@ -1,0 +1,154 @@
+// ID: w3jGDy
+// Name: Glitchy Thoughts
+// User: diatribes
+// Date: 1744912102
+
+
+// ===== PASS 0: Image =====
+
+/*
+References that helped:
+https://lodev.org/cgtutor/raycasting.html
+https://blog.maximeheckel.com/posts/painting-with-math-a-gentle-study-of-raymarching/
+https://www.shadertoy.com/view/X32SD3
+https://www.shadertoy.com/view/4dX3zl
+
+*/
+
+#define SCALE 6.
+#define inf 1e9
+#define T (sin(iTime*.3)*4.+iTime*8.)*4.
+#define MORPH_FREQ tanh(sin(T*.01)*.01)*.01
+
+#define N normalize
+#define P1(z) (vec3(tanh(cos((z)*.015) *  .24) * 226., \
+                    tanh(cos((z) * .0065) *.5) * 220., (z)))
+
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float length2(float p){
+    float k = 20.;
+    p = pow(abs(p), k);
+    return pow(p, 1./k);
+}
+
+float length2(vec2 p){
+    float k = 20.;
+    p = pow(abs(p), vec2(k));
+    return pow(p.x + p.y, 1./k);
+}
+
+float b0rx(vec3 p, vec3 b) {
+  b = abs(p) - b;
+  return min(max(b.x,max(b.y,b.z)),0.0) +
+         length(max(b,0.0));
+}
+
+
+float bars(vec3 p) {
+    p = mod(p, .75) - .375;
+    p = (sin(p.z)*.15+1.05) - abs(p);
+    return max(0.,b0rx(p.yzx, vec3(1.0, inf, 1.0)));
+}
+
+float map(vec3 p) {
+    float s, r = abs(MORPH_FREQ*SCALE)-6.;
+    vec2 p1 = P1(p.z).xy;
+    s  = r - min(length2(p.y - p1.x) - 10.,
+              min(length2(p.xy - p1.xy) - 20.,
+                  length2(p.y - p1.x) - 60.));
+
+    return s*bars(p*s+MORPH_FREQ);
+}
+
+
+// I based this on @chronos' "Lode Style Voxel DDA 3D"
+// https://www.shadertoy.com/view/X32SD3
+vec3 tex(vec3 ro, vec3 rd, vec3 p, vec3 n, float side) {
+    vec3 rgb;                         
+    
+    // Solve ray plane intersection equation: dot(n, ro + t * rd - p = 0.
+    // for t 
+    float t = dot(n, p - ro) / dot(n, N(rd));
+    vec3 hit = ro + N(rd) * t;
+ 
+    if(side == 0.)
+        rgb = pow(texture(iChannel0, hit.yz*.0525).rgb,  vec3(2.)),
+        rgb.rb *= 1.5,
+        rgb.b *= 1.1,
+        rgb *= .5;
+    else if(side == 1.)
+        rgb = pow(texture(iChannel1, hit.xz*.0475).rgb, vec3(2.5)),
+        rgb.r -= .05,
+        rgb.b += .13,
+        rgb.g -= .11;
+    else
+        rgb = pow(texture(iChannel2, p.z*.001+.004*T+hit.xy*.0775).rgb, vec3(2.5)),
+        rgb.g *= .75,
+        rgb.b *= 1.3,
+        rgb *= 2.5;
+       
+    for (t = .4; t < 4.;
+        rgb -=  abs(dot(sin(hit * t * 128.),
+        vec3(.04))) / t, t *= 1.4142); 
+
+    return rgb*4.;
+}
+
+void mainImage(out vec4 o, vec2 u) {
+
+    vec3  id,
+          blue = vec3(.15,.11,.57)*1.5,
+          red = vec3(.7,.11,.05)*2.5,
+          green = vec3(.11,.32,.11)*1.5,
+          e = vec3(.005,0,0),
+          r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+          // rayPos
+    vec3  p = P1(T)/SCALE, ro = p,
+          Z = N( P1(T+16.) - P1(T)),
+          X = N(vec3(Z.z,0,-Z)),
+          
+          // rayDir
+          rd = vec3(rot(sin(T*MORPH_FREQ*.003)*3.3)*u, 1) 
+             * mat3(-X, cross(X, Z), Z),
+          fp = floor(p);
+              
+    // rayStep
+	vec3 rs = sign(rd),
+         // deltaDist
+	     dd = 1. / abs(rd),
+         // sideDist
+		 sd = (rs * (fp - p) + (rs * 0.5) + 0.5) * dd; 
+
+    o-=o;
+    float i,s,d;
+    float side = 0.;
+	for (i=0.; i++ < 200.;) {
+
+        if(sd.x <= sd.y && sd.x <= sd.z){
+            sd.x += dd.x; // Add delta dist
+            fp.x += rs.x; // step right/left
+            side = 0.;    // yz wall
+        } else if(sd.y <= sd.z && sd.y <= sd.x) {
+            sd.y += dd.y; // Add delta dist
+            fp.y += rs.y; // step up/down
+            side = 1.;    // xz wall
+        }  else {
+            sd.z += dd.z; // Add delta dist
+            fp.z += rs.z; // step front/back
+            side = 2.;    // xy wall
+        }
+        s = map(fp*SCALE);
+        id = fp/s;
+		if (s < .0) break;
+	}
+    p = fp  + .5 - rs * .5;
+    vec3 n = vec3(side==0., side==1., side==2.);
+    o.rgb = tex(ro, rd, p, n, side);
+  
+
+    o.rgb *= max(dot(n, normalize(rd)), .3)*15.;
+    o.rgb = pow(o.rgb*exp((-exp(i/64.))-dot(sin(u),u)*6.), vec3(.45));
+}
+

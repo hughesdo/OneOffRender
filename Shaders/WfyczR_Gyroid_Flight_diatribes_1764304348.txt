@@ -1,0 +1,225 @@
+// ID: WfyczR
+// Name: Gyroid Flight
+// User: diatribes
+// Date: 1764304348
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Gyroid Flight
+    
+    I was just tinkering and threw some gyroids at each other.
+    It has textures, AO, flight path, look-ahead/at, etc...
+    There's comments in this one if you're looking to
+    make weird tunnels :D
+    
+    
+    AO and dependant functions from here:
+    
+    @Shane's "Snub Polygon Raymarch Traversal"
+        
+        https://www.shadertoy.com/view/W3V3zR
+
+*/
+
+// Time or Speed, adjust to your liking :)
+#define T (iTime*6.)
+
+// Path for the tunnel
+// it's just a squiggly line
+// you look up the path xy by passing in your current z
+#define P(z) (vec3(cos((z)*.1)*4.+tanh(cos((z) * .05) * 1.8) * 24., \
+                   tanh(cos((z) * .08) * .7) * 16., (z)))
+// 2d rotation matrix
+#define R(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+// idk I blame Fabrice, I just like it now :D
+#define N normalize
+
+// flying orb light accumulated brightness
+vec4 lights;
+
+// @Shane
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+  
+    n = max((abs(n) - 0.2)*7., 0.001);
+    n /= (n.x + n.y + n.z );  
+    
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+float orb(vec3 p) {
+    float t = sin(T*.4)*.5;
+    vec3 q = P(p.z);
+    // the flying light is just a sphere
+    // the trick is to add the same time val to the z coord
+    // that you use to traverse the tunnel (T)
+    return length(p - vec3(             // orb (sphere with xyz offset by t)
+               q.x,
+               q.y + t,
+               8. + T + t*2.)-t)-.01;
+}
+
+float tunnel(vec3 p) {
+    // offset p space by path
+    p.xy -= P(p.z).xy;
+    
+    // return distance to tunnel
+    return 5. - length(p.xy);
+}
+
+float gyroids(vec3 p) {
+    // scale p
+    p *= .5;
+    // turbulence on p
+    p += cos(p.yzx*2.)*.6;
+    // 3 gyroids added together
+    vec3 sp = sin(p);
+    float g = .2-dot(sp, cos(p.yzx))/4.
+            + .1-dot(sp, cos(p.zxy))/2.
+            + .0-dot(sp, cos(p.xzy))/3.;
+
+    // return re-scaled gyroid
+    return g * 2.;
+}
+
+float map(vec3 p) {
+    
+    // get our orb light distance
+    float l = orb(p);
+    
+    // accumulate light for the orb
+    lights += 1e1*vec4(1,2,5,0)/l;
+
+    // max to bore through the gyroids with the tunnel
+    return min(l,max(gyroids(p), tunnel(p)));
+}
+
+/* START
+
+    From @Shane's "Snub Polygon Raymarch Traversal
+        
+        https://www.shadertoy.com/view/W3V3zR
+*/
+
+// Hash without Sine -- Dave Hoskins
+// https://www.shadertoy.com/view/4djSRW
+//  2 out, 3 in...
+vec2 hash23(vec3 p3){
+
+	p3 = fract(p3*vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx + 527.1273);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+ 
+// A nice random hemispherical routine taken out of one of IQ's examples.
+// The routine itself was written by Fizzer.
+vec3 cosDir(in vec3 p, in vec3 n){
+
+    vec2 rnd = hash23(p);
+    float u = rnd.x;
+    float v = rnd.y;
+    
+    // Method 1 and 2 first generate a frame of reference to use with an arbitrary
+    // distribution, cosine in this case. Method 3 (invented by fizzer) specializes 
+    // the whole math to the cosine distribution and simplfies the result to a more 
+    // compact version that does not depend on a full frame of reference.
+
+    // Method by fizzer: http://www.amietia.com/lambertnotangent.html
+    float a = 6.2831853*v;
+    u = 2.*u - 1.;
+    return normalize(n + vec3(sqrt(1. - u*u)*vec2(cos(a), sin(a)), u));
+    
+}
+
+// This  is heavily based on XT95's pseudo path tracing ambient occlusion
+// function. It's a faux effect, but it can give a scene a slight multiple
+// bounce path traced feel.
+float calcAO(in vec3 p, in vec3 n){
+    
+
+	float sca = 2., occ = 0.;
+    for(int i = 0; i<16; i++){
+    
+        float hr = float(i + 1)*.5/16.; 
+        //float fi = float(i + 1);
+        //vec3 rnd = vec3(hash31(p + fi), hash31(p + fi + .1), hash31(p + fi + .3)) - .5;
+        //vec3 rn = normalize(n + rnd*.15);
+        vec3 rn = cosDir(p + n*hr, n); // Random half hemisphere vector.
+        float d = map(p + rn*hr);
+        
+        occ = occ + max(hr - d, 0.)*sca;
+        sca *= .7;
+    }
+    
+    return clamp(1. - occ, 0., 1.);    
+    
+}
+
+/* END
+
+    From @Shane's "Snub Polygon Raymarch Traversal
+        
+        https://www.shadertoy.com/view/W3V3zR
+*/
+
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.002,d=0.,i=0.;
+    vec3  r = iResolution;
+    
+    // scale coords
+    u = (u-r.xy/2.)/r.y;
+    
+    // cinema bars
+    if (abs(u.y) > .35) { o = vec4(0); return; }
+    
+    
+    // set up ray origin, direction, and look-at
+    vec3  e = vec3(.001,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(R(sin(T*.1)*.2)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+
+    // remember to clear o :D
+    o = vec4(0);
+    
+    // loop 100 times or until d is "large"
+    for(;i++ < 1e2 && d < 1e3;)
+        // get raymarch position
+        p = ro + D * d,
+        // accumulate distance
+        // understep to clean up some wiggle wobbles
+        d += s = map(p) * .45;
+    
+    // get our normal
+    r =  N(map(p) - vec3(map(p-e.xyy), 
+                         map(p-e.yxy), 
+                         map(p-e.yyx)));
+    
+    // mix a couple textures based on p.z
+    o.rgb = mix(tex3D(iChannel1, .3*p, r),
+                tex3D(iChannel0, .2*p, r),
+                cos(p.z*.3)*.5+.7);
+    // square after texture fetch
+    o *= o;
+    
+    // apply lights
+    o *= lights*lights;
+    
+    // plasma'ish light things
+    float plasma = abs(1. /
+                  dot(cos(.4*iTime+p*.2),vec3(.1)));
+                  
+    // apply AO and plasma light
+    o *= calcAO(p, r) * plasma;
+    
+    // tanh tonemap, sqrt the square, exp(-d) dist fade
+    // the mix() is mixing the current color by a swizzle based on length of u
+    o = tanh(sqrt(
+             mix(o=o / 5e5 * exp(-d/1e1),
+                 o.zxyw, smoothstep(.2, 1., length(u)))));
+
+}

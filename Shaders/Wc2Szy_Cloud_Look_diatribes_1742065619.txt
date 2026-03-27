@@ -1,0 +1,52 @@
+// ID: Wc2Szy
+// Name: Cloud Look
+// User: diatribes
+// Date: 1742065619
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * .5)
+#define P(z) (vec3(tanh(cos((z) * .4) * .5) * 8., \
+                    tanh(cos((z) * .5) * .5) * 4., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s=.006,l,w=1.,d=0.,i;
+    vec3  r = iResolution, q,
+          e = vec3(.005,0,0),
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.15)*.3)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+	if (iMouse.z > 40.) {
+        float a = atan(.0, -1.);
+        D.yz *= rot(-a * .5 + iMouse.y/r.y * a);
+        D.zx *= rot(a - iMouse.x/r.x * a * 2.);
+    }
+    o -= o;;
+    for(int steps = 0; s > .005 && steps++ < 100;) {
+        p = ro + D * d;
+        q = p;
+        q.xy -= P(q.z).xy;
+        s = 2.75 - length(q.xy);
+        q.x -= 3.;
+        q.xy *= .5;
+
+        w = .5;
+        for (int j; j++ < 8; q *= l, w *= l )
+            q  = abs(sin(q)) - 1.,
+            l = 1.6/dot(q,q);
+        s = length(q)/w;
+
+        o.rgb += (abs(sin(p))*.05);
+        for(float a=.2;a < 12.;
+            s-=abs(dot(sin(p*a*(20.+(sin(T)*.6+.5))),
+            vec3(.75)))/a*.01,a+=a);
+        d += s;
+    };
+    o.rgb *= exp(-d/abs(4.+sin(p.z)));
+    o = vec4(pow(o.rgb,vec3(.45)), 1.);
+}

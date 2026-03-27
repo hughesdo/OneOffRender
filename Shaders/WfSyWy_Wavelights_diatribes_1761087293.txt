@@ -1,0 +1,35 @@
+// ID: WfSyWy
+// Name: Wavelights
+// User: diatribes
+// Date: 1761087293
+
+
+// ===== PASS 0: Image =====
+
+// try starting "d" at different values
+
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i,s, d=3.5, t=iTime;
+    vec3  p = iResolution;
+    
+    u =(u+u-p.xy)/p.y;
+    
+    for (o = vec4(0); i++ < 1e2; ) {
+        // position
+        p = vec3(u * d, d);
+        // rots
+        p.xy *= R(-t*.11);
+        p.xz *= R(t*.11);
+        // ripples
+        p += cos(2.*t+dot(cos(t+p), p) *  p),
+        // accumulate distance
+        d += s = dot(abs(p-floor(p)-.5), vec3(.02));
+        // accumulate color
+        o += 6.*d*vec4(1,2,7,0)+(1.+cos(p.z+vec4(6,4,2,0)))/s;
+    }
+    
+    // tonemap, brightness
+    o = tanh(o/2e4);
+}

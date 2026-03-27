@@ -1,0 +1,52 @@
+// ID: tfSBW1
+// Name: Colorflow Orb
+// User: diatribes
+// Date: 1758644762
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 q,p = iResolution;
+    
+    float i, s, d=.1*texelFetch(iChannel0, ivec2(u)%1024, 0).a,t = iTime;
+          
+    // scale coords
+    u =(u+u-p.xy)/p.y;
+    
+    for(o*=i; i++<1e2; ) {
+        
+        // shorthand for standard raymarch sample, then move forward:
+        // p = ro + rd * d, p.z -= 16.;
+        q = p = vec3(u * d, d - 16.);
+        
+        // rot xy by time and p.z
+        p.xy *= mat2(cos(t+p.z*.2+vec4(0,33,11,0)));
+
+        // turbulence
+        for (s = 1.; s++ <6.;
+            q += sin(.3*t+p.xzy*s*.3)*.3,
+            p += sin(.4*t+q.yzx*s*.4)*.3);
+
+        // distance to spheres and light field
+        s = abs(min(dot(abs(p-floor(p)-.5), vec3(1)),
+                            max(length(p)-6., length(q)-6.)));
+        
+        
+        // warp by u
+        s = .005+abs(mix(s, .001/abs(p.y), length(u))),
+        
+        // accumulate distance
+        d += s,
+        
+        // color
+        o += (1.+cos(p.z+vec4(6,4,2,0))) / s
+          +  (1.+cos(q.z+vec4(3,1,0,0))) / s;
+        
+    }
+    
+    // tonemap and divide brightness
+    o = tanh(o*o/8e7);
+}

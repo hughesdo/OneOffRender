@@ -1,0 +1,23 @@
+// ID: tfdGRf
+// Name: Sun [269]
+// User: diatribes
+// Date: 1747329294
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s;
+    vec3  p = iResolution;    
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<1e2; ) {
+        p = vec3(u* d,d);
+        for (s = .15; s < 1.;
+            p += abs(dot(cos(iTime+p.z+p * s * 16.), vec3(.01))) / s,
+            s *= 1.4);
+        d += s = .04 + abs(5.-length(p.xy))*.3;
+        o += vec4(4,2,1,0) / s;
+    }
+    o = tanh(o*o / 2e7 / dot(u,u)*6.);
+}
+

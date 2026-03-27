@@ -1,0 +1,17 @@
+// ID: wXVGRW
+// Name: Light Swirl [263]
+// User: diatribes
+// Date: 1752185990
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,s,d,t=iTime;
+    vec3  p,r = iResolution; 
+    for (o*=i; i++<1e2; o += (1.+cos(4.*t+p.z+vec4(3,1,0,0)))/s)
+            p = vec3((u-r.xy/2.)/r.y * d, d + t),
+            p.xy *= mat2(cos(.07*t+.2*p.z+vec4(0,33,11,0))),
+            d += s = dot(abs(p-floor(p)-.5), vec3(.3));
+    o = tanh(o*o/1e5/d);
+}

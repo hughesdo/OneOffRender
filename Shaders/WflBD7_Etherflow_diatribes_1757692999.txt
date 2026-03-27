@@ -1,0 +1,52 @@
+// ID: WflBD7
+// Name: Etherflow
+// User: diatribes
+// Date: 1757692999
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float d,a,e,i,s,t = iTime;
+    vec3  ep, p = iResolution;    
+    
+    // scale coords
+    u = (u+u-p.xy)/p.y;
+    
+    u += vec2(cos(t*.4)*.3, cos(t*.8)*.1);
+    
+    for(o = vec4(0); i++<1e2;
+
+        // accumulate distance
+        d += s = min(.02+.4*abs(s),e=max(.8*e, .01)),
+        
+        // grayscale color
+        o += 16.*vec4(3,2,7,0)/(s+e*.5)+.1*vec4(6,2,1,0)/length(u.x))
+        
+        // noise loop start, march
+        for (p = vec3(u*d,d+t), // p = ro + rd *d, p.z + t;
+    
+            // entity (orb) position
+            ep = p - vec3(
+                sin(sin(t*1.4)+t*.3) * 16.,
+                sin(sin(t)+t*1.5) *16.,
+                42.+t+cos(t*.5)*32.),
+                
+            // orb sphere
+            e = length(ep) - .1,
+                    
+            // plane, mix with entity/orb
+            s = mix(e*.02,16.-abs(p.x), smoothstep(0.,32., e)),
+            
+            // noise params
+            a = .4; a < 8.; a *= 1.4)
+
+            // apply turbulence
+            p += cos(p.yzx * .5)*.2,
+            
+            // apply noise
+            s -= abs(dot(cos(2.*t+.2*p.z+p * a ), .2+p-p)) / a;
+    
+    // tanh tonemap, blue tint, brightness, moon
+    o = tanh(o/1e3);
+}

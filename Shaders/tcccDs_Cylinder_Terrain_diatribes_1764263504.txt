@@ -1,0 +1,55 @@
+// ID: tcccDs
+// Name: Cylinder Terrain
+// User: diatribes
+// Date: 1764263504
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Inspired by Jaenam's "Stormy Torus"
+        https://www.shadertoy.com/view/tcccRl
+        
+    I like this diorama-type stuff
+    
+    Feel free to golf if you like
+
+*/
+ 
+ 
+ #define T iTime * 2.
+ 
+
+/*
+    @iq
+    Vertical Capped Cylinder - exact
+    https://www.shadertoy.com/view/wdXGDr
+*/
+float C( vec3 p, float r, float h )
+{
+  p.z -= T + 8.;
+  
+  vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    float i, s, f, d, n;
+    vec3 c,p,r=iResolution;
+    
+    u =(u+u-r.xy)/r.y;
+    
+    for(o*=i;i++< 64.; 
+        d += s = .001+.7*abs(min(.007+.5*abs(f), max(f, min(4.5 - s, .03+.1*abs(s))))),
+        c += (sin(T+p*.5)*.3)/s +  1./s +  4.*vec3(1,2,5)/length(u-.3)
+    )
+        for(p = vec3(u * d, d + T),
+            f=C(p, 4., 4.),
+            s = 1.7-p.y+cos(p.x*.3)*.3+sin(p.z*.4)*.4,
+            n = .01; n < .4; n += n * 3.
+        )
+            s -= abs(dot(sin(.1*p.z +.2*p/n),vec3(n+n)));
+    o.rgb = tanh(c*c/4e7 );
+}
+

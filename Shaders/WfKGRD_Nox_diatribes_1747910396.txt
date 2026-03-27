@@ -1,0 +1,172 @@
+// ID: WfKGRD
+// Name: Nox
+// User: diatribes
+// Date: 1747910396
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Verbose comments on how to make this shader below.
+
+    Assumes basic SDF and raymarching knowledge.
+    
+    Be aware, I started with shaders this year, I'm a beginner.
+    Do your own experimentation to verify.
+    
+    This is some stuff I've learned from a bunch of people
+    on Shadertoy. I like the bite-size shaders @Xor does for
+    learning, so I'm doing this one to pass on the little bits
+    and tricks I've learned.
+    
+    The base geometry for this shader is a tunnel. You should be able
+    to apply the same ideas to planes though, e.g:
+    
+        my golfy version:
+            https://www.shadertoy.com/view/tfc3W2
+
+        PrzemyslawZaworski's readable refactor:
+            https://www.shadertoy.com/view/Wf33Df
+           
+        dray's day->night readable version:
+            https://www.shadertoy.com/view/wcdGDX
+    
+    Maybe it's a good exercise to refactor this one, it's
+    pretty short.
+    
+    You do not need to know exactly how a tunnel works
+    to make this, but you can learn a bit about that here:
+        https://www.shadertoy.com/view/Wcf3D7
+        
+    I made the code short, but didn't golf it,
+    it's just what I ended up with, then added comments.
+
+    For reference, uncommented:
+
+    void mainImage(out vec4 o, vec2 u) {
+        float i, d, s, n, t=iTime*.05;
+        vec3 p = iResolution;
+        u = (u-p.xy/2.)/p.y;
+        for(o*=i; i++<1e2; ) {
+            p = vec3(u * d, d + t*4.);
+            p += cos(p.z+t+p.yzx*.5)*.5;
+            s = 5.-length(p.xy);
+            for (n = .06; n < 2.;
+                p.xy *= mat2(cos(t*.1+vec4(0,33,11,0))),
+                s -= abs(dot(sin(p.z+t+p * n * 20.), vec3( .05))) / n,
+                n += n);
+            d += s = .02 + abs(s)*.1;
+            o += 1. / s;
+        }
+        o = tanh(o / d / 9e2 / length(u));
+    }
+
+*/
+
+void mainImage(out vec4 o, vec2 u) 
+{
+    float
+    // loop iterator
+    i,
+    // total distance
+    d,
+    // signed distance to tunnel
+    s,
+    // noise iterator
+    n,
+    // time (very slow)
+    t=iTime*.05;
+    // raymarch position, temporarily resolution
+    vec3 p = iResolution;
+    // scale coords to viewport
+    u = (u-p.xy/2.)/p.y;
+    // zero out o, loop until 100.
+    for(o*=i; i++<1e2; ) {
+        // march and move, this is essentially p = ro + rd *d,
+        // and p.z += t * 4.
+        p = vec3(u * d, d + t*4.);
+        // perturb p by it's own swizzled components and time,
+        // and p.z to add some flavor and somewhat reduce the pattern.
+        // @Xor refers to this as turbulence, you can see it in
+        // a bunch of his shaders
+        // play with the two .5's
+        p += cos(p.z+t+p.yzx*.5)*.5;
+        // complement of the distance to tunnel
+        // https://www.shadertoy.com/view/Wcf3D7
+        // 5. is the radius of the cylinder.
+        // to do a cylinder that you're NOT inside of,
+        // you would normallly do length(p.xy) - .5, but we
+        // want to be inside the cloud tunnel
+        s = 5.-length(p.xy);
+        // start noise loop at .06, up to 2.
+        // clouds i think i usually start somewhere around .05 to .15
+        for (n = .06; n < 2.;
+            // equivalent to p.xy *= rotate2D(t*.1)
+            // just a golf trick
+            p.xy *= mat2(cos(t*.1+vec4(0,33,11,0))),
+            // we're going to subtract some noise from the distance
+            // to the tunnel, this is what makes the tunnel cloud-like.
+            
+            // don't let the dot product scare you,
+            // it's not really being used to determine information here,
+            // it's just shorthand for the sum of the products of the
+            // components.
+            
+            // the second param is vec3(.05), which is just the scale or
+            // "intensity", if you will, of the noise.
+            
+            // The '20.' is the frequency or detail level or granularity,
+            // however you'd like to think of it.
+            // t+ is to pass time through sin() so the noise moves,
+            // take it out and have a look at still noise, it's cool.
+            
+            // p.z + t is to add flavor, it can help reduce patterns
+            // in the image, it all depends on the context though,
+            // maybe it looks better with out p.z, maybe your shader
+            // puts 2.*t+p.x through sin().
+            
+            // n grows each iteration by n+=n, divide by it to get
+            // the scale of the current noise iteration
+            s -= abs(dot(sin(p.z+t+p * n * 20.), vec3( .05))) / n,
+            // growth of the noise here,
+            // can also use n *= 1.x (e.g., n*=1.4142)
+            n += n);
+        // accumulate the total distance
+        // sample and attenuate the abs()'d distance to the clouds
+        // i don't understand how this translucency stuff works,
+        // sorry :), but the pattern is: a + abs(s) * b;
+        // play with a and b and you'll quickly get an intuition for it.
+        // it does seem like the abs() "pops" distant surfaces forward,
+        // something like that, creating the translucency, which makes
+        // sense considering you're abs()'ing a SIGNED distance,
+        // this is just my gut feeling, i have no idea how it really works
+        d += s = .02 + abs(s)*.1;
+        
+        // goth mode grayscale, no palette here
+        // simply divide 1 by the signed distance
+        o += 1. / s;
+    }
+    
+    // tanh() maps our color values to a curve that looks
+    // acceptably consistent across displays (i learned tone mapping
+    // like two weeks ago so look more into it than that)
+    o = tanh(
+    // we divide by the total distance to give it some depth
+    // if you'd like to add some color, change the below line to:
+    // vec4(4,2,1,0) * o / d /
+    o / d / 
+    // at this point we've accumulated color (or brightness in this case)
+    // in o to a high degree and need to tone it down a bit
+    
+    // divide by 9e2, i find this number by playing around and building
+    // an intuition, you can start around the number of iterations
+    // you're doing and just manually search up and down some values
+    // to hone in on it.
+    9e2 /
+    // and divide by the length of u which makes our moon.
+    // the distance increases as you move away from the center
+    // of the screen, so you get a bright circle.
+    // try doing u -= vec2(.3,.4); before the tanh() call   
+    length(u));
+}
+

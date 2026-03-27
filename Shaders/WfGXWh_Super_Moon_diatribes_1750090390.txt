@@ -1,0 +1,27 @@
+// ID: WfGXWh
+// Name: Super Moon
+// User: diatribes
+// Date: 1750090390
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s, n, t=iTime;
+    vec3 p = iResolution, q;
+    u = (u-p.xy/2.)/p.y;
+    for(o*=i; i++<80.; ) {
+        q = p = vec3(u,1) * d,
+        p.z += t,
+        p += cos(t+p.yzx*.2)*.3,
+        p.xy -= cos(vec2(.15,.03)*p.z)*4.;
+        s = min(16. + p.y - length(p.y), .1+tanh(cos(.5*t+10./i)*3.)*8.);
+        for (n = .1; n < 4.; n += n )
+            s += abs(dot(sin(.2*p.z+t+q*n*2.), vec3(.13))) / n;
+        d += s = .02 + abs(s)*.3;
+        o += 1. / s;
+    }
+    u.y -= .3;
+    o = tanh(vec4(6,5, 7,1)*o*o  / 6e6 / dot(u,u));
+}
+

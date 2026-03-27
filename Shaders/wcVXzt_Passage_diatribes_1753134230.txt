@@ -1,0 +1,90 @@
+// ID: wcVXzt
+// Name: Passage
+// User: diatribes
+// Date: 1753134230
+
+
+// ===== PASS 0: Image =====
+
+// it's a plane for the floor, apollonian fractal for the pillar
+// looking things and a distorted sphere for the ghost
+
+// Time
+#define T (iTime)
+
+// Morph frequency
+#define F ((tanh(cos(T*.3)*23.)*.3)*.2)
+
+// the bubble ghost thing :D
+float orb(vec3 p, float f, float zoffs) {
+    return length(p - vec3(
+            sin(sin(f*.2)+T*.4) * 2.,
+            1.+sin(sin(f*1.3)+T*.2) *1.23,
+            zoffs+5.+T+cos(T*.5)*6.));
+}
+
+// apollonian fractal
+float fractal(vec3 p) {
+    float s,w = 1., l;
+    
+    // scale
+    p *= vec3(.45, .15, 1.);
+    
+    // translate
+    p.xy -= 1.5;
+    
+    // fractal
+    for (int i; i++ < 7; p *= l, w *= l )
+        p  = sin(p),
+        // F subtraction is what "opens" and "closes" the fractal
+        l = 2.7/dot(p,p)-F;
+        
+    // dist
+    return length(p)/w; 
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    float 
+    // distance
+    d,
+    // iterator
+    i,
+    // entity
+    e,
+    // signed distance
+    s;
+    
+    // temporarily resolution, then raymarch point
+    vec3  p = iResolution;
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    // look around
+    u += vec2(sin(T*.75)*.1,
+              sin(T*.5)*.1);
+              
+    // clear o, up to 70, accumulate brightness
+    for(o*=i; i++<70.; o += 1. /  s)
+        
+        // march
+        p = vec3(u*d,d+T),
+        
+        // ghost
+        e = orb(p, p.z*.6, 8.)-1.,
+    
+        // get dist to ghost, fractal or floor
+        d += s =
+                //ghost
+                min(.009+abs(e)*.5,
+                // fractal
+                min(.001+abs(fractal(p)),
+                // floor
+                .005+abs( 1.2+p.y)*.8));
+
+    // move light
+    u.y -= sin(T)*.05+.1;
+ 
+    // tonemap, divide down brightness, add light
+    // divide by F for the flash
+    o = tanh(o /  6e5 / length(u)/abs(F));
+}
+

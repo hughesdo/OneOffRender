@@ -1,0 +1,75 @@
+// ID: wctcWH
+// Name: Dark Waters 
+// User: diatribes
+// Date: 1763562570
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -16 chars by @Xor!!
+    
+    ty!!   :D
+    
+*/
+
+void mainImage( out vec4 o, vec2 u ) {
+    float s,i,n,g;
+    vec3 r = iResolution, p, f;
+    u = ( u - r.xy/2. ) / r.y;
+    
+    for(f.xz = u+.1*cos(u.y*1e2); 
+         i++ < 32.;
+         g += s/length(f.xy*(.2+.1*sin(iTime))+s-i/4e1)
+       )
+        for ( p += vec3(u*s,s),
+              s = .8 + p.y,
+              n = .01;
+              n < 1.;
+              n += n
+            )
+            s += .1*n*abs(dot(sin(p.z+iTime +p/n), r/r));
+            
+    u.y-=.3;
+    o = vec4(tanh(g/1e2+.03/length(u)));
+}
+
+
+
+
+
+
+
+
+
+
+/***********
+
+// forked from a shader golfed by a few people
+// and was pointed out that the sun highlights didn't really make sense
+
+// ty 🙏 :D
+
+void mainImage( out vec4 o, vec2 u ) {
+    float s,i,n,t=iTime;
+    vec3 r = iResolution, p;
+    
+    u = ( u - r.xy/2. ) / r.y;
+    
+    // not sure how to simplify
+    vec2 f = vec2(u.x+.1*cos(u.y*1e2), 0)*(.2+.1*sin(t));
+    for(o = vec4(0); 
+         i++ < 32.;
+         o += 1e1/length(f+s-i/4e1)*s + .9/length(u+vec2(0,-.3))
+       )
+        for ( p += vec3(u*s,s),
+              s = .8 + p.y,
+              n =.01;
+              n < 1.;
+              n += n
+            )
+            s += abs(dot(sin(p.z+t +p/n),  r/r)) * n*.1;
+            
+    o = tanh(o/1e3);
+}
+*/

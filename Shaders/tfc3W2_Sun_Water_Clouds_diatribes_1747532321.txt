@@ -1,0 +1,48 @@
+// ID: tfc3W2
+// Name: Sun Water Clouds
+// User: diatribes
+// Date: 1747532321
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Sound from an @msm01 comment in this shader:
+        https://www.shadertoy.com/view/wfdGWM
+
+    Playing with turbulence and translucency from
+    @Xor's recent shaders, e.g.
+        https://www.shadertoy.com/view/wXjSRt
+        https://www.shadertoy.com/view/wXSXzV
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,t=iTime;
+    vec3  p = iResolution;
+    
+    u = (u-p.xy/2.)/p.y;
+    
+    for(o*=i; i++<1e2;
+        d += s = .03 + abs(2.-abs(p.y))*.2,
+        o += 1. /  s)
+        
+        for (p = vec3(u* d,d+t),s = .05; s < 1.;
+             p += cos(p.z+p.yzx*.02)*.1,
+             p += abs(dot(sin(t+p.z+p * s * 16.), vec3(.01))) / s,
+             s += s);
+             
+    o *= mix(pow(vec4(4,2.3,1,0),vec4(1.5)),
+                 vec4(1,2.3,6,0),
+                 smoothstep(.2, -.5, u.y));
+    u -= vec2(.6, .25);
+    o = tanh(o / 6e3/ vec4(length(u)) );
+}
+
+
+// ===== PASS 1: Sound =====
+
+float noise(vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
+vec2 mainSound( int samp, float time )
+{
+    return vec2( cos(0.3*time)*abs(sin(0.3*time))*0.025*noise(vec2(time))+0.02*noise(vec2(time)));
+}

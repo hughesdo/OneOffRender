@@ -81,3 +81,8 @@ Output_Video/*
 
 # Shader staging folder - development/testing shaders in various states
 /Shaders/Shaders in Different Stages/
+
+# Local-only folders - not for GitHub
+Junk/
+Notes/
+ffmpeg/

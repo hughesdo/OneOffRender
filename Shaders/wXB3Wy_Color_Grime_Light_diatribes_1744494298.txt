@@ -1,0 +1,125 @@
+// ID: wXB3Wy
+// Name: Color Grime Light
+// User: diatribes
+// Date: 1744494298
+
+
+// ===== PASS 0: Image =====
+
+/*
+References that helped:
+https://lodev.org/cgtutor/raycasting.html
+https://www.shadertoy.com/view/X32SD3
+https://www.shadertoy.com/view/4dX3zl
+*/
+
+#define SCALE 6.
+#define T iTime*32.
+#define N normalize
+#define P1(z) (vec3(tanh(cos((z)*.009) *  1.6) * 84., \
+                    tanh(cos((z) * .01) * 1.) * 64., (z)))
+#define P2(z) (vec3(tanh(cos((z)*.16) *  .23) * 64., \
+                       tanh(cos((z) * .061) * .7) * 64., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+
+float tunnels(vec3 p) {
+    vec2 t = P1(p.z).xy;
+    vec2 sq = abs(p.xy - t);
+    float f = 65.-p.y, s, s1, s2;
+
+    s1 = min(length(p.xy - t.x),
+         min(length(p.xy - t.xy) - 15.,
+             length(p.xy - t.y ) + 5.));
+    t = P2(p.z).xy;
+    s2 = min(length(p.xy - t.x),
+         min(length(p.xy - t.xy) - 15.,
+             length(p.xy - t.y ) + 5.));
+    s = 32.- min(length(p.y - t.x), min(s1, s2));
+    s = min(f,min(s, max(15. - sq.x, 15. - sq.y)));
+    return s;
+}
+
+
+// I based this on @chronos' "Lode Style Voxel DDA 3D"
+// https://www.shadertoy.com/view/X32SD3
+vec3 tex(vec3 ro, vec3 rd, vec3 p, vec3 n, float side) {
+    vec3 rgb;                         
+    
+    // Solve ray plane intersection equation: dot(n, ro + t * rd - p = 0.
+    // for t 
+    float t = dot(n, p - ro) / dot(n, N(rd));
+    vec3 hit = ro + N(rd) * t;
+ 
+    if(side == 0.)
+        rgb = texture(iChannel0, hit.yz*.125).rgb;
+    else if(side == 1.)
+        rgb = texture(iChannel1, hit.xz*.0675).rgb*2.,
+        rgb.g += .25;
+
+    else
+        rgb = texture(iChannel2, hit.xy*.0875).rgb*4.;
+  
+    for (t = .2; t < 1.2;
+        rgb.rgb -= abs(dot(sin(rgb * t * 32.), vec3(.05))) / t,
+        t *= 1.4142);
+   
+    rgb *= rgb * .5;
+    return rgb;
+}
+
+void mainImage(out vec4 o, vec2 u) {
+
+    vec3  id,
+          r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+          // rayPos
+    vec3  p = P1(T)/SCALE, ro = p,
+          Z = N( P1(T+16.) - P1(T)),
+          X = N(vec3(Z.z,0,-Z)),
+          
+          // rayDir
+          rd = vec3(rot(sin(T*.03)*.3)*rot(tanh(sin(p.z*.02)*5.)*3.)*u, 1) 
+             * mat3(-X, cross(X, Z), Z),
+          fp = floor(p);
+              
+    // rayStep
+	vec3 rs = sign(rd),
+         // deltaDist
+	     dd = 1. / abs(rd),
+         // sideDist
+		 sd = (rs * (fp - p) + (rs * 0.5) + 0.5) * dd; 
+
+    o-=o;
+    float i,s,d;
+    float side = 0.;
+	for (i=0.; i++ < 128.;) {
+
+        if(sd.x <= sd.y && sd.x <= sd.z){
+            sd.x += dd.x; // Add delta dist
+            fp.x += rs.x; // step right/left
+            side = 0.;    // yz wall
+        } else if(sd.y <= sd.z && sd.y <= sd.x) {
+            sd.y += dd.y; // Add delta dist
+            fp.y += rs.y; // step up/down
+            side = 1.;    // xz wall
+        }  else {
+            sd.z += dd.z; // Add delta dist
+            fp.z += rs.z; // step front/back
+            side = 2.;    // xy wall
+        }
+        s = tunnels(fp*SCALE);
+        id = fp/s;
+		if (s < .0) break;
+	}
+    p = fp  + .5 - rs * .5;
+    vec3 n = vec3(side==0., side==1., side==2.);
+    vec3 green = vec3(.11,.32,.11)*2.5;
+    vec3 lights = abs(sin(fp) /
+                  dot(tanh(sin(.002*T+fp)*2.)*1.,vec3(.03)))*.01;
+    o.rgb = green*tex(ro, rd, p, n, side);
+    o.rgb = mix(o.rgb, lights, .01);        
+    o.rgb *= max(dot(n, normalize(rd)), .05)*12.;
+    o.rgb = pow(o.rgb*exp(-(exp(i/32.))-dot(u,u)*3.), vec3(.45));
+}
+

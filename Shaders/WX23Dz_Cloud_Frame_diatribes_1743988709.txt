@@ -1,0 +1,29 @@
+// ID: WX23Dz
+// Name: Cloud Frame
+// User: diatribes
+// Date: 1743988709
+
+
+// ===== PASS 0: Image =====
+
+#define T iTime*1.5+sin(iTime)
+void mainImage(out vec4 o, vec2 u) {
+    float s=.02,i=0.,n,d;
+    vec3  r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    vec3  p = vec3(0,sin(T)*.125,T);
+    o -= o;
+    for(; i++ < 80. && s > .01;) {
+        n = dot(sin(1.35*p*.3)+sin(p),cos(T+p));
+        s = 1.5 - length(p.xy) - n *.3;
+        for (n = .075; n < 2.;
+            s -= abs(dot(sin(p * n * 65.), vec3(.007))) / n,
+            n = ((n+n)+(n * 1.4142))/2.);
+        o.rgb += sin(p*.25) *.035+.0125;
+        p += vec3(u, 1)*.7 * s;
+        d += s;
+    }
+    o.rgb = d > 20. ? vec3(.4, .1, .6)/(length(u))*.75
+            : o.rgb = 1. - o.rgb;
+    o.rgb = pow(o.rgb, vec3(.45));
+}

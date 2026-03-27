@@ -1,0 +1,74 @@
+// ID: t3SyDy
+// Name: Gyroid X Apollonian
+// User: diatribes
+// Date: 1761174104
+
+
+// ===== PASS 0: Image =====
+
+#define T (sin(iTime*.4) + iTime * 3. )
+#define P(z) vec3(tanh(cos((z)*.2))*6., cos((z)*.2)*4., (z))
+#define R(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float light;
+
+float tunnel(vec3 p) {
+    p.xy -= P(p.z).xy;
+    return cos(p.z*.5)*.4+2. - length(p.xy);
+}
+
+float gyroid(vec3 p) {
+    return 1.-dot(tanh(p*.3), sin(p*.3+cos(p.yzx)));
+}
+
+float orb(vec3 p) {
+    vec3 q = P(p.z);
+    return length(p - vec3(
+                   q.x+sin( sin(p.z*.3) ), 
+                   q.y+sin( sin(p.z*.1) ),
+                   7.  +T +cos(T*.35) *3. )  ) ;
+}
+
+float fractal(vec3 p) {
+    float s,w,l,y = p.y + 4.5;
+    p += cos(p.yzx*2.)*.2;
+    p = vec3(
+        abs(sin(p.z)) - 1.,
+        abs(sin(p.x+p.y))*.3,
+        abs(sin(p.x*.4)) - .5
+    ) * .7;
+    for (s=0.,w=.4; s++ < 8.; p *= l, w *= l )
+        p  = abs(sin(p))-1.,
+        l = 1.6/dot(p,p)-.1;
+
+    return length(p)/w;
+}
+
+float map(vec3 p) {
+    float s = orb(p);
+    light += s;
+    return min(.001+.5*abs(s-.1), max(max(fractal(p), gyroid(p)), tunnel(p)));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float s,d,i;
+    u = (u-iResolution.xy/2.)/iResolution.y;
+    if (abs(u.y) > .4) { o = vec4(0); return; }
+        
+    vec3  p = P(T),ro=p,
+          Z = normalize( P(T+2.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(R(sin(T*.1)*.4*tanh(sin(p.z*.1)*3.)*3.)*u, 1) 
+             * mat3(-X, cross(X, Z), Z);
+
+    o = vec4(0);
+    for(;i++ < 128.;)
+        p = ro + D * d * .6,
+        d += s = map(p),
+        o +=  vec4(1e1,2,1e2,0)/max(s, .0005)
+         + abs(vec4(3e1,3,1,0) /
+                  dot(cos(.5*iTime+.5*p),vec3(4.*s/d)));
+
+    o = tanh(sqrt(o / 2e6 / sqrt(light) ));
+
+}

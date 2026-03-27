@@ -1,0 +1,37 @@
+// ID: w3tGWS
+// Name: Slumber
+// User: diatribes
+// Date: 1751673547
+
+
+// ===== PASS 0: Image =====
+
+/*
+    -6 chars from spalmer
+    
+    thanks!   :D
+
+*/
+
+#define N(x,s) abs(dot(cos(x * n), vec3(s))) / n
+void mainImage( out vec4 o, vec2 u )
+{
+    float i,n,s=.002,d, t = iTime;
+    vec3  w,p = iResolution;
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<64. && s > .001; 
+         d += s = min(s*.7,.002+abs(2.+w.y)),
+         o += 2./d)
+        for(p = w = vec3(u * d, d + t),
+            n = 1.,
+            w.z += t,
+            s = max(w.y+1., 3. - length(p.xy-u));
+            n < 8.;
+            w.y -= N(t+w, .04),
+            s += N(p, .13),
+            n *= 1.42);
+    o.rb += .3;
+    o = tanh(o/9e1/length(u-=.4));
+}
+
+

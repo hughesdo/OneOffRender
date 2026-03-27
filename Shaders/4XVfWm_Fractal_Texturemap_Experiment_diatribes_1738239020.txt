@@ -1,0 +1,152 @@
+// ID: 4XVfWm
+// Name: Fractal Texturemap Experiment
+// User: diatribes
+// Date: 1738239020
+
+
+// ===== PASS 0: Image =====
+
+// Forked from https://www.shadertoy.com/view/DllBzl
+// Changes are fractal texture mapping and precision (s)
+// To experiment with mapping fractal textures
+
+#define rot(a)   mat2 (cos(a+vec4(0,11,33,0)))                   
+#define T iTime
+
+// modified from the fractal function found here:
+// https://www.shadertoy.com/view/4XdfW4
+float fractal(vec3 p, out vec3 rgb, int iterations){
+  float m = 1.;
+  for (int i = 0; i < iterations; i++) {
+    float n = abs(p.x*p.y*p.z);
+    p = abs(p)/clamp(n,.3,1.)-1.45;
+    m = abs(min(p.x,min(p.y,p.z)));
+  }
+  m = exp(-3. * m)*2.5;
+  rgb=vec3(p.xy,2.5) * m;
+  return length(rgb*.1);
+}
+
+vec3 cor;
+float M(vec3 p){
+    float d = dot(cos(p), sin(p.yzx)) + 1.3;
+    
+    vec3 q = p * 9.;
+    float k = dot(cos(q), sin(q.yzx)) + .1;
+    
+    vec3 cor1 = vec3(217,193,136)/255.; 
+    vec3 cor2 = vec3(67,47,31)/255.; 
+    vec3 cor3 = vec3(148,108,65)/255.; 
+    
+    cor = mix(cor1, cor2, k * 1.1 + .75) ;
+    cor = mix(cor, cor3, abs(k * .45) + .3);
+    
+    return  d;
+}
+
+void mainImage(out vec4 O, vec2 u){
+    float T  = iTime * 4., 
+          a  = T * .04, 
+          PI = 3.14;
+          
+    vec3  R = iResolution,
+    
+          // scrool z
+          p = vec3(0, 0, sin(a) * 12. - 1.),
+          
+          // normalize(vec3(uv, 1));
+          D = normalize(vec3(u, R.y) - .5 * R);
+                    
+    
+    // rotate camera
+    D.yz *= rot(cos(3. * a));
+    D.zx *= rot(sin(2. * a));
+                  
+	
+    
+    // raymarching, uh!
+    float f = 25., s = f, i, d;          
+    for(; i++ < 4e2 && d < f && s > .001;  p += s * D)
+        s = .5 * M(p),
+        d += s;
+
+    
+    
+    
+    
+    
+    // plot
+    O *= 0.; 
+    
+    
+    if(d < f) {
+        // normals
+        vec3 e = vec3(.1, 0,0),
+             n = vec3( M(p-e.xyy),
+                       M(p-e.yxy),
+                       M(p-e.yyx));
+                       
+             n = normalize(M(p) - n);
+                       
+        // reflection               
+        vec3 r = reflect(D, n);
+                                
+                     
+        // color  
+        // fractal(mod(p,6.), cor,6);
+        // fractal(p, cor,8);
+        // fractal(mod(p,3.), cor,6);
+        // fractal(fract(p), cor,6);
+        fractal(sin(p), cor,6);
+        // cor *= texture(iChannel0,p.xy).xyz;
+        
+        
+        vec4 C = vec4(cor,0);
+        
+        O = C 
+           // difuse
+           + .05 
+            * smoothstep( -.1, .1  , dot(p,r)/length(p) + 1.) 
+            * smoothstep(-1.1,  1.1, dot(r, vec3(.58))) 
+            * clamp(dot(n, D) + 1., 0., 1.)
+            
+           // specular
+           + (
+               dot(
+                   r, 
+                   normalize(
+                       vec3(
+                           sin(T*.5),
+                           cos(T*.5),
+                           -1
+                       )
+                   )
+               ) + .5
+             ) * .3 - .2;
+        
+        // gama
+        O = pow(O, 1.5 - C * 1.1);
+        O = pow(O, vec4(1.1));
+        O *= 1. - d/f;
+    }
+}
+
+/*
+    relateds
+    
+    https://www.shadertoy.com/view/DllBzl
+    https://www.shadertoy.com/view/mdSBWy
+    https://www.shadertoy.com/view/mssBzs
+    https://www.shadertoy.com/view/cdBfRd
+    https://www.shadertoy.com/view/cdBfDy
+    https://www.shadertoy.com/view/mdBBWt
+    https://www.shadertoy.com/view/dlXBRH
+    https://www.shadertoy.com/view/ctlBzX
+    https://www.shadertoy.com/view/dlXBzB
+    https://www.shadertoy.com/view/ddXBz7
+    https://www.shadertoy.com/view/dtfBR4
+    https://www.shadertoy.com/view/clfBRr    
+    https://www.shadertoy.com/view/DdXBW8
+    https://www.shadertoy.com/view/DssBDn
+
+*/

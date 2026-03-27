@@ -1,0 +1,45 @@
+// ID: wcVcRG
+// Name: Fire Temple
+// User: diatribes
+// Date: 1764861094
+
+
+// ===== PASS 0: Image =====
+
+vec4 fire(vec3 p) {
+    float s, i, d, n, T = iTime;
+    vec4 o = vec4(0);
+    p += cos(p.z+T+p.yzx*.5)*.6;
+    s = 5.-length(p.xy);
+    p.xy *= mat2(cos(.1*T+vec4(0,33,11,0)));
+    for (n = 1.6; n < 32.; n += n )
+        s -= abs(dot(sin( p.z + T + 4.3*p*n ), vec3(.6))) / n;
+    s = (.01 + abs(s)*.15);
+    o += 1. / s;
+    return (vec4(7,2,1,1) * o * o );
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    float d=6.+.5*texelFetch(iChannel0, ivec2(u)%1024, 0).a,
+          i,s,w,l, T = iTime*.5;
+    vec3  q,p = iResolution;
+    u = ( u - p.xy/2. ) / p.y;
+    u.y += .05;
+    for(o = vec4(0); i++ < 1e2;
+        o +=  d / s
+          + (d > 8. ? 7.*fire(q) : vec4(0))
+          + 1e2*vec4(9,2,1,0)/length(u)) {
+        q = p = vec3( u*d, d + T+T),
+        p *= .3;
+        w = .75;
+        p.y -= 4.;
+        p.y *= .3;
+        p.x *= .8;
+        for (int i; i++ < 8; w *= l )
+            p *= l = 1.5/dot( p = abs(sin(p))-1. , p);
+        d += s = min(.002+.2*abs(q.y + 4.), max(.5 - length(q.xy), .002+abs(length(p)/w) * 4.));
+    } 
+    o = mix(o, o.yzxw, smoothstep(2., .1, length(u)*4.));
+    o = tanh(max(o/1.5e5/d, .0));
+}
+

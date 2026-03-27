@@ -1,0 +1,59 @@
+// ID: tfBXWG
+// Name: Color Bounce
+// User: diatribes
+// Date: 1742336367
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .32) * .5) * 10., \
+                  tanh(cos((z) * .26) * .4) * 10., (z))
+#define T iTime*1.5
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float M(vec3 p, out vec3 rgb) {
+    float l,w=1.,s;
+    p.xy -=  P(p.z).xy;
+    
+    s = p.y +
+                (.6*(sin(p.x+T*3.)+
+                     sin(p.z+T*2.)+
+                     sin(p.z+T*4.)));
+    p.y -= s*.15;
+    p.x -= 1.5;
+    w = .4;
+    for (int j; j++ < 8; p *= l, w *= l )
+        p = clamp(p, -1.5, 1.5) * 2. - p,
+        p  = abs(sin(p)) - 1.,
+        l = 1.4/dot((sin(p)+1.65)*p,p);
+    rgb = sin(p)*.02+.02;
+    return length(p)/w-.002;
+}
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002, d=0.;
+    vec3  r = iResolution,
+          e = vec3(.005,0,0),
+          p = P(T),ro=p,
+          Z = N( P(T+1.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = vec3(rot(tanh(sin(p.z*.1)*6.)*3.)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;
+    int i = 0;
+    for(; i++ < 120 && s > .001;) {
+        p += (s = M(p,r))*D;
+        d += s;
+        o.rgb += r;
+    }
+    r =  N(M(p,Z) - vec3(M(p-e.xyy, Z), 
+                         M(p-e.yxy, Z), 
+                         M(p-e.yyx, Z)));
+
+    o.rgb = 1. - o.rgb;
+    o.rgb *= exp(-d/5.);
+    o.rgb *= max(dot(r, normalize(ro-p)), .01);
+    o.rgb = pow(o.rgb, vec3(.45));
+}

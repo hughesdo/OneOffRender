@@ -1,0 +1,32 @@
+#version 330 core
+
+uniform float iTime;
+uniform vec2 iResolution;
+
+out vec4 fragColor;
+
+// Color Swirl [265]->[253]
+// Created by diatribes
+// Shadertoy ID: 332XRK
+// https://www.shadertoy.com/view/332XRK
+
+// -10 chars from SnoopethDuckDuck :D
+// and -2 because of an unused assignment i missed :)
+
+void main() {
+    vec2 I = gl_FragCoord.xy;
+    vec4 O = vec4(0.0);
+    float i, z, s;
+    for(O *= i; i++<1e2;) {
+        vec3 p = z * normalize(vec3(I+I,0) - iResolution.xyx);
+        p.yx *= mat2(cos(z*.4 + vec4(0,11,33,0)));
+        for(s = 2.; s < 6.; s += s)
+            p += cos(iTime+p.yzx*s) / s;
+        z += abs(5.-abs(p.x))*.1+.007;
+        O += cos(p.yzxx)/z;
+    }
+    O = tanh(O/z);
+    
+    fragColor = O;
+}
+

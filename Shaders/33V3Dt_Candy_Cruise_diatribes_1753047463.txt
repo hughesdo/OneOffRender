@@ -1,0 +1,30 @@
+// ID: 33V3Dt
+// Name: Candy Cruise
+// User: diatribes
+// Date: 1753047463
+
+
+// ===== PASS 0: Image =====
+
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s=.1, n, t=iTime;
+    vec3 p,r = iResolution;
+    u = (u-r.xy/2.)/r.y;
+    
+    u += vec2(cos(t*.3)*.3, cos(t*.15)*.2);
+    
+    for(o*=i; i++<1e2;
+        d += s = (.001+abs(s)*.5),
+        o += (1.+cos(.06*p.z+vec4(3,1,0,0)))/s)
+        for (p = vec3(u * d, d + t+t),
+             s = (4.+cos(p.z*.3)*3.) - length(p.xy),
+             p.xy *= mat2(cos(p.z*.05+vec4(0,33,11,0))),
+             p.x = 2.- abs(sin(p.z*.5))*sin(p.x),
+             s = max(s, max(sin(p.y) , cos(p.x))),
+             n = .5; n < 4.; n += n )
+                 s -= abs(dot(sin(.11*t+p*n), vec3(.2))) / n,
+                 s += abs(dot(sin(.12*t+p*n), vec3(.3))) / n;
+                 
+    o = tanh(o/1e4);
+}
+

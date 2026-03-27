@@ -1,0 +1,54 @@
+// ID: wfSXRy
+// Name: Orb Charge Turbo
+// User: diatribes
+// Date: 1742039272
+
+
+// ===== PASS 0: Image =====
+
+#define T (iTime * 4.5)
+#define P(z) (vec3(tanh(cos((z) * .24) * .6) * 8., \
+                    tanh(cos((z) * .3) * .6) * 8., (z)))
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+
+#define LIGHTS_COUNT 8.
+
+void mainImage(out vec4 o, in vec2 u) {
+    vec2 r = iResolution.xy; 
+         u = (u - r.xy / 2.) / r.y;
+    vec3 p,q,
+         ro = P(T),
+         la = P(T+2.);
+    vec3 laz = normalize(la - ro),
+         lax = normalize(cross(laz, vec3(0.,-1., 0))),
+         lay = cross(lax, laz),
+         rd = vec3(rot(sin(T*.05))*u, 1.) * mat3(-lax, lay, laz) * .75,
+         rgb;
+    float orb[int(LIGHTS_COUNT)];
+    float d = 0.,s = .006, i;
+    o-=o;
+    for(int steps = 0; s > .005 && steps++ < 100;) {
+        p = ro + rd * d;
+        q = p;
+        q.xy -= P(q.z).xy;
+        s = 2.75 - length(q.xy);
+        float l,w = .5;
+        q.x -= 3.5;
+        q = clamp(q, -1.0, 1.0) * 2.0 - q;
+        for (int j; j++ < 8; q *= l, w *= l )
+            q  = abs(sin(q)) - 1.,
+            l = 1.6/dot(q,q);
+        s = length(q)/w;
+        for (i = 0.; i < LIGHTS_COUNT; i++) {
+            orb[int(i)] = length(p - vec3(P(p.z).xy+sin(1.4*p.z)*.25,
+                           3.+T+tanh(cos(i+T*.1)*.2)*(i*2.5)))-.05;
+            s = min(s, orb[int(i)]);
+            orb[0] = min(orb[0],orb[int(i)]);
+        }
+        o.rgb += (abs(sin(p))*.15);
+        d += s;
+    };
+    o.rgb = o.rgb/orb[0]*.1;
+    o = vec4(pow(vec3(o.rgb),vec3(.45)), 1.);
+}

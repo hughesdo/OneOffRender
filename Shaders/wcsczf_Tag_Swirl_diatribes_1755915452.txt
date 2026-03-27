@@ -1,0 +1,26 @@
+// ID: wcsczf
+// Name: Tag Swirl
+// User: diatribes
+// Date: 1755915452
+
+
+// ===== PASS 0: Image =====
+
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,d,s,n,t = iTime, a;
+    vec3 p = iResolution;
+    
+    u = (u-p.xy/2.)/p.y;
+    
+    for(o*=i; i++<128.;d += s = .003+abs(s) * .8, o += vec4(32,4,16, 0)/(s+a))
+        for (p = vec3(u * d, d+t*4.),
+             p.xy *= mat2(cos(.1*t+p.z*.1+vec4(0,33,11,0))),
+             s = 1.+sin(1.+p.y+p.x),
+             n = 8.; n < 32.; n += n )
+                 a = abs(dot(cos(p*n*s*s*d*2.), sin(p))) / n,
+                 s -= a;
+                 
+    o = tanh(mix(o, o.yzxw, i=length(u))/2e5/i);
+}
+

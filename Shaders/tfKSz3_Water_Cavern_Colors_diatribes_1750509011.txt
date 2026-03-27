@@ -1,0 +1,100 @@
+// ID: tfKSz3
+// Name: Water Cavern Colors
+// User: diatribes
+// Date: 1750509011
+
+
+// ===== PASS 0: Image =====
+
+// morning comments with no coffee
+// beware of mistakes and please let me know :)
+
+
+// Golfed noise, we use this twice, so macro it
+#define A(x,r) abs(dot(sin(x*p*n), r +p-p )) / n
+
+void mainImage(out vec4 o, vec2 u) 
+{
+    float r, // river
+          i, // iterator
+          s, // signed distance or surface distance
+          n, // noise iterator 
+          t=iTime,
+          
+          // we're going to offset the initial ray
+          // with some pseudo randomness to hide banding
+          // it's nicer to use the blue noise texture
+          // as a noise source but this saves chars :)
+          // @chronos showed me the texture sample way:
+          // d = .2*texelFetch(iChannel0, ivec2(u)%1024, 0).a;
+          // I saw this one in an @mrange shader:
+          d = 2.*fract(dot(u,sin(u)));
+          
+    // use p temporarily as resolution to scale coords
+    vec3  p = iResolution; 
+    
+    // scale coords
+    u = (u-p.xy/2.)/p.y;
+    
+    // zero out o relying on i being implicitly zero,
+    // don't rely on that in real code
+    for (o*=i;
+         // 70 steps
+         i++<70.;
+         // we want the minimum of s and the river
+         // abs is what makes it translucent
+         // the .01 + and * .5 are best understood by playing with
+         // them. try .001 to .1 for the addition and .1 to 1. for the
+         // multiplication
+         d += s = .01 + abs(min(s,r))*.5,
+         
+         // Originally saw this in an @Xor shader
+         // 1.+ so we don't go negative
+         // cycle through vec4(3,1,0,0) color ratio
+         // using p.z as sort of the index
+         // try other tings like:
+         // (1.+cos(.2*t+vec4(1,2,3,4)))
+         // the last vec4 number does nothing on ST (alpha) is my understanding
+         // / s, dividing by distance is what actually gives us something to look at :)
+         o += (1.+cos(.1*p.z+vec4(3,1,0,0))) / s)
+        // Ok, we're in the body of the first for-loop now
+        // p = vec3(u * d, d + t*4.)
+        // this is shorthand for: p = ro + rd * d, p.z += t * 4
+        // which means take a step in the direction of the ray,
+        // then move forward by 4x time
+        for(p = vec3(u * d, d + t*4.),
+            
+            // this is our river!
+            // it's just a plane!
+            // seriously, delete everything after the 4.5+p.y and it'll
+            // still look like a river.
+            // the extra sine waves are just there to make some waves
+            // in the river, just to add something...
+            r = 4.5+p.y+sin(1.5*t+p.z*.25)*.3+sin(2.*t+p.z*.33)*.2,
+            // the gist on min/max for me is: experiment, experiment, experiment
+            // it appears to be an include vs exclude type of operation
+            // i typically get an idea of wanting to join two things together
+            // or bore one thing through another. max in my mind is sort of
+            // "this thing but not that thing" and min is like "ok maybe both things"
+            // we take the abs of p.y to mirror it, subtract a distance to move
+            // the mirrored parts a bit apart from one another
+            // the 12. - length(p.xy) is our tunnel :D
+            // the - p.yx/4. is there to correct a lean it has due to how
+            // the noise works. take out the "- p.yx/4." to see what i mean
+            s = max(8. - abs(p.y), 12. - length(p.xy - p.yx/4.)),
+            // start noise pretty low
+            n = .2;
+            // up to 2.22, found by experimentation and some intution i guess
+            n < 2.22;
+            // grow by close to the square root of two because that's in nature and stuff
+            // at least i think it is...
+            n *= 1.4)
+            // use our noise macro to add some water-like noise to our river
+            // the t+ is what makes it flow :)
+            r += A(4.*t+p.z + 4., .02),
+            // use our noise macro to add some cave like noise to the cave surface
+            s -= A(.65,.35);
+    // tanh is cheap, easy, good tone mapping
+    // we've accumulated a lot of color, tone that down by dividing
+    o = tanh(o / 1e3);
+}

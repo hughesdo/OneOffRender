@@ -1,0 +1,42 @@
+// ID: WfBSRK
+// Name: t3rmgl0w
+// User: diatribes
+// Date: 1742089809
+
+
+// ===== PASS 0: Image =====
+
+#define P(z) vec3(tanh(cos((z) * .31) * .6) * 7., \
+                  tanh(cos((z) * .33) * .5) * 7., (z))
+#define T (sin(iTime*.5)+iTime*2.)
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    float s=.002,d=0.,i,l,w,ws;
+    vec3  r = iResolution,
+          p = P(T),ro = p,
+          Z = normalize( P(T+3.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(p.z*.3)*.3)*(u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+    o -= o;;
+    for(i = 0.; i++ < 100. && s > .001;) {
+        p = ro + D * d;
+        p.xy -= P(p.z).xy;
+        p.y -= 1.5;
+        p.x *= .5;
+        w = .6;
+        ws = .6;
+        for (int j; j++ < 6; p *= l, w *= l )
+            p  = abs(sin(p)) - 1.,
+            l = (1.+ws)/dot(p+.05,p),
+            ws += ws * .2;
+        s = length(p)/w;
+        d += s;
+        o.rgb += sin(p)*.0125+.0175;
+    }
+    o.rgb *= s > .001 || i > 40. ? vec3(0,3,0) : vec3(0,1,0);
+    o.rgb *= exp(-d/1.);
+    o.rgb = pow(o.rgb, vec3(.45));
+}

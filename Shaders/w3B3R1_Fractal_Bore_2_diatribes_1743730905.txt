@@ -1,0 +1,127 @@
+// ID: w3B3R1
+// Name: Fractal Bore 2
+// User: diatribes
+// Date: 1743730905
+
+
+// ===== PASS 0: Image =====
+
+/*
+    Removed noise texture, rescaled, etc...
+    Added an orb :D
+    
+*/
+
+/*
+    Put a tunnel through stuff. I figured this
+    out when trying to put a @pb shader in a tunnel
+    and just thought I'd share.
+
+    Raymarch to a tunnel, square or cylindrical,
+    doesn't matter. Raymarch again starting at the
+    point hit on the tunnel. You now have a tunnel
+    through whatever you marched on the second march.
+    
+    Play with the tunnel size (W, H, and L).
+    If you set L to around 2. to 3., the fractal
+    will not exist directly in front of the camera;
+    it sort of slices away or dissovles.
+
+*/
+
+
+#define W .75
+#define H .75
+#define L 120.
+
+#define T (iTime*1.5)
+#define N normalize
+#define P(z) (vec3(tanh(cos((z) * .25) * .5) * 8., \
+                     tanh(cos((z) * .12) * .65) * 8., (z)))
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+
+// o
+float orb(vec3 p) {
+    float t = T*.5;
+    return length(p - vec3(
+            P(p.z).x+tanh(sin(p.z*.7) * 1.25)*.5,
+            P(p.z).y+sin(sin(p.z*.5)*2.5) *.75,
+            3.5+T+tan(cos(t*.25))*3.));
+}
+
+// distance to tunnel
+float tunnel(vec3 p) {
+    vec3 tun = abs(p - P(p.z));
+    return min(W-tun.x, H-tun.y);
+}
+
+// distance to fractal
+float fractal(vec3 p) {
+    float s,w = 1., l;
+
+    // wiggle wiggle wiggle
+    p.y -= (.1*(sin(p.x+T*.4)+
+                sin(p.z+T*.6)+
+                sin(p.z+T*.85)));
+    p.xy *= .5;
+
+    // translate to some place interesting
+    p.xy += 2.14;
+    
+    // NOTE: no p.xy -= path(p.z).xy,
+    // we're going to go _through_ the fractal,
+    // not stretch the fractal around the path
+    
+    // distance to fractal
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.5/dot(p,p);
+    return length(p)/w; 
+}
+
+void mainImage( out vec4 o, in vec2 u ) {
+    bool orbHit = false;
+    float t,i,n,s=.002,ps,l,w=1.,d=0.;
+    vec3  r = iResolution,
+          e = vec3(.0001,0,0),
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3(rot(sin(T*.1)*3.)*(u-r.xy/2.)/r.y, 1) 
+              * mat3(-X, cross(X, Z), Z);
+    o -= o;
+
+    // raymarch tunnel
+    vec3 tun;
+    float td;
+    for(i = 0.; i++ < L && s > .001;)
+        p = ro + D * d,
+        d += (s = min(tunnel(p), orb(p)-.1))*.5,
+        orbHit = s == orb(p) - .1;
+    td = d;
+    
+    if (orbHit) {
+        o.rgb = vec3(10);
+    } else {
+        // reset, origin now starts at p
+        // i.e., p is on the tunnel (ro = p)
+        ro = p, s=.002,d=0.;
+        for(i = 0.; i++ < 140. && s > .001;)
+            p = ro + D * d,
+            d += s = min(orb(p) - .1, fractal(p)),
+            orbHit = s == orb(p) - .1,
+            o.rgb += sin(p*.5)*.008+.0125; 
+        o.rgb = 2. - o.rgb;
+    }
+    
+    // orb light
+    o.rgb /= pow(orb(p), 1.);
+    
+    // distance fade
+    o.rgb *= exp(-(td+d)/12.);
+    
+    // gamma correction
+    o.rgb = pow(o.rgb, vec3(.45));
+}
+

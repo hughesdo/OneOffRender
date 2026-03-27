@@ -1,0 +1,48 @@
+// ID: tXBXzG
+// Name: Mengerland
+// User: diatribes
+// Date: 1746234113
+
+
+// ===== PASS 0: Image =====
+
+#define T ((sin(iTime*.25)+iTime*.25)) * 2.
+#define rot(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// @Shane's Menger function hacked up
+#define MENGERLAYER(scale, minmax, hole)\
+    s /= (scale), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	d = minmax(d, min(max(p.x, p.y), \
+                  min(max(p.y, p.z), \
+                  max(p.x, p.z))) - s/(hole))
+float map(in vec3 q){
+    float d, s = 16.;
+    
+    vec3 p = q;
+    p.x-=1.5;
+    float l, w = 1.;
+    for (int i; i++ < 8; p *= l, w *= l )
+        p  = abs(sin(p)) - 1.,
+        l = 1.7/dot(p,p);
+        
+    d = length(p)/w;
+    MENGERLAYER(8.,max, 3.);
+    MENGERLAYER(8., max, 4.5);
+    MENGERLAYER(16., max, 4.5);
+    return d;
+}
+
+void mainImage(out vec4 O, vec2 I) {
+    vec3 p;
+    float t = T/8.,i,z,d;
+    for (O *= i; i++ < 90.;)
+        p = z * normalize(vec3(I+sin(t*9.)*I*rot(T)+I*2.,0)-iResolution.xxy),
+        p.z -= 5.*t,
+        p.y -= sin(t*1.5)*4.,
+        p.x += sin(t+p.z)*.3,
+        z += (d = map(p)+(.0002+sin(p.z)*.0002)),
+        O += max(sin(vec4(p*.3,1)), .1) / d;
+    O /= 5e5;
+    O /= (O + 0.155) * 1.019;
+}

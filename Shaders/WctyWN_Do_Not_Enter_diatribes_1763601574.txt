@@ -1,0 +1,28 @@
+// ID: WctyWN
+// Name: Do Not Enter
+// User: diatribes
+// Date: 1763601574
+
+
+// ===== PASS 0: Image =====
+
+#define A(x,r) abs(dot(sin(x*p/n), r +p-p )) * n
+void mainImage(out vec4 o, vec2 u) 
+{
+    float r,i,s,n,t=iTime,
+          d;
+    vec3  q, p = iResolution; 
+    u = (u-p.xy/2.)/p.y;
+    for (o*=i;i++<32.;
+         d += s = min(.002+.5*abs(s),.01+.5*abs(r)),
+         o += vec4(r < s ? 2 : 3,4,5,1)/ s
+           +  vec4(9,2,1,0) / length(u*sin(t*.4)))
+        for(p = vec3(u * d, d),
+            r = 3.+p.y,
+            s = 2. - length(p.xy ),
+            n = .01;n < 3.;n *= 1.4)
+                q = 1.+cos(p),
+                r += A(t-p.z-p.x + .6*t + 4., .027),
+                s += A(.06*p.z +.5,.35);
+    o = tanh(o / 1.5e4);
+}
