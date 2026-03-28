@@ -66,15 +66,8 @@ Output_Video/*
 # Input_Audio/*.wav
 # Input_Audio/*.flac
 
-# Large video files (optional - uncomment if you don't want to track large video files)
-# Input_Video/*.mp4
-# Input_Video/*.mov
-# Input_Video/*.avi
-
-# Large video files (excluded from git to reduce repo size) - COMMENTED OUT TO ALLOW INPUT_VIDEO PUSH
-# Input_Video/*.mp4
-# Input_Video/*.mov
-# Input_Video/*.avi
+# Input video files - excluded from git (too large for GitHub)
+Input_Video/
 
 # FFmpeg temporary files
 *.ffmpeg_temp*
