@@ -61,10 +61,11 @@ Output_Video/*
 # But keep the folder itself
 !Output_Video/.gitkeep
 
-# Large audio files (optional - uncomment if you don't want to track large audio files)
-# Input_Audio/*.mp3
-# Input_Audio/*.wav
-# Input_Audio/*.flac
+# Audio input files - local only
+Input_Audio/
+
+# Project files - local only
+Projects/
 
 # Input video files - excluded from git (too large for GitHub)
 Input_Video/
@@ -79,3 +80,13 @@ Input_Video/
 Junk/
 Notes/
 ffmpeg/
+
+# Local scripts and binaries
+cloud.bat
+ssh_wrapper.bat
+render_batch.bat
+cloudflared.exe
+gotta shit.bat
+
+# Temp files
+temp_render_manifest.json

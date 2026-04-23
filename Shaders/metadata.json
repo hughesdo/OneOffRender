@@ -1,11 +1,101 @@
 [
   {
+    "name": "Audio Planet.glsl",
+    "preview_image": "Audio Planet.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Raymarched alien planet with procedural oceans, land, clouds, and starfield. Audio reactivity: snd drives planet rotation speed and geometry pulse, snare triggers planet color inversion flash. Camera auto-orbits when no mouse input.",
+    "audio_reactive": true
+  },
+  {
+    "name": "00 - kishimisu Bass-reactive remix.GLSL",
+    "preview_image": "00 - kishimisu Bass-reactive remix.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive interference pattern by kishimisu. Bass drives XY rotation speed, glow brightness, and subtle geometry pulse. Fractal self-similar structure with tanh tone mapping.",
+    "audio_reactive": true
+  },
+  {
+    "name": "A8 - Kimi test 2.glsl",
+    "preview_image": "A8 - Kimi test 2.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Liquid chrome soft-body worm with crystal snakes and ice trees. Audio reactivity on color palette shift (bass), iridescence intensity (mids), and surface ripple turbulence (highs). Geometry untouched.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Candy Star Reactive Zoom Bloom.glsl",
+    "preview_image": "Candy Star Reactive Zoom Bloom.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive candy star zoom bloom. Bass drives zoom depth and glow, treble controls rotation speed and bloom falloff. Layered star patterns with psychedelic color mixing.",
+    "audio_reactive": true
+  },
+  {
+    "name": "fragcord-ggc25z3w.glsl",
+    "preview_image": "fragcord-ggc25z3w.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Layered disc glow with golden-ratio rotated particle layers. Audio reactivity: bass pumps glow intensity, mids shift the red-blue color gradient, highs sharpen ridge detail. Elegant ring structure.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fusion Reactor OldEclipse.glsl",
+    "preview_image": "Fusion Reactor OldEclipse.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Hyperboloid fusion reactor with Menger-sponge carving. Audio reactivity: bass speeds layer rotation and pumps volumetric glow, mids shift color phase, highs affect carving depth. Compact code-golf style.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Futureshock Seek and Destroy Diatribes.glsl",
+    "preview_image": "Futureshock Seek and Destroy Diatribes.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "High-speed fractal tunnel fly-through with Menger-box carving. Audio reactivity: bass speeds camera, pumps volumetric glow, and triggers camera shake; mids flash light accumulation. Cinematic widescreen.",
+    "audio_reactive": true
+  },
+  {
+    "name": "kishimisu-Dtj3zW.glsl",
+    "preview_image": "kishimisu-Dtj3zW.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Audio-reactive city bar visualization by kishimisu. Frequency bins map to bar heights per cell, volume controls camera distance and color intensity. Pink/green/purple palette with logistic amplitude shaping.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Lost in the Infinite OldEclipse.glsl",
+    "preview_image": "Lost in the Infinite OldEclipse.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Infinite repeated sphere lattice with rotating axis. Audio reactivity: bass speeds rotation and pulses sphere radius, mids shift color phase. Volumetric accumulation with tanh tone mapping.",
+    "audio_reactive": true
+  },
+  {
+    "name": "TetraMenger II - audio reactive  ArthurTent.glsl",
+    "preview_image": "TetraMenger II - audio reactive  ArthurTent.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "ArthurTent's audio-reactive TetraMenger fractal. FFT-driven geometry with old-film sepia CRT post-processing, vertical film scratches, and optional audio camera shake. Beautiful monochrome aesthetic.",
+    "audio_reactive": true
+  },
+  {
     "name": "infinite_drift_stars_v2_ar.glsl",
     "preview_image": "infinite_drift_stars_v2_ar.JPG",
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Updated version of Infinite Drift starfield. Smooth diagonal-scrolling multi-layer starfield with parallax depth, magenta→purple→blue→cyan→green palette. Select stars click into bright audio-reactive halos on transients while the rest twinkle gently independent of the music. Subtle nebula background wash and edge vignette.",
+    "description": "Updated version of Infinite Drift starfield. Smooth diagonal-scrolling multi-layer starfield with parallax depth, magenta\u2192purple\u2192blue\u2192cyan\u2192green palette. Select stars click into bright audio-reactive halos on transients while the rest twinkle gently independent of the music. Subtle nebula background wash and edge vignette.",
     "audio_reactive": true
   },
   {
@@ -14,7 +104,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Smoothly scrolling diagonal starfield with 5 depth layers and parallax. Stars are colored across a magenta→purple→blue→cyan→green palette by ID. 20% of stars are designated audio-reactive: each listens to a specific frequency bin and \"clicks\" into a bright glow halo on transients. The remaining 80% twinkle gently independent of audio. Subtle background nebula wash and edge vignette complete the depth.",
+    "description": "Smoothly scrolling diagonal starfield with 5 depth layers and parallax. Stars are colored across a magenta\u2192purple\u2192blue\u2192cyan\u2192green palette by ID. 20% of stars are designated audio-reactive: each listens to a specific frequency bin and \"clicks\" into a bright glow halo on transients. The remaining 80% twinkle gently independent of audio. Subtle background nebula wash and edge vignette complete the depth.",
     "audio_reactive": true
   },
   {
@@ -23,7 +113,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Continuous fibrous plasma stream that maps the live frequency spectrum to color bands across its cross-section — magenta (sub-bass) through purple, blue, cyan, to green (highs). Domain-warped directional FBM noise creates organic striation and turbulence. Each color band's brightness is driven by its actual audio energy. Includes a hot white-magenta core pulse on bass hits, filament edge highlights, and a soft bloom haze.",
+    "description": "Continuous fibrous plasma stream that maps the live frequency spectrum to color bands across its cross-section \u2014 magenta (sub-bass) through purple, blue, cyan, to green (highs). Domain-warped directional FBM noise creates organic striation and turbulence. Each color band's brightness is driven by its actual audio energy. Includes a hot white-magenta core pulse on bass hits, filament edge highlights, and a soft bloom haze.",
     "audio_reactive": true
   },
   {
@@ -32,7 +122,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Sawtooth-colored particle stream — audio-reactive 3D plasma flow. 8 depth layers of particles stream along a tilted axis with curl-noise turbulence. The saw-wave color palette cycles magenta→purple→blue→cyan→green with sharp resets. Bass drives glow intensity, particle size, stream spread, and flow speed. White-hot core hotness near the stream center. Orbiting camera with slow drift.",
+    "description": "Sawtooth-colored particle stream \u2014 audio-reactive 3D plasma flow. 8 depth layers of particles stream along a tilted axis with curl-noise turbulence. The saw-wave color palette cycles magenta\u2192purple\u2192blue\u2192cyan\u2192green with sharp resets. Bass drives glow intensity, particle size, stream spread, and flow speed. White-hot core hotness near the stream center. Orbiting camera with slow drift.",
     "audio_reactive": true
   },
   {
@@ -3473,5 +3563,59 @@
     "texture": null,
     "description": "cdak port V3 \u2014 identical to V1 except the camera x/y wobble is smoothly damped to near-zero by t=80s, keeping the camera looking forward for the full render. Same Sobel edge lines, same tone curve, same geometry.",
     "audio_reactive": false
+  },
+  {
+    "name": "Audio Reactive Liquid Blobs.glsl",
+    "preview_image": "Audio Reactive Liquid Blobs.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Metaball liquid-blob system with smooth SDF merging. Bass pulses the central blob and orbit radii, mids expand the outer ring, treble sharpens blob edges. Deep blue-black palette with Fresnel rim lighting and subsurface glow.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fiber Bundle.glsl",
+    "preview_image": "Fiber Bundle.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Rotating cylindrical fiber bundle by FabriceNeyret2. Layered noise inside cylinders with repeating xz grid. Subtle audio reactivity: highs shift the color hue phase, bass lifts overall glow luminance via tone mapping.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fractal Cartoon - former DE edge detection by Kali.glsl",
+    "preview_image": "Fractal Cartoon - former DE edge detection by Kali.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Kali's Amazing Surface fractal with cartoon edge detection. Full Clubber-style audio reactivity via iChannel0: bass speeds up camera flythrough, drives wave amplitude and tunnel repetition offset; mids modulate fold parameters; highs control sun size; treble drives sun ray length and spin.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Hard-Wired.glsl",
+    "preview_image": "Hard-Wired.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "OldEclipse volumetric raymarcher with spherical inversion and voxel quantization. Compact code-golf style, chromatic tunnel accumulation. Subtle audio reactivity: highs shift color hue phase, bass lifts glow via tone mapping divisor.",
+    "audio_reactive": true
+  },
+  {
+    "name": "happy end of the world.glsl",
+    "preview_image": "happy end of the world.JPG",
+    "stars": 4,
+    "buffer": null,
+    "texture": null,
+    "description": "Code-golf star-density raymarcher with rotating xy coordinates and periodic repetition. Dense layered star field with warm-to-cool color sweep. Subtle audio reactivity: bass warms the palette hue, highs push overall brightness via tone mapping.",
+    "audio_reactive": true
+  },
+  {
+    "name": "Fractal Cartoon - former DE edge detection by Kali V2.glsl",
+    "preview_image": "Fractal Cartoon - former DE edge detection by Kali V2.JPG",
+    "stars": 5,
+    "buffer": null,
+    "texture": null,
+    "description": "Kali's Amazing Surface fractal with cartoon edge detection, V2 smoother audio. Multi-bin band averaging + pow compression replaces single-bin FFT; additive time offset (not multiplicative) eliminates runaway jerk. Camera breathes with full-spectrum energy, fractal folds and sun geometry respond subtly to each band.",
+    "audio_reactive": true
   }
 ]
