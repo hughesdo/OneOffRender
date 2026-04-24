@@ -95,7 +95,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Updated version of Infinite Drift starfield. Smooth diagonal-scrolling multi-layer starfield with parallax depth, magenta\u2192purple\u2192blue\u2192cyan\u2192green palette. Select stars click into bright audio-reactive halos on transients while the rest twinkle gently independent of the music. Subtle nebula background wash and edge vignette.",
+    "description": "Updated version of Infinite Drift starfield. Smooth diagonal-scrolling multi-layer starfield with parallax depth, magenta→purple→blue→cyan→green palette. Select stars click into bright audio-reactive halos on transients while the rest twinkle gently independent of the music. Subtle nebula background wash and edge vignette.",
     "audio_reactive": true
   },
   {
@@ -104,7 +104,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Smoothly scrolling diagonal starfield with 5 depth layers and parallax. Stars are colored across a magenta\u2192purple\u2192blue\u2192cyan\u2192green palette by ID. 20% of stars are designated audio-reactive: each listens to a specific frequency bin and \"clicks\" into a bright glow halo on transients. The remaining 80% twinkle gently independent of audio. Subtle background nebula wash and edge vignette complete the depth.",
+    "description": "Smoothly scrolling diagonal starfield with 5 depth layers and parallax. Stars are colored across a magenta→purple→blue→cyan→green palette by ID. 20% of stars are designated audio-reactive: each listens to a specific frequency bin and \"clicks\" into a bright glow halo on transients. The remaining 80% twinkle gently independent of audio. Subtle background nebula wash and edge vignette complete the depth.",
     "audio_reactive": true
   },
   {
@@ -113,7 +113,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Continuous fibrous plasma stream that maps the live frequency spectrum to color bands across its cross-section \u2014 magenta (sub-bass) through purple, blue, cyan, to green (highs). Domain-warped directional FBM noise creates organic striation and turbulence. Each color band's brightness is driven by its actual audio energy. Includes a hot white-magenta core pulse on bass hits, filament edge highlights, and a soft bloom haze.",
+    "description": "Continuous fibrous plasma stream that maps the live frequency spectrum to color bands across its cross-section — magenta (sub-bass) through purple, blue, cyan, to green (highs). Domain-warped directional FBM noise creates organic striation and turbulence. Each color band's brightness is driven by its actual audio energy. Includes a hot white-magenta core pulse on bass hits, filament edge highlights, and a soft bloom haze.",
     "audio_reactive": true
   },
   {
@@ -122,7 +122,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Sawtooth-colored particle stream \u2014 audio-reactive 3D plasma flow. 8 depth layers of particles stream along a tilted axis with curl-noise turbulence. The saw-wave color palette cycles magenta\u2192purple\u2192blue\u2192cyan\u2192green with sharp resets. Bass drives glow intensity, particle size, stream spread, and flow speed. White-hot core hotness near the stream center. Orbiting camera with slow drift.",
+    "description": "Sawtooth-colored particle stream — audio-reactive 3D plasma flow. 8 depth layers of particles stream along a tilted axis with curl-noise turbulence. The saw-wave color palette cycles magenta→purple→blue→cyan→green with sharp resets. Bass drives glow intensity, particle size, stream spread, and flow speed. White-hot core hotness near the stream center. Orbiting camera with slow drift.",
     "audio_reactive": true
   },
   {
@@ -149,7 +149,7 @@
     "stars": 4,
     "buffer": "cdak_oneoff_v4.buffer.A.glsl",
     "texture": null,
-    "description": "cdak tunnel port V4 \u00e2\u20ac\u201d introduces audio reactivity for heavy drum beat music alongside the stable camera from V3. Bass punches up the thickness and intensity of the blue/purple edge detection lines, shifts their colors based on mids/highs, and adds a pulsing warm glow.",
+    "description": "cdak tunnel port V4 â€” introduces audio reactivity for heavy drum beat music alongside the stable camera from V3. Bass punches up the thickness and intensity of the blue/purple edge detection lines, shifts their colors based on mids/highs, and adds a pulsing warm glow.",
     "audio_reactive": true
   },
   {
@@ -158,7 +158,7 @@
     "stars": 4,
     "buffer": "cdak_oneoff_v2.buffer.A.glsl",
     "texture": null,
-    "description": "cdak tunnel port V2 \u00e2\u20ac\u201d adds MusicCave-style audio streak glow. During raymarching, FFT energy is sampled at each step based on tunnel depth (frequency bins mapped to Z position), accumulating bright warm streaks wherever the ray grazes a surface. On loud transients the architecture lights up with orange-white fire streaks that follow the geometry edges and fractal lattice detail. All other audio reactivity from V1 retained (bass specular pulse, broadband edge glow). No camera wobble.",
+    "description": "cdak tunnel port V2 â€” adds MusicCave-style audio streak glow. During raymarching, FFT energy is sampled at each step based on tunnel depth (frequency bins mapped to Z position), accumulating bright warm streaks wherever the ray grazes a surface. On loud transients the architecture lights up with orange-white fire streaks that follow the geometry edges and fractal lattice detail. All other audio reactivity from V1 retained (bass specular pulse, broadband edge glow). No camera wobble.",
     "audio_reactive": true
   },
   {
@@ -167,7 +167,7 @@
     "stars": 4,
     "buffer": "cdak_oneoff.buffer.A.glsl",
     "texture": null,
-    "description": "Verbatim GLSL port of cdak 4K intro by Quite & Orange (1st at Chaos Constructions 2010). Two-pass buffer system: Buffer A raymarches the architectural tunnel and fractal lattice geometry; Image pass runs the original Sobel edge detection producing the characteristic bluish-purple edge lines, plus volumetric glow and tone curve grading. Stable version \u2014 no audio wobble on camera.",
+    "description": "Verbatim GLSL port of cdak 4K intro by Quite & Orange (1st at Chaos Constructions 2010). Two-pass buffer system: Buffer A raymarches the architectural tunnel and fractal lattice geometry; Image pass runs the original Sobel edge detection producing the characteristic bluish-purple edge lines, plus volumetric glow and tone curve grading. Stable version — no audio wobble on camera.",
     "audio_reactive": true
   },
   {
@@ -194,7 +194,7 @@
     "stars": 4,
     "buffer": null,
     "texture": null,
-    "description": "Plasma Wreath \u00e2\u20ac\u201d audio-reactive electric plasma ring with Rive vector feathering. Deep purple and electric blue tendrils with hot orange highlights at peak intensity. Hollow center for compositing. Bass breathes the ring radius and drives turbulence; mids modulate plasma density and flicker.",
+    "description": "Plasma Wreath â€” audio-reactive electric plasma ring with Rive vector feathering. Deep purple and electric blue tendrils with hot orange highlights at peak intensity. Hollow center for compositing. Bass breathes the ring radius and drives turbulence; mids modulate plasma density and flicker.",
     "audio_reactive": true
   },
   {
@@ -1062,7 +1062,7 @@
     "texture": {
       "iChannel1": "sky-night-milky-way-star-a7d722848f56c2013568902945ea7c1b.jpg"
     },
-    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4lBSRm. \u00c3\u0192\u00c6\u2019\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00c2\u00a2\u00c3\u00a2\u00e2\u201a\u00ac\u00c5\u00be\u00c3\u201a\u00c2\u00a2\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00ab Low Frequency Flow. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
+    "description": "Original author: patu. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/4lBSRm. ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢Ãƒâ€šÃ‚Â« Low Frequency Flow. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License",
     "audio_reactive": true
   },
   {
@@ -1181,7 +1181,7 @@
     "stars": 0,
     "buffer": null,
     "texture": "pexels_videos_3931(1080p).mp4",
-    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u2020\u00e2\u20ac\u2122\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
     "audio_reactive": true
   },
   {
@@ -1190,7 +1190,7 @@
     "stars": 0,
     "buffer": null,
     "texture": "pexels_videos_3931(1080p).mp4",
-    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. \u00c3\u0192\u00c6\u2019\u00c3\u2020\u00e2\u20ac\u2122\u00c3\u0192\u00e2\u20ac\u0161\u00c3\u201a\u00c2\u00a9chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
+    "description": "Original author: sukupaper. Modified by ArthurTent for ShaderAmp project. URL: https://www.shadertoy.com/view/7lBXRG. ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©chappatoire. License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License Video: pexels_videos_3931(1080p).mp4",
     "audio_reactive": true
   },
   {
@@ -3561,7 +3561,7 @@
     "stars": 4,
     "buffer": "cdak_oneoff_v3.buffer.A.glsl",
     "texture": null,
-    "description": "cdak port V3 \u2014 identical to V1 except the camera x/y wobble is smoothly damped to near-zero by t=80s, keeping the camera looking forward for the full render. Same Sobel edge lines, same tone curve, same geometry.",
+    "description": "cdak port V3 — identical to V1 except the camera x/y wobble is smoothly damped to near-zero by t=80s, keeping the camera looking forward for the full render. Same Sobel edge lines, same tone curve, same geometry.",
     "audio_reactive": false
   },
   {
@@ -3617,5 +3617,536 @@
     "texture": null,
     "description": "Kali's Amazing Surface fractal with cartoon edge detection, V2 smoother audio. Multi-bin band averaging + pow compression replaces single-bin FFT; additive time offset (not multiplicative) eliminates runaway jerk. Camera breathes with full-spectrum energy, fractal folds and sun geometry respond subtly to each band.",
     "audio_reactive": true
+  },
+  {
+    "name": "02b-xt95_Fixed.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "3cBSDt_AbstractInterference2.glsl",
+    "preview_image": "3cBSDt_AbstractInterference2.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "3cBXDD_ThursdayTurboTunnel.glsl",
+    "preview_image": "3cBXDD_ThursdayTurboTunnel.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "3cBXRK_SketchTrain.glsl",
+    "preview_image": "3cBXRK_SketchTrain.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "3cXyDH_Disoriented.glsl",
+    "preview_image": "3cXyDH_Disoriented.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "3X3SRS_ApolloLightFlight.glsl",
+    "preview_image": "3X3SRS_ApolloLightFlight.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "AudioVisualizerNumber5-Wipeout.glsl",
+    "preview_image": "AudioVisualizerNumber5-Wipeout.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "cosmos in crystal.GLSL",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Dancing Glow Lights.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Eagle.common.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "FieldFx 2025-07-28.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "fractal in lense.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "fractEla.glsl",
+    "preview_image": "fractEla.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "frequencyballs.glsl",
+    "preview_image": "frequencyballs.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "FrequencyVisualization.glsl",
+    "preview_image": "FrequencyVisualization.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "fru-isco.glsl",
+    "preview_image": "fru-isco.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Galaxy of Universes.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "ltt.glsl",
+    "preview_image": "ltt.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MatrixClock.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MatrixRainShader.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MeRed2_color_reactive.glsl",
+    "preview_image": "MeRed2_color_reactive.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MerryChristmasKishimisu.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MindFlowers.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "ModifiedBear.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MoreCubesForTheCubeLovers.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Moving without travelling.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MusicalHeart.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MusicAndMandlebrot.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "MöbiusMusicVisualization.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "NeonBridge.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "NeonFlowerQuilt.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "NeonOctagonalAudioVisualizer.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "neural_image_shader - original.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "new_colorful_galaxy.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "NyanCat.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Otherworldy.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "PAEz_Jaes magical gem - Light.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Pixellerman.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "PlasmaGlobe.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "PopShift.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "portals way.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "PsychedelicEye.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "QuiteSaturdayAfternoon.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "RadarMusicVisualizer.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Rainbow Prism Dance.glsl",
+    "preview_image": "Rainbow Prism Dance.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "RainbowSoundviz.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "ReadyPlayerOne.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Recogniser.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "SailingBeyond-HyperTunnel.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "SESH_maybe.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "SoundOscilloscopeFromSpectrum.glsl",
+    "preview_image": "SoundOscilloscopeFromSpectrum.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "spectrum_TEST.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "symbolism.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Truchet0.glsl",
+    "preview_image": "Truchet0.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "twistedthingy.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Unicorn Torus (FieldFX).glsl",
+    "preview_image": "Unicorn Torus (FieldFX).JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Volumetric Glow.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Waveform3d.glsl",
+    "preview_image": "Waveform3d.JPG",
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
+  },
+  {
+    "name": "Waveform_fixed-but-upside_down_the fix is in this not app.glsl",
+    "preview_image": null,
+    "stars": null,
+    "buffer": null,
+    "texture": null,
+    "description": null,
+    "audio_reactive": null
   }
 ]
